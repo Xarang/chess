@@ -10,7 +10,7 @@ namespace board
      * on the board */
     enum class File
     {
-        A,
+        A = 0,
         B,
         C,
         D,
