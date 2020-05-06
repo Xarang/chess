@@ -39,6 +39,7 @@ namespace board
     class Position final
     {
     public:
+        Position() : file_(File::A), rank_(Rank::ONE) {};
         Position(File file, Rank rank);
 
         File file_get() const;

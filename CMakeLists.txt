@@ -5,8 +5,8 @@ set(OPT_FLAGS)
 # END OPTIMIZATION FLAGS
 # SOURCES : FIXME
 
-set(SRC_ENGINE)
-include_directories()
+set(SRC_ENGINE src/chessengine/)
+include_directories(src/chessengine)
 
 # END SOURCES
 
