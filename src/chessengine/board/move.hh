@@ -8,12 +8,13 @@ namespace board
     struct Move {
         //the type of the piece moved
         PieceType piece_;
+        //ths position from which the piece moves
+        Position start_position_;
         //the position where the piece is moved
         Position end_position_;
-        //ths position from which the piece moves (used in case of ambiguities)
-        std::optional<Position> start_position_;
+
         //a pawn is getting promotted to a new piecetype
-        std::optional<PieceType> promotion_;
+        opt_piecetype_t promotion_;
 
         //the move is a capture
         bool is_capture_;
@@ -37,5 +38,11 @@ namespace board
         bool is_en_passant_;
 
         Move(PgnMove pgnmove); //TODO: code this in move.cc
+
+        private:
+        void setDoublePawnPush();
+        void setKingCastling();
+        void setQueenCastling();
+        void setEnPassant();
     };
 }
