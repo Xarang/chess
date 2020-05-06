@@ -1,8 +1,11 @@
 #pragma once
 
-#include "position.hh"
+#include <list>
+
 #include "color.hh"
+#include "move.hh"
 #include "piece-type.hh"
+#include "position.hh"
 
 
 namespace board
@@ -15,7 +18,8 @@ namespace board
         Piece(Position newPos, Color newColor, PieceType newPieceType) 
         : position_(newPos), color_(newColor), type_(newPieceType)
         {}
+
+        std::list<struct Move> getAllPotentialMoves();
     };
     
-
 }

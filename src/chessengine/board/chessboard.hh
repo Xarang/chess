@@ -40,11 +40,15 @@ namespace board {
     };
 
 
-    struct ListBasedChessboard : public Chessboard {
+    struct ChessboardImpl : public Chessboard {
+
+        boost::numeric::ublas::matrix<std::optional<Piece>> board_;
         std::vector<Piece> pieces_;
 
+        //todo: add some attribute to hold the informations for the '3 move' rule
+
         public:
-        ListBasedChessboard() {
+        ChessboardImpl() : board_(8,8) {
             //White Pawns
             pieces_.push_back(Piece(Position(File::A, Rank::TWO), Color::WHITE, PieceType::PAWN));
             pieces_.push_back(Piece(Position(File::B, Rank::TWO), Color::WHITE, PieceType::PAWN));
@@ -81,6 +85,12 @@ namespace board {
             pieces_.push_back(Piece(Position(File::F, Rank::EIGHT), Color::BLACK, PieceType::BISHOP));
             pieces_.push_back(Piece(Position(File::G, Rank::EIGHT), Color::BLACK, PieceType::KNIGHT));
             pieces_.push_back(Piece(Position(File::H, Rank::EIGHT), Color::BLACK, PieceType::ROOK));
+
+            //fill the initial matrix
+            for (Piece piece : pieces_) {
+                board_((int)piece.position_.file_get(), (int)piece.position_.rank_get()) = piece;
+                //todo: ^ make sure cast to int works, and file and rank are in good order
+            }
         }
 
         void do_move(Move);
@@ -91,25 +101,6 @@ namespace board {
         std::optional<Piece> operator[](Position p);
         std::string to_string();
     };
-
-    struct MatrixBasedChessboard : public Chessboard {
-        boost::numeric::ublas::matrix<std::optional<Piece>> board_;
-
-        public:
-        MatrixBasedChessboard() : board_(8,8) {
-            //fill the initial matrix
-           throw "not implemented";
-        }
-
-        void do_move(struct Move);
-        bool is_move_legal(struct Move);
-        bool is_check();
-        bool is_checkmate();
-        bool is_draw();
-        std::optional<Piece> operator[](Position p);
-        std::string to_string();
-    };
-
 
 
 }
