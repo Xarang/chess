@@ -26,4 +26,7 @@ namespace board {
         throw "not implemented";
     }
 
+    std::string MatrixBasedChessboard::to_string() {
+        throw "not implemented";
+    }
 }

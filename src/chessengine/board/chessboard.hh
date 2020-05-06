@@ -1,5 +1,8 @@
 #pragma once
+
+#include <boost/numeric/ublas/matrix.hpp>
 #include <vector>
+
 
 #include "color.hh"
 
@@ -33,6 +36,7 @@ namespace board {
             virtual bool is_checkmate() = 0;
             virtual bool is_draw() = 0;
             virtual std::optional<Piece> operator[](Position p) = 0;
+            std::string to_string();
     };
 
 
@@ -85,13 +89,15 @@ namespace board {
         bool is_checkmate();
         bool is_draw();
         std::optional<Piece> operator[](Position p);
+        std::string to_string();
     };
 
     struct MatrixBasedChessboard : public Chessboard {
-        //TODO: implement this when we need another board impl
+        boost::numeric::ublas::matrix<std::optional<Piece>> board_;
 
         public:
-        MatrixBasedChessboard() {
+        MatrixBasedChessboard() : board_(8,8) {
+            //fill the initial matrix
            throw "not implemented";
         }
 
@@ -101,6 +107,7 @@ namespace board {
         bool is_checkmate();
         bool is_draw();
         std::optional<Piece> operator[](Position p);
+        std::string to_string();
     };
 
 

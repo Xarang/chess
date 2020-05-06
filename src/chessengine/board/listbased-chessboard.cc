@@ -26,5 +26,9 @@ namespace board {
         throw "not implemented";
     }
 
+    std::string ListBasedChessboard::to_string() {
+        throw "not implemented";
+    }
+
 }
 
