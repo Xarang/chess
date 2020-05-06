@@ -1,7 +1,7 @@
 #pragma once
 
 #include "chessboard.hh"
-#include "pgn/pgn-move.hh"
+#include "../pgn/pgn-move.hh"
 
 namespace board
 {

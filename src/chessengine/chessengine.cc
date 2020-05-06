@@ -1,19 +1,18 @@
 #include <iostream>
 
-#include "chessboard.hh"
-#include "pgn/pgn-move.hh"
-#include "pgn/pgn-parser.hh"
+#include "board/chessboard.hh"
+#include "../pgn/pgn-move.hh"
+#include "../pgn/pgn-parser.hh"
 
 
-namespace board 
+namespace chessengine
 {
     void runPgnFile(std::string& filename) {
-
         try {
-            std::vector<PgnMove> moves = pgn_parser::parse_pgn(filename);
-            auto chessboard = ListBasedChessboard();
-            for (PgnMove m : moves) {
-                auto move = Move(m);
+            std::vector<board::PgnMove> moves = pgn_parser::parse_pgn(filename);
+            auto chessboard = board::ListBasedChessboard();
+            for (board::PgnMove m : moves) {
+                auto move = board::Move(m);
                 if (chessboard.is_move_legal(move)) {
                     chessboard.do_move(move);
                 }

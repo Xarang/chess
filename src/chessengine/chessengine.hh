@@ -1,5 +1,8 @@
 #pragma once
 
-#include "chessengine/board/chessboard.hh"
+#include <string>
 
-void runPgnFile(std::string& filename);
+namespace chessengine
+{
+    void runPgnFile(std::string& filename);
+}

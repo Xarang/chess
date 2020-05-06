@@ -9,7 +9,7 @@ int main(int argc, const char *argv[]) {
     }
     std::string pgnfilename = argv[1];
     try {
-        runPgnFile(pgnfilename);
+        chessengine::runPgnFile(pgnfilename);
     }
     catch (std::exception &e) {
         std::cerr << e.what() << "\n";

@@ -3,12 +3,6 @@
 set(OPT_FLAGS)
 
 # END OPTIMIZATION FLAGS
-# SOURCES : FIXME
-
-set(SRC_ENGINE src/chessengine/)
-include_directories(src/chessengine)
-
-# END SOURCES
 
 
 # SETUP
@@ -32,7 +26,19 @@ set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost REQUIRED COMPONENTS system program_options)
 set(LIBRARIES Boost::system Boost::program_options ${CMAKE_DL_LIBS})
 
+
+# SOURCES : FIXME
+
+set(SRC_ENGINE_DIRECTORY src/chessengine)
+set(CHESSENGINE_LIBRARY CHESSENGINE)
+
+include_directories(${SRC_ENGINE_DIRECTORY})
+add_subdirectory(${SRC_ENGINE_DIRECTORY})
+
+# END SOURCES
+
 # CHESSENGINE
-add_executable(chessengine)
-target_sources(chessengine PRIVATE ${SRC_ENGINE})
+add_executable(chessengine
+    src/main.cc)
 target_link_libraries(chessengine PRIVATE ${LIBRARIES} -static)
+target_link_libraries(chessengine PRIVATE ${CHESSENGINE_LIBRARY})

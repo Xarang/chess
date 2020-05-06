@@ -27,8 +27,8 @@ namespace board {
 
                 };
             
-            virtual void do_move(Move) = 0;
-            virtual bool is_move_legal(Move) = 0;
+            virtual void do_move(struct Move) = 0;
+            virtual bool is_move_legal(struct Move) = 0;
             virtual bool is_check() = 0;
             virtual bool is_checkmate() = 0;
             virtual bool is_draw() = 0;
@@ -95,8 +95,8 @@ namespace board {
            throw "not implemented";
         }
 
-        void do_move(Move);
-        bool is_move_legal(Move);
+        void do_move(struct Move);
+        bool is_move_legal(struct Move);
         bool is_check();
         bool is_checkmate();
         bool is_draw();

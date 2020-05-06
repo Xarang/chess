@@ -2,11 +2,11 @@
 
 namespace board {
 
-    void MatrixBasedChessboard::do_move(Move m) {
+    void MatrixBasedChessboard::do_move(Move) {
         throw "not implemented";
     }
 
-    bool MatrixBasedChessboard::is_move_legal(Move m) {
+    bool MatrixBasedChessboard::is_move_legal(Move) {
         throw "not implemented";
     }
 
@@ -22,7 +22,7 @@ namespace board {
         throw "not implemented";
     }
 
-    std::optional<Piece> MatrixBasedChessboard::operator[](Position p) {
+    std::optional<Piece> MatrixBasedChessboard::operator[](Position) {
         throw "not implemented";
     }
 
