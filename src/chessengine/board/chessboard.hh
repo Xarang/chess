@@ -32,7 +32,7 @@ namespace board {
             virtual bool is_check() = 0;
             virtual bool is_checkmate() = 0;
             virtual bool is_draw() = 0;
-            virtual Piece operator[](Position p) = 0;
+            virtual std::optional<Piece> operator[](Position p) = 0;
     };
 
 
@@ -84,7 +84,7 @@ namespace board {
         bool is_check();
         bool is_checkmate();
         bool is_draw();
-        Piece operator[](Position p);
+        std::optional<Piece> operator[](Position p);
     };
 
     struct MatrixBasedChessboard : public Chessboard {
@@ -100,7 +100,7 @@ namespace board {
         bool is_check();
         bool is_checkmate();
         bool is_draw();
-        Piece operator[](Position p);
+        std::optional<Piece> operator[](Position p);
     };
 
 

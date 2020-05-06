@@ -22,7 +22,7 @@ namespace board {
         throw "not implemented";
     }
 
-    Piece MatrixBasedChessboard::operator[](Position p) {
+    std::optional<Piece> MatrixBasedChessboard::operator[](Position p) {
         throw "not implemented";
     }
 

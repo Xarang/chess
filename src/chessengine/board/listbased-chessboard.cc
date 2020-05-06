@@ -22,7 +22,7 @@ namespace board {
         throw "not implemented";
     }
 
-    Piece ListBasedChessboard::operator[](Position p) {
+    std::optional<Piece> ListBasedChessboard::operator[](Position p) {
         throw "not implemented";
     }
 
