@@ -130,14 +130,82 @@ namespace board {
             return rook_moves;
         }
 
-        static std::list<Move> Queen(Piece&) {
-            return std::list<Move>();
+        static std::list<Move> Queen(Piece& p) {
+            std::list<Move> queen_moves;
+
+            File org_file = p.position_.file_get();
+            Rank org_rank = p.position_.rank_get();
+            File curr_file = org_file;
+            Rank curr_rank = org_rank;
+
+            std::pair<int, int> pairs[8] = {
+                std::make_pair(1, 1),
+                std::make_pair(-1, -1),
+                std::make_pair(1, -1),
+                std::make_pair(-1, 1),
+                std::make_pair(1, 0),
+                std::make_pair(-1, 0),
+                std::make_pair(0, 1),
+                std::make_pair(0, -1)
+            };
+
+            for (int i = 0; i < 8; i++)
+            {
+                std::pair<int, int> pair = pairs[i];
+                int add_file = pair.first;
+                int add_rank = pair.second;
+
+                while (true)
+                {
+                    curr_file = curr_file + add_file;
+                    curr_rank = curr_rank + add_rank;
+                    int check_file = static_cast<int>(curr_file);
+                    int check_rank = static_cast<int>(curr_file);
+                    if (check_file == -1 || check_rank == -1)
+                    {
+                        break;
+                    }
+                    queen_moves.push_back(MoveBuilder::BasicMove(p, Position(curr_file, curr_rank)));
+                    queen_moves.push_back(MoveBuilder::BasicCapture(p, Position(curr_file, curr_rank)));
+                }
+            }
+
+            return queen_moves;
         }
 
         static std::list<Move> King(Piece& p)   {
-            if (!p.has_already_moved_ == false) {
-                //castling
+            std::list<Move> king_moves;
+            if (!p.has_already_moved_) {
+                king_moves.push_back(MoveBuilder::KingCastling(p));
+                king_moves.push_back(MoveBuilder::QueenCastling(p));
             }
+
+            File org_file = p.position_.file_get();
+            Rank org_rank = p.position_.rank_get();
+
+            king_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file - 1, org_rank)));
+            king_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file - 1, org_rank)));
+
+            king_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file - 1, org_rank + 1)));
+            king_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file - 1, org_rank + 1)));
+
+            king_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file - 1, org_rank - 1)));
+            king_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file - 1, org_rank - 1)));
+
+            king_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file, org_rank + 1)));
+            king_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file, org_rank + 1)));
+
+            king_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file, org_rank - 1)));
+            king_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file, org_rank - 1)));
+
+            king_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank)));
+            king_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank)));
+
+            king_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank + 1)));
+            king_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank + 1)));
+
+            king_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank - 1)));
+            king_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank - 1)));
             return std::list<Move>();
         }
     };
