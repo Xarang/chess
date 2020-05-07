@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/caron/Projets/E2022_Chess/src/chessengine/chessengine.hh
+string
+-
+
+/home/caron/Projets/E2022_Chess/src/main.cc
+iostream
+-
+string
+-
+chessengine/chessengine.hh
+/home/caron/Projets/E2022_Chess/src/chessengine/chessengine.hh
+

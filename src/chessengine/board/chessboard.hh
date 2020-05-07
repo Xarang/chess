@@ -100,6 +100,14 @@ namespace board {
         bool is_draw();
         std::optional<Piece> operator[](Position p);
         std::string to_string();
+
+    private:
+        bool is_move_legal_QUEEN(Move);
+        bool is_move_legal_KING(Move);
+        bool is_move_legal_PAWN(Move);
+        bool is_move_legal_BISHOP(Move);
+        bool is_move_legal_ROOK(Move);
+        bool is_move_legal_KNIGHT(Move);
     };
 
 
