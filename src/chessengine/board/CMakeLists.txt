@@ -1,4 +1,5 @@
 add_library(BOARD
-    position.cc
     chessboard-impl.cc
-    move.cc)
+    move.cc
+    piece.cc
+    position.cc)

@@ -10,6 +10,25 @@ namespace board {
         throw "not implemented";
     }
 
+    std::list<Move> ChessboardImpl::generateLegalMoves() {
+        std::list<Move> allMoves;
+
+        //build the list of all "potential" moves, not accounting for OOB and blocked paths
+        for (auto piece : pieces_) {
+            if ((bool)piece.color_ != is_white_turn_) {
+                std::list<Move> pieceMoves = piece.getAllPotentialMoves();
+                for (auto move : pieceMoves) {
+                    allMoves.push_front(move);
+                }
+            }
+        }
+        
+        //TODO: figure out best way to do this
+        //allMoves.remove_if((Move move) => is_move_legal(move));
+    
+        return allMoves;
+    }
+
     bool ChessboardImpl::is_check() {
         throw "not implemented";
     }

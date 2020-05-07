@@ -2,11 +2,20 @@
 #include <string>
 
 #include "chessengine/chessengine.hh"
+#include "chessengine/board/chessboard.hh"
 
 int main(int argc, const char *argv[]) {
     if (argc != 2) {
+
+        //generator here
+        auto board = board::ChessboardImpl();
+
+
         return 1;
     }
+
+
+    //pgn here
     std::string pgnfilename = argv[1];
     try {
         chessengine::runPgnFile(pgnfilename);
