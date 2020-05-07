@@ -20,8 +20,82 @@ namespace board {
             return moves;
         }
 
-        static std::list<Move> Bishop(Piece&) {
-            return std::list<Move>();
+        static std::list<Move> Bishop(Piece& p) {
+            std::list<Move> bishop_moves;
+            File org_file = p.position_.file_get();
+            Rank org_rank = p.position_.rank_get();
+            File curr_file = org_file;
+            Rank curr_rank = org_rank;
+
+            //Upper-right Diagonal
+            while (true)
+            {
+                curr_file = curr_file + 1;
+                curr_rank = curr_rank + 1;
+                int check_file = static_cast<int>(curr_file);
+                int check_rank = static_cast<int>(curr_file);
+                if (check_file == -1 || check_rank == -1)
+                {
+                    break;
+                }
+                bishop_moves.push_back(MoveBuilder::BasicMove(p, Position(curr_file, curr_rank)));
+                bishop_moves.push_back(MoveBuilder::BasicCapture(p, Position(curr_file, curr_rank)));
+            }
+            curr_file = org_file;
+            curr_rank = org_rank;
+
+            //Lower-left Diagonal
+            while (true)
+            {
+                curr_file = curr_file - 1;
+                curr_rank = curr_rank - 1;
+                int check_file = static_cast<int>(curr_file);
+                int check_rank = static_cast<int>(curr_file);
+                if (check_file == -1 || check_rank == -1)
+                {
+                    break;
+                }
+                bishop_moves.push_back(MoveBuilder::BasicMove(p, Position(curr_file, curr_rank)));
+                bishop_moves.push_back(MoveBuilder::BasicCapture(p, Position(curr_file, curr_rank)));
+            }
+            curr_file = org_file;
+            curr_rank = org_rank;
+
+            //Lower-right Diagonal
+            while (true)
+            {
+                curr_file = curr_file + 1;
+                curr_rank = curr_rank - 1;
+                int check_file = static_cast<int>(curr_file);
+                int check_rank = static_cast<int>(curr_file);
+                if (check_file == -1 || check_rank == -1)
+                {
+                    break;
+                }
+                bishop_moves.push_back(MoveBuilder::BasicMove(p, Position(curr_file, curr_rank)));
+                bishop_moves.push_back(MoveBuilder::BasicCapture(p, Position(curr_file, curr_rank)));
+            }
+            curr_file = org_file;
+            curr_rank = org_rank;
+
+            //Upper-left Diagonal
+            while (true)
+            {
+                curr_file = curr_file - 1;
+                curr_rank = curr_rank + 1;
+                int check_file = static_cast<int>(curr_file);
+                int check_rank = static_cast<int>(curr_file);
+                if (check_file == -1 || check_rank == -1)
+                {
+                    break;
+                }
+                bishop_moves.push_back(MoveBuilder::BasicMove(p, Position(curr_file, curr_rank)));
+                bishop_moves.push_back(MoveBuilder::BasicCapture(p, Position(curr_file, curr_rank)));
+            }
+            curr_file = org_file;
+            curr_rank = org_rank;
+
+            return bishop_moves;
         }
 
         static std::list<Move> Knight(Piece&) {
@@ -43,7 +117,7 @@ namespace board {
             return std::list<Move>();
         }
     };
-   
+
 
 
     std::list<Move> Piece::getAllPotentialMoves() {
