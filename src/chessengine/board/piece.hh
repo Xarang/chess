@@ -14,9 +14,10 @@ namespace board
         Position position_;
         Color color_;
         PieceType type_;
+        bool has_already_moves_;
 
         Piece(Position newPos, Color newColor, PieceType newPieceType) 
-        : position_(newPos), color_(newColor), type_(newPieceType)
+        : position_(newPos), color_(newColor), type_(newPieceType), has_already_moves_(false)
         {}
 
         std::list<struct Move> getAllPotentialMoves();
