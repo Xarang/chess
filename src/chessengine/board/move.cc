@@ -1,5 +1,5 @@
+#include <list>
 #include "move.hh"
-#include "../utype.hh"
 
 namespace board
 {
@@ -22,7 +22,7 @@ namespace board
     if (
             piece_ == PieceType::KING
             && start_position_.file_get() == File::E
-            && end_position_.file_get() == File::H
+            && end_position_.file_get() == File::G
         ) {
             is_king_castling_ = true;
         }
@@ -32,7 +32,7 @@ namespace board
     if (
             piece_ == PieceType::KING
             && start_position_.file_get() == File::E
-            && end_position_.file_get() == File::A
+            && end_position_.file_get() == File::B
         ) {
             is_queen_castling_ = true;
         }
@@ -58,6 +58,10 @@ namespace board
     }
 
 
+
+
+
+
     //take the informations we want from pgnmove and re-reformate them in a handier way.
     Move::Move(PgnMove move)
         :   piece_(move.piece_get()),
@@ -74,5 +78,31 @@ namespace board
         setKingCastling();
         setQueenCastling();
         setEnPassant();
+    }
+
+    std::string Move::to_string() {
+        std::string str = "[MOVE] ";
+        str += piece_to_char(piece_);
+        str += "  ";
+        str += start_position_.to_string() + " -> " + end_position_.to_string();
+        str += "  ";
+        std::list<std::string> tags;
+        if (is_king_castling_) {
+            tags.push_front("king castling");
+        }
+        if (is_queen_castling_) {
+            tags.push_front("queen castling");
+        }
+        if (is_double_pawn_push_) {
+            tags.push_front("double pawn push");
+        }
+        if (is_en_passant_) {
+            tags.push_front("en passant");
+        }
+
+        for (auto tag : tags) {
+            str += " [ " + tag + " ] ";
+        }
+        return str + "\n";
     }
 }
