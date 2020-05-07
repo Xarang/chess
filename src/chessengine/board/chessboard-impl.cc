@@ -5,10 +5,48 @@
 namespace board {
 
     void ChessboardImpl::do_move(Move move) {
-        (*this)[move.end_position_] = (*this)[move.start_position_];
-        (*this)[move.start_position_] = std::nullopt;
-    }
+        int j = 0;
+        Color color;
+        Rank end;
+        if (is_white_turn_) {
+            color = Color::WHITE;
+            end = Rank::EIGHT;
+        }
+        else {
+            color = Color::BLACK;
+            end = Rank::ONE;
+        }
 
+        for (auto ite = pieces_.begin(); ite < pieces_.end(); ite++)
+        {
+            if (ite->position_ == move.end_position_)
+            {
+                pieces_.erase(ite);
+            }
+        }
+
+        for (unsigned  long i = 0; i < pieces_.size(); i++)
+        {
+            if (pieces_[i].position_ == move.start_position_)
+            {
+                pieces_[i].position_ = move.end_position_;
+                pieces_[i].has_already_moved_ = true;
+                j = i;
+                break;
+            }
+        }
+
+        (*this)[move.end_position_] = std::make_optional(pieces_[j]);
+        (*this)[move.start_position_] = std::nullopt;
+
+        if ((*this)[move.end_position_].value().type_ == PieceType::PAWN && move.end_position_.rank_get() == end)
+        {
+            //Progression to queen ?
+            Piece piece(move.end_position_, color, PieceType::QUEEN);
+            (*this)[move.end_position_] = piece;
+        }
+        is_white_turn_ = color == Color::WHITE;
+    }
 
     bool ChessboardImpl::is_move_legal_QUEEN(Move move) {
         if (is_move_legal_BISHOP(move))
