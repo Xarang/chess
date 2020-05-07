@@ -1,6 +1,6 @@
 #pragma once
 
-#include "chessboard.hh"
+#include "position.hh"
 #include "../pgn/pgn-move.hh"
 
 namespace board
@@ -37,7 +37,16 @@ namespace board
         //the move is the special case of "en passant"
         bool is_en_passant_;
 
-        Move(PgnMove pgnmove); //TODO: code this in move.cc
+        Move() : piece_(PieceType::PAWN), start_position_(), end_position_(),
+                promotion_(), is_capture_(false), is_check_(false), is_checkmate_(),
+                is_double_pawn_push_(false), is_king_castling_(false), is_queen_castling_(false), is_en_passant_(false) {
+                    //default, empty constructor
+                }
+
+        Move(PgnMove pgnmove);
+
+
+        std::string to_string();
 
         private:
         void setDoublePawnPush();
