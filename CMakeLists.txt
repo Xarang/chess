@@ -17,7 +17,7 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -pedantic")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -pedantic -g")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${OPT_FLAGS}")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Og -g3 -fsanitize=address")
 
@@ -40,5 +40,4 @@ add_subdirectory(${SRC_ENGINE_DIRECTORY})
 # CHESSENGINE
 add_executable(chessengine
     src/main.cc)
-target_link_libraries(chessengine PRIVATE ${LIBRARIES} -static)
-target_link_libraries(chessengine PRIVATE ${CHESSENGINE_LIBRARY})
+target_link_libraries(chessengine PRIVATE ${LIBRARIES} ${CHESSENGINE_LIBRARY})
