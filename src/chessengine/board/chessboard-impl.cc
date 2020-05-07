@@ -199,6 +199,10 @@ namespace board {
     }
 
     bool ChessboardImpl::is_move_legal(Move move) {
+
+        if (!board_((int)move.start_position_.file_get(), (int)move.start_position_.rank_get()).has_value())
+            return false;
+
         auto piece = board_((int)move.end_position_.file_get(), (int)move.end_position_.rank_get());
         if (piece.has_value())
         {
