@@ -27,79 +27,68 @@ namespace board {
             File curr_file = org_file;
             Rank curr_rank = org_rank;
 
-            //Upper-right Diagonal
-            while (true)
-            {
-                curr_file = curr_file + 1;
-                curr_rank = curr_rank + 1;
-                int check_file = static_cast<int>(curr_file);
-                int check_rank = static_cast<int>(curr_file);
-                if (check_file == -1 || check_rank == -1)
-                {
-                    break;
-                }
-                bishop_moves.push_back(MoveBuilder::BasicMove(p, Position(curr_file, curr_rank)));
-                bishop_moves.push_back(MoveBuilder::BasicCapture(p, Position(curr_file, curr_rank)));
-            }
-            curr_file = org_file;
-            curr_rank = org_rank;
+            std::pair<int, int> pairs[4] = {
+                std::make_pair(1, 1),
+                std::make_pair(-1, -1),
+                std::make_pair(1, -1);
+                std::make_pair(-1, 1)
+            };
 
-            //Lower-left Diagonal
-            while (true)
+            for (int i = 0; i < 4; i++)
             {
-                curr_file = curr_file - 1;
-                curr_rank = curr_rank - 1;
-                int check_file = static_cast<int>(curr_file);
-                int check_rank = static_cast<int>(curr_file);
-                if (check_file == -1 || check_rank == -1)
-                {
-                    break;
-                }
-                bishop_moves.push_back(MoveBuilder::BasicMove(p, Position(curr_file, curr_rank)));
-                bishop_moves.push_back(MoveBuilder::BasicCapture(p, Position(curr_file, curr_rank)));
-            }
-            curr_file = org_file;
-            curr_rank = org_rank;
+                std::pair<int, int> pair = pairs[i];
+                int add_file = pair.first;
+                int add_rank = pair.second;
 
-            //Lower-right Diagonal
-            while (true)
-            {
-                curr_file = curr_file + 1;
-                curr_rank = curr_rank - 1;
-                int check_file = static_cast<int>(curr_file);
-                int check_rank = static_cast<int>(curr_file);
-                if (check_file == -1 || check_rank == -1)
+                while (true)
                 {
-                    break;
+                    curr_file = curr_file + add_file;
+                    curr_rank = curr_rank + add_rank;
+                    int check_file = static_cast<int>(curr_file);
+                    int check_rank = static_cast<int>(curr_file);
+                    if (check_file == -1 || check_rank == -1)
+                    {
+                        break;
+                    }
+                    bishop_moves.push_back(MoveBuilder::BasicMove(p, Position(curr_file, curr_rank)));
+                    bishop_moves.push_back(MoveBuilder::BasicCapture(p, Position(curr_file, curr_rank)));
                 }
-                bishop_moves.push_back(MoveBuilder::BasicMove(p, Position(curr_file, curr_rank)));
-                bishop_moves.push_back(MoveBuilder::BasicCapture(p, Position(curr_file, curr_rank)));
             }
-            curr_file = org_file;
-            curr_rank = org_rank;
-
-            //Upper-left Diagonal
-            while (true)
-            {
-                curr_file = curr_file - 1;
-                curr_rank = curr_rank + 1;
-                int check_file = static_cast<int>(curr_file);
-                int check_rank = static_cast<int>(curr_file);
-                if (check_file == -1 || check_rank == -1)
-                {
-                    break;
-                }
-                bishop_moves.push_back(MoveBuilder::BasicMove(p, Position(curr_file, curr_rank)));
-                bishop_moves.push_back(MoveBuilder::BasicCapture(p, Position(curr_file, curr_rank)));
-            }
-            curr_file = org_file;
-            curr_rank = org_rank;
 
             return bishop_moves;
         }
 
-        static std::list<Move> Knight(Piece&) {
-            return std::list<Move>();
+        static std::list<Move> Knight(Piece& p) {
+            std::list<Move> knight_moves;
+
+            File org_file = p.position_.file_get();
+            Rank org_rank = p.position_.rank_get();
+
+            knigh_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank + 2)));
+            knigh_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank + 2)));
+
+            knigh_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank - 2)));
+            knigh_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank - 2)));
+
+            knigh_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file - 1, org_rank + 2)));
+            knigh_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file - 1, org_rank - 2)));
+
+            knigh_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 2, org_rank + 1)));
+            knigh_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 2, org_rank + 1)));
+
+            knigh_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank + 2)));
+            knigh_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank + 2)));
+
+            knigh_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank + 2)));
+            knigh_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank + 2)));
+
+            knigh_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank + 2)));
+            knigh_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank + 2)));
+
+            knigh_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank + 2)));
+            knigh_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank + 2)));
+
+            return knight_moves;
         }
 
         static std::list<Move> Rook(Piece&) {
