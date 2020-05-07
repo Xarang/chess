@@ -107,11 +107,19 @@ namespace board {
         {
             if (move.start_position_.rank_get() + 1 != move.end_position_.rank_get())
             {
-                 if (move.is_double_pawn_push_ && move.start_position_.rank_get() + 2 == move.end_position_.rank_get()) {
+                 if (move.start_position_.rank_get() == Rank::TWO && move.start_position_.rank_get() + 2 == move.end_position_.rank_get()) {
                      if (board_((int)move.end_position_.file_get(), (int)move.end_position_.rank_get() - 1).has_value())
                          return false;
                      move.is_double_pawn_push_ = false;
                      return true;
+                 }
+                 if (move.is_capture_)
+                 {
+                     if (move.start_position_.rank_get() - 1 == move.end_position_.rank_get() && move.start_position_.file_get() - 1 == move.start_position_.file_get())
+                         return true;
+
+                     if (move.start_position_.rank_get() + 1 == move.end_position_.rank_get() && move.start_position_.file_get() - 1 == move.start_position_.file_get())
+                         return true;
                  }
                  return false;
             }
@@ -120,12 +128,20 @@ namespace board {
         {
             if (move.start_position_.rank_get() - 1 != move.end_position_.rank_get())
             {
-                if (move.is_double_pawn_push_ && move.start_position_.rank_get() - 2 == move.end_position_.rank_get())
+                if (move.start_position_.rank_get() == Rank::SEVEN && move.start_position_.rank_get() - 2 == move.end_position_.rank_get())
                 {
                     if (board_((int)move.end_position_.file_get() - 1, (int)move.end_position_.rank_get()).has_value())
                         return false;
                     move.is_double_pawn_push_ = false;
                     return true;
+                }
+                if (move.is_capture_)
+                {
+                    if (move.start_position_.rank_get() + 1 == move.end_position_.rank_get() && move.start_position_.file_get() - 1 == move.start_position_.file_get())
+                        return true;
+
+                    if (move.start_position_.rank_get() + 1 == move.end_position_.rank_get() && move.start_position_.file_get() + 1 == move.start_position_.file_get())
+                        return true;
                 }
                 return false;
             }
