@@ -4,8 +4,9 @@
 
 namespace board {
 
-    void ChessboardImpl::do_move(Move) {
-        throw "not implemented";
+    void ChessboardImpl::do_move(Move move) {
+        (*this)[move.end_position_] = (*this)[move.start_position_];
+        (*this)[move.start_position_] = std::nullopt;
     }
 
 
@@ -16,9 +17,33 @@ namespace board {
     }
 
     bool ChessboardImpl::is_move_legal_KING(Move move) {
-        if (is_move_legal_BISHOP(move))
+        auto startFile = move.start_position_.file_get();
+        auto startRank = move.start_position_.rank_get();
+        auto endFile = move.end_position_.file_get();
+        auto endRank = move.end_position_.rank_get();
+
+        if (startFile - 1 == endFile && startRank - 1 == endRank)
             return true;
-        return is_move_legal_ROOK(move);
+        if (startFile == endFile && startRank - 1 == endRank)
+            return true;
+        if (startFile + 1 == endFile && startRank - 1 == endRank)
+            return true;
+
+        if (startFile - 1 == endFile && startRank == endRank)
+            return true;
+        if (startFile + 1 == endFile && startRank == endRank)
+            return true;
+
+        if (startFile - 1 == endFile && startRank + 1 == endRank)
+            return true;
+        if (startFile == endFile && startRank + 1 == endRank)
+            return true;
+        if (startFile + 1 == endFile && startRank + 1 == endRank)
+            return true;
+        return false;
+
+        //Need to figure outillegal moves, (cannot put yourself in check)
+
     }
 
     bool ChessboardImpl::is_move_legal_KNIGHT(Move move){
@@ -200,10 +225,10 @@ namespace board {
 
     bool ChessboardImpl::is_move_legal(Move move) {
 
-        if (!board_((int)move.start_position_.file_get(), (int)move.start_position_.rank_get()).has_value())
+        if (!(*this)[move.start_position_].has_value())
             return false;
 
-        auto piece = board_((int)move.end_position_.file_get(), (int)move.end_position_.rank_get());
+        auto piece = (*this)[move.end_position_];
         if (piece.has_value())
         {
             if (piece.value().color_ == Color::WHITE && is_white_turn_)
@@ -241,8 +266,8 @@ namespace board {
         throw "not implemented";
     }
 
-    std::optional<Piece> ChessboardImpl::operator[](Position) {
-        throw "not implemented";
+    std::optional<Piece> ChessboardImpl::operator[](Position pos) {
+        return board_((int)pos.file_get(), (int)pos.rank_get());
     }
 
     std::string ChessboardImpl::to_string() {
