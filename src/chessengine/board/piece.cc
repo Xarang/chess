@@ -91,8 +91,43 @@ namespace board {
             return knight_moves;
         }
 
-        static std::list<Move> Rook(Piece&) {
-            return std::list<Move>();
+        static std::list<Move> Rook(Piece& p) {
+            std::list<Move> rook_moves;
+
+            File org_file = p.position_.file_get();
+            Rank org_rank = p.position_.rank_get();
+            File curr_file = org_file;
+            Rank curr_rank = org_rank;
+
+            std::pair<int, int> pairs[4] = {
+                std::make_pair(1, 0),
+                std::make_pair(-1, 0),
+                std::make_pair(0, 1),
+                std::make_pair(0, -1)
+            };
+
+            for (int i = 0; i < 4; i++)
+            {
+                std::pair<int, int> pair = pairs[i];
+                int add_file = pair.first;
+                int add_rank = pair.second;
+
+                while (true)
+                {
+                    curr_file = curr_file + add_file;
+                    curr_rank = curr_rank + add_rank;
+                    int check_file = static_cast<int>(curr_file);
+                    int check_rank = static_cast<int>(curr_file);
+                    if (check_file == -1 || check_rank == -1)
+                    {
+                        break;
+                    }
+                    rook_moves.push_back(MoveBuilder::BasicMove(p, Position(curr_file, curr_rank)));
+                    rook_moves.push_back(MoveBuilder::BasicCapture(p, Position(curr_file, curr_rank)));
+                }
+            }
+
+            return rook_moves;
         }
 
         static std::list<Move> Queen(Piece&) {
