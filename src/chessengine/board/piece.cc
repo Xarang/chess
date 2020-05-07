@@ -30,7 +30,7 @@ namespace board {
             std::pair<int, int> pairs[4] = {
                 std::make_pair(1, 1),
                 std::make_pair(-1, -1),
-                std::make_pair(1, -1);
+                std::make_pair(1, -1),
                 std::make_pair(-1, 1)
             };
 
@@ -64,29 +64,29 @@ namespace board {
             File org_file = p.position_.file_get();
             Rank org_rank = p.position_.rank_get();
 
-            knigh_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank + 2)));
-            knigh_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank + 2)));
 
-            knigh_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank - 2)));
-            knigh_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank - 2)));
+            knight_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank - 2)));
+            knight_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank - 2)));
 
-            knigh_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file - 1, org_rank + 2)));
-            knigh_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file - 1, org_rank - 2)));
+            knight_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file - 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file - 1, org_rank - 2)));
 
-            knigh_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 2, org_rank + 1)));
-            knigh_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 2, org_rank + 1)));
+            knight_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 2, org_rank + 1)));
+            knight_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 2, org_rank + 1)));
 
-            knigh_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank + 2)));
-            knigh_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank + 2)));
 
-            knigh_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank + 2)));
-            knigh_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank + 2)));
 
-            knigh_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank + 2)));
-            knigh_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank + 2)));
 
-            knigh_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank + 2)));
-            knigh_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank + 2)));
 
             return knight_moves;
         }
