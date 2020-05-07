@@ -36,7 +36,7 @@ namespace board {
             virtual bool is_check() = 0;
             virtual bool is_checkmate() = 0;
             virtual bool is_draw() = 0;
-            virtual std::optional<Piece> operator[](Position p) = 0;
+            virtual std::optional<struct Piece> operator[](Position p) = 0;
             std::string to_string();
             
     };
@@ -44,8 +44,8 @@ namespace board {
 
     struct ChessboardImpl : public Chessboard {
 
-        boost::numeric::ublas::matrix<std::optional<Piece>> board_;
-        std::vector<Piece> pieces_;
+        boost::numeric::ublas::matrix<std::optional<struct Piece>> board_;
+        std::vector<struct Piece> pieces_;
 
         //todo: add some attribute to hold the informations for the '3 move' rule
 

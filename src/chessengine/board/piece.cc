@@ -1,4 +1,5 @@
 #include "piece.hh"
+#include "move-builder.hh"
 
 namespace board {
 
@@ -9,37 +10,37 @@ namespace board {
             int direction = p.color_ == Color::WHITE ? 1 : -1;
             //double pawn advance
             if (!p.has_already_moved_) {
-                moves.push_front(Move::DoublePawnPush(p));
+                moves.push_front(MoveBuilder::DoublePawnPush(p));
             }
             //move forward
-            moves.push_front(Move::BasicMove(p, Position(p.position_.file_get(), p.position_.rank_get() + direction)));
+            moves.push_front(MoveBuilder::BasicMove(p, Position(p.position_.file_get(), p.position_.rank_get() + direction)));
             //capture in diagonals
-            moves.push_front(Move::BasicCapture(p, Position(p.position_.file_get() + 1, p.position_.rank_get() + direction)));
-            moves.push_front(Move::BasicCapture(p, Position(p.position_.file_get() - 1, p.position_.rank_get() + direction)));
+            moves.push_front(MoveBuilder::BasicCapture(p, Position(p.position_.file_get() + 1, p.position_.rank_get() + direction)));
+            moves.push_front(MoveBuilder::BasicCapture(p, Position(p.position_.file_get() - 1, p.position_.rank_get() + direction)));
             return moves;
         }
 
         static std::list<Move> Bishop(Piece&) {
-            throw "not implemented";
+            return std::list<Move>();
         }
 
         static std::list<Move> Knight(Piece&) {
-            throw "not implemented";
+            return std::list<Move>();
         }
 
         static std::list<Move> Rook(Piece&) {
-            throw "not implemented";
+            return std::list<Move>();
         }
 
         static std::list<Move> Queen(Piece&) {
-            throw "not implemented";
+            return std::list<Move>();
         }
 
-        static std::list<Move> King(Piece& p) {
+        static std::list<Move> King(Piece& p)   {
             if (!p.has_already_moved_ == false) {
                 //castling
             }
-            throw "not implemented";
+            return std::list<Move>();
         }
     };
    

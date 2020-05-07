@@ -1,6 +1,6 @@
 #pragma once
 
-#include "chessboard.hh"
+#include "position.hh"
 #include "../pgn/pgn-move.hh"
 
 namespace board
@@ -43,13 +43,10 @@ namespace board
                     //default, empty constructor
                 }
 
-        Move(PgnMove pgnmove); //TODO: code this in move.cc
+        Move(PgnMove pgnmove);
 
-        static Move BasicMove(Piece p, Position target);
-        static Move BasicCapture(Piece p, Position target);
-        static Move DoublePawnPush(Piece p);
-        static Move KingCastling(Piece p);
-        static Move QueenCastling(Piece p);
+
+        std::string to_string();
 
         private:
         void setDoublePawnPush();

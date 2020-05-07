@@ -7,7 +7,7 @@ namespace board {
     }
 
     bool ChessboardImpl::is_move_legal(Move) {
-        throw "not implemented";
+       return true;//just for testing purposes;
     }
 
     std::list<Move> ChessboardImpl::generateLegalMoves() {
@@ -24,7 +24,7 @@ namespace board {
         }
         
         //TODO: figure out best way to do this
-        //allMoves.remove_if((Move move) => is_move_legal(move));
+        allMoves.remove_if([this](Move m){return !this->is_move_legal(m); });
     
         return allMoves;
     }
