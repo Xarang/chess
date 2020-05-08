@@ -46,7 +46,7 @@ namespace board {
             Piece piece(move.end_position_, color, PieceType::QUEEN);
             (*this)[move.end_position_] = piece;
         }
-        is_white_turn_ = color == Color::WHITE;
+        is_white_turn_ = !is_white_turn_;
     }
 
 
