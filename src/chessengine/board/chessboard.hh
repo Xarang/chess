@@ -95,6 +95,9 @@ namespace board {
                 }
         }
 
+        //recreates a chessboard from an ongoing game using a fen string
+        Chessboard(std::string fen_string);
+
         void do_move(Move);
         bool is_move_legal(Move);
         std::list<Move> generateLegalMoves();
@@ -102,7 +105,10 @@ namespace board {
         bool is_checkmate();
         bool is_draw();
         std::optional<Piece>& operator[](Position p);
+
+        //utils
         std::string to_string();
+        Color whose_turn_is_it() { return is_white_turn_ ? Color::WHITE : Color::BLACK; }
 
         friend class MoveLegalityChecker;
 

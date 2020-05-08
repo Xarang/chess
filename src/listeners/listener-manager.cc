@@ -44,11 +44,13 @@ namespace listener {
             std::vector<board::PgnMove> moves = pgn_parser::parse_pgn(filename);
             for (board::PgnMove m : moves) {
                 auto move = board::Move(m);
-                std::cout << move.to_string();
+                //std::cout << move.to_string();
                 try {
                     if (board_.is_move_legal(move)) {
                         try {
                             board_.do_move(move);
+                            register_move(board_.whose_turn_is_it(), move, board_[move.end_position_]);
+                            //TODO: do all the other move registrations
                         }
                         catch (std::exception &e) {
                             throw std::runtime_error("error happened while executing move: " + move.to_string() + " : " + e.what() + "\n");

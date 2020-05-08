@@ -1,4 +1,5 @@
 #include <err.h>
+#include <sstream>
 #include "chessboard.hh"
 #include "piece-type.hh"
 
@@ -124,5 +125,48 @@ namespace board {
 
     std::string Chessboard::to_string() {
         throw "not implemented";
+    }
+
+    Chessboard::Chessboard(std::string fen_string) {
+        auto fen_string_stream = std::istringstream(fen_string);
+        std::vector<std::string> fields;
+        std::string s;
+        while (getline(fen_string_stream, s, ' ')) {
+            fields.push_back(s);
+        }
+
+        //parse the board position
+        auto piece_placement_stream = std::istringstream(fields[0]);
+        std::vector<std::string> ranks;
+        while (getline(piece_placement_stream, s, '/')) {
+            ranks.push_back(s);
+        }
+
+        int rankIndex = 0;
+        for (auto rank : ranks) {
+            int fileIndex = 0;
+            for (auto it = rank.begin(); it != rank.end(); it++) {
+                if (isdigit(*it)) {
+                    fileIndex += std::stoi("" + *it);
+                }
+                else {
+                    pieces_.push_back(Piece(Position((File)fileIndex, (Rank)rankIndex), islower(*it) ? Color::BLACK : Color::WHITE, char_to_piece(toupper(*it))));
+                }
+            }
+            rankIndex++;
+        }
+        for (auto piece : pieces_) {
+            (*this)[piece.position_] = piece;
+        }
+
+        //parse informations regarding the current state of the game
+        is_white_turn_ = fields[1] == "w";
+        did_black_king_castling_ = fields[2].find("k") != fields[2].npos;
+        did_white_king_castling_ = fields[2].find("K") != fields[2].npos;
+        did_black_queen_castling_ = fields[2].find("q") != fields[2].npos;
+        did_white_queen_castling_ = fields[2].find("Q") != fields[2].npos;
+
+        //TODO: add potential en-passant spot
+
     }
 }
