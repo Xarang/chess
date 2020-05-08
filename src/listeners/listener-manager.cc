@@ -13,7 +13,7 @@ namespace listener {
             void *lib = dlopen(listener.c_str(), RTLD_LAZY);
             if (!lib) {
                 std::cerr << "could not open listener lib " << listener << " : " << dlerror();
-                throw new std::runtime_error("could not open listener lib " + listener + " : " + dlerror());
+                throw std::runtime_error("could not open listener lib " + listener + " : " + dlerror());
             }
             std::cout << "[LOAD] loaded listener lib: " << listener << "\n";
             void *listenerFunc = dlsym(lib, "listener_create");

@@ -8,6 +8,7 @@ namespace board {
         int j = 0;
         Color color;
         Rank end;
+
         if (is_white_turn_) {
             color = Color::WHITE;
             end = Rank::EIGHT;
@@ -117,7 +118,7 @@ namespace board {
         throw "not implemented";
     }
 
-    std::optional<Piece> Chessboard::operator[](Position pos) {
+    std::optional<Piece>& Chessboard::operator[](Position pos) {
         return board_((int)pos.file_get(), (int)pos.rank_get());
     }
 

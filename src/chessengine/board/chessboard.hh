@@ -22,7 +22,7 @@ namespace board {
 
         //matrix representation of the board [FILE][RANK]
         boost::numeric::ublas::matrix<std::optional<struct Piece>> board_;
-        
+
         //all our pieces
         std::vector<struct Piece> pieces_;
 
@@ -101,7 +101,7 @@ namespace board {
         bool is_check();
         bool is_checkmate();
         bool is_draw();
-        std::optional<Piece> operator[](Position p);
+        std::optional<Piece>& operator[](Position p);
         std::string to_string();
 
         friend class MoveLegalityChecker;
