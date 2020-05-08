@@ -21,6 +21,9 @@ namespace board {
             */
             opt_piece_t operator[](const Position& position) const;
 
+            std::string piece_to_char(PieceType myPiece);
+            std::string toString();
+
     };
 
 }
