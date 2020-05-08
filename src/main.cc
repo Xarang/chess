@@ -32,20 +32,18 @@ int main(int argc, const char *argv[]) {
         return 1;
     }
 
-    listener::ListenerManager listenerManager;
+    auto board = board::Chessboard();
+    listener::ListenerManager listenerManager(board);
     if (variables.count("listeners")) {
         auto listeners = variables["listeners"].as<std::vector<std::string>>();
-        listenerManager = listener::ListenerManager(listeners);
+        listenerManager = listener::ListenerManager(board, listeners);
     }
-
-    auto board = board::Chessboard();
-    listenerManager.register_board(board);
 
     if (variables.count("pgn")) {
          //pgn here
-         std::string pgnfilename = argv[1];
+         std::string pgnfilename = variables["pgn"].as<std::string>();
          try {
-             chessengine::runPgnFile(board, pgnfilename);
+             listenerManager.runPgnFile(pgnfilename);
          }
          catch (std::exception &e) {
              std::cerr << e.what() << "\n";
@@ -53,6 +51,7 @@ int main(int argc, const char *argv[]) {
     }
     else if (variables.count("perft")) {
          //generator here
+        //TODO: incorprate this in listenerManager like pgn
          auto moves = board.generateLegalMoves();
          for (auto move : moves) {
              std::cout << move.to_string();

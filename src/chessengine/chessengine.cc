@@ -1,9 +1,8 @@
 #include <iostream>
 
 #include "board/chessboard.hh"
-#include "../pgn/pgn-move.hh"
-#include "../pgn/pgn-parser.hh"
-
+#include "pgn/pgn-move.hh"
+#include "pgn/pgn-parser.hh"
 
 namespace chessengine
 {
