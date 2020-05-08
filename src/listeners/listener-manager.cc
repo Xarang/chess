@@ -27,6 +27,11 @@ namespace listener {
     }
 
     void ListenerManager::close_listeners() {
+        for (auto listener: listeners_ )
+        {
+            delete(listener);
+        }
+
         for (auto plugin : plugins_) {
             dlclose(plugin);
         }
