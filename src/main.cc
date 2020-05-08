@@ -5,7 +5,6 @@
 
 #include <boost/program_options.hpp>
 
-#include "chessengine/chessengine.hh"
 #include "chessengine/board/chessboard.hh"
 #include "chessengine/board/chessboard-interface-impl.hh"
 #include "listener-manager.hh"
