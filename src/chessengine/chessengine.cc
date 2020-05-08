@@ -7,10 +7,9 @@
 
 namespace chessengine
 {
-    void runPgnFile(std::string& filename) {
+    void runPgnFile(board::Chessboard& chessboard, std::string& filename) {
         try {
             std::vector<board::PgnMove> moves = pgn_parser::parse_pgn(filename);
-            auto chessboard = board::Chessboard();
             for (board::PgnMove m : moves) {
                 auto move = board::Move(m);
                 if (chessboard.is_move_legal(move)) {

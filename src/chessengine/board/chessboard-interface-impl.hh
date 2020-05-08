@@ -1,3 +1,5 @@
+#pragma once
+
 #include "chessboard.hh"
 #include "chessboard-interface.hh"
 

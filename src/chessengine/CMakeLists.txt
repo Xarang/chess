@@ -10,6 +10,4 @@ add_subdirectory(ai/)
 add_subdirectory(board/)
 add_subdirectory(pgn/)
 
-target_link_libraries(CHESSENGINE PGN)
-target_link_libraries(CHESSENGINE BOARD)
-target_link_libraries(CHESSENGINE AI)
+target_link_libraries(CHESSENGINE PGN BOARD AI LISTENERS)
