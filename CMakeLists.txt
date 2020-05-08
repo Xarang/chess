@@ -24,20 +24,24 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Og -g3 -fsanitize=address")
 # LIBRARIES
 set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost REQUIRED COMPONENTS system program_options)
-set(LIBRARIES Boost::system Boost::program_options ${CMAKE_DL_LIBS})
+set(LIBRARIES Boost::system Boost::program_options)
 
 
 # SOURCES : FIXME
 
 set(SRC_ENGINE_DIRECTORY src/chessengine)
 set(CHESSENGINE_LIBRARY CHESSENGINE)
+set(SRC_LISTENERS_DIRECTORY src/listeners)
+set(LISTENERS_LIBRARY LISTENERS)
 
 include_directories(${SRC_ENGINE_DIRECTORY})
 add_subdirectory(${SRC_ENGINE_DIRECTORY})
+include_directories(${SRC_LISTENERS_DIRECTORY})
+add_subdirectory(${SRC_LISTENERS_DIRECTORY})
 
 # END SOURCES
 
 # CHESSENGINE
 add_executable(chessengine
     src/main.cc)
-target_link_libraries(chessengine PRIVATE ${LIBRARIES} ${CHESSENGINE_LIBRARY})
+target_link_libraries(chessengine PRIVATE ${LIBRARIES} ${CHESSENGINE_LIBRARY} ${LISTENERS_LIBRARY})

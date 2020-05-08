@@ -1,48 +1,65 @@
 
-#include <dlfcn.h>
 #include <iostream>
 #include <string>
+#include <vector>
 
-#include "chessengine/chessengine.hh"
+#include <boost/program_options.hpp>
+
 #include "chessengine/board/chessboard.hh"
 #include "chessengine/board/chessboard-interface-impl.hh"
+#include "listener-manager.hh"
 #include "listener.hh"
 
 int main(int argc, const char *argv[]) {
 
-    void *lib = dlopen("./libbasic-output.so", RTLD_LAZY);
-    if (!lib) {
-        std::cerr << "could not open listener lib: " << dlerror();
+    namespace po = boost::program_options;
+    auto options = po::options_description("Usage");
+
+    options.add_options()
+        ("help,h", "displays helpful message")
+        ("pgn", po::value<std::string>(), "runs provided PGN on our chessengine")
+        ("listeners,l", po::value<std::vector<std::string>>()->multitoken(), "plugs in provided listeners")
+        ("perft", po::value<std::string>(), "runs provided Perft on our chessengine and output the amount of moves we were able to generate.")
+        ;
+    
+    po::variables_map variables;
+    po::store(po::parse_command_line(argc, argv, options), variables);
+    po::notify(variables);
+
+    if (variables.count("help")) {
+        std::cout << options << "\n";
         return 1;
     }
-    std::cout << "[LISTENER] loaded listener lib: " << lib << "\n";
-    void *listenerFunc = dlsym(lib, "listener_create");
-    std::cout << "[LISTENER] extracted 'listener_create' from lib: " << listenerFunc << "\n";
-    listener::Listener* lst = reinterpret_cast<listener::Listener*(*)()>(listenerFunc)();
-    std::cout << "[LISTENER] reinterpreted listener; ready to go!" << "\n";
 
-    if (argc != 2) {
-        //generator here
-        auto board = board::Chessboard();
-        lst->register_board(board::ChessboardInterfaceImpl(board));
-        auto moves = board.generateLegalMoves();
-        for (auto move : moves) {
-            std::cout << move.to_string();
-        }
+    auto board = board::Chessboard();
+    listener::ListenerManager listenerManager(board);
+    if (variables.count("listeners")) {
+        auto listeners = variables["listeners"].as<std::vector<std::string>>();
+        listenerManager = listener::ListenerManager(board, listeners);
+    }
+
+    if (variables.count("pgn")) {
+         //pgn here
+         std::string pgnfilename = variables["pgn"].as<std::string>();
+         try {
+             listenerManager.runPgnFile(pgnfilename);
+         }
+         catch (std::exception &e) {
+             std::cerr << e.what() << "\n";
+         }
+    }
+    else if (variables.count("perft")) {
+         //generator here
+        //TODO: incorprate this in listenerManager like pgn
+         auto moves = board.generateLegalMoves();
+         for (auto move : moves) {
+             std::cout << move.to_string();
+         }
     }
     else {
-        //pgn here
-        std::string pgnfilename = argv[1];
-        try {
-            chessengine::runPgnFile(pgnfilename);
-        }
-        catch (std::exception &e) {
-            std::cerr << e.what() << "\n";
-            dlclose(lib);
-            return 1;
-        }
+        //ai here
     }
-    dlclose(lib);
+
+    listenerManager.close_listeners();
     return 0;
-   
 }

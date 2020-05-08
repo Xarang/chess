@@ -1,3 +1,5 @@
+#pragma once
+
 #include "chessboard.hh"
 #include "chessboard-interface.hh"
 
@@ -17,13 +19,8 @@ namespace board {
             ** @param position A position on the chessboard.
             ** @return Piece and Color, or nullopt_t if the square is empty
             */
-            opt_piece_t operator[](const Position& position) const {
-                std::optional<Piece> p = cb_[position];
-                if (p.has_value()) {
-                    return std::pair<PieceType, Color>(p->type_, p->color_);
-                }
-                return std::nullopt;
-            }
+            opt_piece_t operator[](const Position& position) const;
+
     };
 
 }
