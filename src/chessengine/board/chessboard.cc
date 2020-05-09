@@ -171,10 +171,12 @@ namespace board {
 
     std::list<Move> Chessboard::generateLegalMoves() {
         std::list<Move> allMoves;
+ 
+        std::cout << (whose_turn_is_it() == Color::WHITE ? "White" : "Black") << "\n";
 
         //build the list of all "potential" moves, not accounting for OOB and blocked paths
         for (auto piece : pieces_) {
-            if ((bool)piece.color_ != is_white_turn_) {
+            if (piece.color_ == whose_turn_is_it()) {
                 std::list<Move> pieceMoves = piece.getAllPotentialMoves();
                 for (auto move : pieceMoves) {
                     allMoves.push_front(move);
@@ -182,7 +184,16 @@ namespace board {
             }
         }
         
+        std::cout << "potential moves:\n";
+        for (auto move : allMoves) {
+            std::cout << move.to_string();
+        }
+
         allMoves.remove_if([this](Move m){return !this->is_move_legal(m); });
+        std::cout << "removed all illegal moves; legal moves remaining: " << allMoves.size() << "\n";
+        for (auto move : allMoves) {
+            std::cout << move.to_string();
+        }
     
         return allMoves;
     }
@@ -237,7 +248,7 @@ namespace board {
             ranks.push_back(s);
         }
 
-        int rankIndex = 0;
+        int rankIndex = 7;
         for (auto rank : ranks) {
             int fileIndex = 0;
             for (auto it = rank.begin(); it != rank.end(); it++) {
@@ -249,7 +260,7 @@ namespace board {
                     fileIndex++;
                 }
             }
-            rankIndex++;
+            rankIndex--;
         }
         for (auto piece : pieces_) {
             (*this)[piece.position_] = piece;
