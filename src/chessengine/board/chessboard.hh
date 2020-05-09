@@ -97,6 +97,7 @@ namespace board {
                     board_((int)piece.position_.file_get(), (int)piece.position_.rank_get()) = piece;
                     //todo: ^ make sure cast to int works, and file and rank are in good order
                 }
+                all_boards_since_start_.push_front(to_string());
         }
 
         //recreates a chessboard from an ongoing game using a fen string

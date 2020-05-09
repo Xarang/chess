@@ -120,6 +120,7 @@ namespace board {
                 }
             }
         }
+        all_boards_since_start_.push_front(to_string());
         is_white_turn_ = !is_white_turn_;
     }
 
@@ -308,29 +309,6 @@ namespace board {
             }
             
         }
-
-        /*
-        if (is_white_turn_)
-            res += "w ";
-        else
-            res += "b ";
-
-        std::string castling = "";
-        if (did_white_king_castling_)
-            castling += "K";
-        if (did_white_queen_castling_)
-            castling += "Q";
-        if (did_black_king_castling_)
-            castling += "k";
-        if (did_black_queen_castling_)
-            castling += "q";
-
-        if (castling == "")
-            res += "-";
-        else
-            res += castling;
-        */
-
         return res;
     }
 
