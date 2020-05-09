@@ -103,12 +103,12 @@ namespace board {
             }
         }
         
-        //TODO: figure out best way to do this
         allMoves.remove_if([this](Move m){return !this->is_move_legal(m); });
     
         return allMoves;
     }
 
+    //copies the board and perform a move on it
     Chessboard Chessboard::project(Move move) {
         auto copy = Chessboard(*this);
         copy.do_move(move);
@@ -116,14 +116,21 @@ namespace board {
     }
 
     bool Chessboard::is_check() {
+        //generate legal moves for opponent and check if one on them captures your king.
         throw "not implemented";
     }
 
     bool Chessboard::is_checkmate() {
+        //is check + project all your legal moves as long as you don't find one in which you are not checked. if you can't find one, you are checkmated
         throw "not implemented";
     }
 
     bool Chessboard::is_draw() {
+        //player has 0 legal moves
+        //or
+        //same board configuration happened 3 times
+        //or
+        //no pawn moved or piece captured in last 50 turns
         throw "not implemented";
     }
 
@@ -132,6 +139,7 @@ namespace board {
     }
 
     std::string Chessboard::to_string() {
+        //TODO: output a FEN string representing the board (https://fr.wikipedia.org/wiki/Notation_Forsyth-Edwards)
         throw "not implemented";
     }
 
