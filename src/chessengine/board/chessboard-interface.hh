@@ -23,6 +23,8 @@ namespace board
 
         virtual ~ChessboardInterface() = default;
 
+
+
         /*!
         ** Access operator.
         ** @param position A position on the chessboard.

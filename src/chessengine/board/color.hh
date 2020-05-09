@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 namespace board
 {
     /* The Color enum represent a side. */
@@ -9,13 +11,6 @@ namespace board
         BLACK = true
     };
 
-    std::string color_to_string(Color c) {
-        if (c == Color::WHITE) {
-            return "White";
-        }
-        if (c == Color::BLACK) {
-            return "Black";
-        }
-        return "Unknown color";
-    }
+    std::string color_to_string(Color c);
+    
 } // namespace board

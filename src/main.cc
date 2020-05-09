@@ -32,17 +32,17 @@ int main(int argc, const char *argv[]) {
     }
 
     auto board = board::Chessboard();
-    listener::ListenerManager listenerManager(board);
+    std::unique_ptr<listener::ListenerManager> listenerManager = std::make_unique<listener::ListenerManager>(board);
     if (variables.count("listeners")) {
         auto listeners = variables["listeners"].as<std::vector<std::string>>();
-        listenerManager = listener::ListenerManager(board, listeners);
+        listenerManager = std::make_unique<listener::ListenerManager>(board, listeners);
     }
 
     if (variables.count("pgn")) {
          //pgn here
          std::string pgnfilename = variables["pgn"].as<std::string>();
          try {
-             listenerManager.runPgnFile(pgnfilename);
+             listenerManager->runPgnFile(pgnfilename);
          }
          catch (std::exception &e) {
              std::cerr << e.what() << "\n";
@@ -60,6 +60,6 @@ int main(int argc, const char *argv[]) {
         //ai here
     }
 
-    listenerManager.close_listeners();
+    listenerManager->close_listeners();
     return 0;
 }

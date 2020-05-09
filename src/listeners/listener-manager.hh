@@ -16,10 +16,11 @@ namespace listener {
             std::vector<Listener*> listeners_;
 
             board::Chessboard board_;
+            board::ChessboardInterfaceImpl interface_;
 
         public:
             void close_listeners();
-            ListenerManager(::board::Chessboard& board) : board_(board) {};
+            ListenerManager(::board::Chessboard& board) : board_(board), interface_(board::ChessboardInterfaceImpl(board_)) {};
             ListenerManager(::board::Chessboard& board, std::vector<std::string> plugins);
 
             //tasks

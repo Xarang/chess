@@ -1,13 +1,18 @@
+#pragma once
+
 #include <iostream>
 
-#include "listeners/listener.hh"
+#include "../listeners/listener.hh"
 
 class BestListener2022 : public listener::Listener {
-
     private:
-        board::ChessboardInterface& interface_;
+        const board::ChessboardInterface* interface_;
+        std::string board_string_representation();
 
     public:
+
+        BestListener2022() = default; 
+
     /**
         ** \brief Register the ChessboardInterface for later use.
         ** Called once per game at the beginning.
@@ -16,7 +21,7 @@ class BestListener2022 : public listener::Listener {
         ** the adapter design pattern
         */
         void register_board(const board::ChessboardInterface& board_interface) {
-            interface_ = board_interface;
+            interface_ = &board_interface;
         }
 
         /**
@@ -134,6 +139,4 @@ class BestListener2022 : public listener::Listener {
         void on_draw() {
             std::cout << "[END] game is a draw" << "\n";
         }
-    };
-
-}
+};

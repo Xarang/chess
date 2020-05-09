@@ -41,6 +41,19 @@ add_subdirectory(${SRC_LISTENERS_DIRECTORY})
 
 # END SOURCES
 
+# CUSTOM LISTENER
+
+add_library(best-listener-2022 SHARED
+    src/best-listener-2022/best-listener-2022.cc)
+
+set_target_properties(best-listener-2022
+    PROPERTIES
+    EXCLUDE_FROM_ALL "true")
+
+add_custom_target(listener
+    DEPENDS best-listener-2022)
+
+
 # CHESSENGINE
 add_executable(chessengine
     src/main.cc)

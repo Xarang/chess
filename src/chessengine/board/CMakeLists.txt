@@ -5,4 +5,5 @@ add_library(BOARD
     move-builder.cc
     move-legality-checker.cc
     piece.cc
-    position.cc)
+    position.cc
+    color.cc)

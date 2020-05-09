@@ -8,7 +8,8 @@
 
 namespace listener {
 
-    ListenerManager::ListenerManager(::board::Chessboard& board, std::vector<std::string> plugins) : board_(board) {
+    ListenerManager::ListenerManager(::board::Chessboard& board, std::vector<std::string> plugins)
+        : board_(board), interface_(board::ChessboardInterfaceImpl(board_)) {
         for (auto listener : plugins) {
             void *lib = dlopen(listener.c_str(), RTLD_LAZY);
             if (!lib) {
@@ -19,7 +20,7 @@ namespace listener {
             void *listenerFunc = dlsym(lib, "listener_create");
             std::cout << "[LOAD] extracted 'listener_create' from lib: " << listenerFunc << "\n";
             listener::Listener* lst = reinterpret_cast<listener::Listener*(*)()>(listenerFunc)();
-            lst->register_board(board::ChessboardInterfaceImpl(board_));
+            lst->register_board(interface_);
             listeners_.push_back(lst);
             plugins_.push_back(lib);
             std::cout << "[LOAD] plugin " << listener << " ready to go!" << "(" << plugins_.size() << "/" << plugins.size() << ")\n";
