@@ -1,2 +1,0 @@
-/usr/bin/ar qc libCHESSENGINE.a  CMakeFiles/CHESSENGINE.dir/chessengine.cc.o
-/usr/bin/ranlib libCHESSENGINE.a

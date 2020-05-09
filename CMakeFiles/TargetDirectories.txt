@@ -1,5 +1,0 @@
-/home/thirstea/Documents/projects/cpp/E2022_Chess/CMakeFiles/rebuild_cache.dir
-/home/thirstea/Documents/projects/cpp/E2022_Chess/CMakeFiles/best-listener-2022.dir
-/home/thirstea/Documents/projects/cpp/E2022_Chess/CMakeFiles/listener.dir
-/home/thirstea/Documents/projects/cpp/E2022_Chess/CMakeFiles/edit_cache.dir
-/home/thirstea/Documents/projects/cpp/E2022_Chess/CMakeFiles/chessengine.dir

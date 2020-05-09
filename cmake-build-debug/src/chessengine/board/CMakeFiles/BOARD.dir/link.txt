@@ -1,2 +1,0 @@
-/usr/bin/ar qc libBOARD.a  CMakeFiles/BOARD.dir/position.cc.o CMakeFiles/BOARD.dir/chessboard-impl.cc.o CMakeFiles/BOARD.dir/move.cc.o
-/usr/bin/ranlib libBOARD.a
