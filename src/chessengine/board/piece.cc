@@ -10,13 +10,24 @@ namespace board {
             int direction = p.color_ == Color::WHITE ? 1 : -1;
             //double pawn advance
             if (!p.has_already_moved_) {
-                moves.push_front(MoveBuilder::DoublePawnPush(p));
+                moves.push_front(MoveBuilder::double_pawn_push(p));
             }
             //move forward
-            moves.push_front(MoveBuilder::BasicMove(p, Position(p.position_.file_get(), p.position_.rank_get() + direction)));
+            moves.push_front(MoveBuilder::basic_move(p, Position(p.position_.file_get(), p.position_.rank_get() + direction)));
             //capture in diagonals
-            moves.push_front(MoveBuilder::BasicCapture(p, Position(p.position_.file_get() + 1, p.position_.rank_get() + direction)));
-            moves.push_front(MoveBuilder::BasicCapture(p, Position(p.position_.file_get() - 1, p.position_.rank_get() + direction)));
+            moves.push_front(MoveBuilder::basic_capture(p, Position(p.position_.file_get() + 1, p.position_.rank_get() + direction)));
+            moves.push_front(MoveBuilder::basic_capture(p, Position(p.position_.file_get() - 1, p.position_.rank_get() + direction)));
+            
+            std::list<Move> promotion_moves;
+            for (auto move : moves) {
+                if ((move.end_position_.rank_get() == Rank::ONE && p.color_ == Color::WHITE)
+                    || (move.end_position_.rank_get() == Rank::EIGHT && p.color_ == Color::BLACK)) {
+                    promotion_moves.push_front(MoveBuilder::with_promotion(move, PieceType::BISHOP));
+                    promotion_moves.push_front(MoveBuilder::with_promotion(move, PieceType::KNIGHT));
+                    promotion_moves.push_front(MoveBuilder::with_promotion(move, PieceType::ROOK));
+                    promotion_moves.push_front(MoveBuilder::with_promotion(move, PieceType::QUEEN));
+                }
+            }
             return moves;
         }
 
@@ -50,8 +61,8 @@ namespace board {
                     {
                         break;
                     }
-                    bishop_moves.push_back(MoveBuilder::BasicMove(p, Position(curr_file, curr_rank)));
-                    bishop_moves.push_back(MoveBuilder::BasicCapture(p, Position(curr_file, curr_rank)));
+                    bishop_moves.push_back(MoveBuilder::basic_move(p, Position(curr_file, curr_rank)));
+                    bishop_moves.push_back(MoveBuilder::basic_capture(p, Position(curr_file, curr_rank)));
                 }
             }
 
@@ -64,29 +75,29 @@ namespace board {
             File org_file = p.position_.file_get();
             Rank org_rank = p.position_.rank_get();
 
-            knight_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank + 2)));
-            knight_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::basic_move(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file + 1, org_rank + 2)));
 
-            knight_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank - 2)));
-            knight_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank - 2)));
+            knight_moves.push_back(MoveBuilder::basic_move(p, Position(org_file + 1, org_rank - 2)));
+            knight_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file + 1, org_rank - 2)));
 
-            knight_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file - 1, org_rank + 2)));
-            knight_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file - 1, org_rank - 2)));
+            knight_moves.push_back(MoveBuilder::basic_move(p, Position(org_file - 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file - 1, org_rank - 2)));
 
-            knight_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 2, org_rank + 1)));
-            knight_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 2, org_rank + 1)));
+            knight_moves.push_back(MoveBuilder::basic_move(p, Position(org_file + 2, org_rank + 1)));
+            knight_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file + 2, org_rank + 1)));
 
-            knight_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank + 2)));
-            knight_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::basic_move(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file + 1, org_rank + 2)));
 
-            knight_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank + 2)));
-            knight_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::basic_move(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file + 1, org_rank + 2)));
 
-            knight_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank + 2)));
-            knight_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::basic_move(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file + 1, org_rank + 2)));
 
-            knight_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank + 2)));
-            knight_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::basic_move(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file + 1, org_rank + 2)));
 
             return knight_moves;
         }
@@ -122,8 +133,8 @@ namespace board {
                     {
                         break;
                     }
-                    rook_moves.push_back(MoveBuilder::BasicMove(p, Position(curr_file, curr_rank)));
-                    rook_moves.push_back(MoveBuilder::BasicCapture(p, Position(curr_file, curr_rank)));
+                    rook_moves.push_back(MoveBuilder::basic_move(p, Position(curr_file, curr_rank)));
+                    rook_moves.push_back(MoveBuilder::basic_capture(p, Position(curr_file, curr_rank)));
                 }
             }
 
@@ -165,8 +176,8 @@ namespace board {
                     {
                         break;
                     }
-                    queen_moves.push_back(MoveBuilder::BasicMove(p, Position(curr_file, curr_rank)));
-                    queen_moves.push_back(MoveBuilder::BasicCapture(p, Position(curr_file, curr_rank)));
+                    queen_moves.push_back(MoveBuilder::basic_move(p, Position(curr_file, curr_rank)));
+                    queen_moves.push_back(MoveBuilder::basic_capture(p, Position(curr_file, curr_rank)));
                 }
             }
 
@@ -176,36 +187,36 @@ namespace board {
         static std::list<Move> King(Piece& p)   {
             std::list<Move> king_moves;
             if (!p.has_already_moved_) {
-                king_moves.push_back(MoveBuilder::KingCastling(p));
-                king_moves.push_back(MoveBuilder::QueenCastling(p));
+                king_moves.push_back(MoveBuilder::king_castling(p));
+                king_moves.push_back(MoveBuilder::queen_castling(p));
             }
 
             File org_file = p.position_.file_get();
             Rank org_rank = p.position_.rank_get();
 
-            king_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file - 1, org_rank)));
-            king_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file - 1, org_rank)));
+            king_moves.push_back(MoveBuilder::basic_move(p, Position(org_file - 1, org_rank)));
+            king_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file - 1, org_rank)));
 
-            king_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file - 1, org_rank + 1)));
-            king_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file - 1, org_rank + 1)));
+            king_moves.push_back(MoveBuilder::basic_move(p, Position(org_file - 1, org_rank + 1)));
+            king_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file - 1, org_rank + 1)));
 
-            king_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file - 1, org_rank - 1)));
-            king_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file - 1, org_rank - 1)));
+            king_moves.push_back(MoveBuilder::basic_move(p, Position(org_file - 1, org_rank - 1)));
+            king_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file - 1, org_rank - 1)));
 
-            king_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file, org_rank + 1)));
-            king_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file, org_rank + 1)));
+            king_moves.push_back(MoveBuilder::basic_move(p, Position(org_file, org_rank + 1)));
+            king_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file, org_rank + 1)));
 
-            king_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file, org_rank - 1)));
-            king_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file, org_rank - 1)));
+            king_moves.push_back(MoveBuilder::basic_move(p, Position(org_file, org_rank - 1)));
+            king_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file, org_rank - 1)));
 
-            king_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank)));
-            king_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank)));
+            king_moves.push_back(MoveBuilder::basic_move(p, Position(org_file + 1, org_rank)));
+            king_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file + 1, org_rank)));
 
-            king_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank + 1)));
-            king_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank + 1)));
+            king_moves.push_back(MoveBuilder::basic_move(p, Position(org_file + 1, org_rank + 1)));
+            king_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file + 1, org_rank + 1)));
 
-            king_moves.push_back(MoveBuilder::BasicMove(p, Position(org_file + 1, org_rank - 1)));
-            king_moves.push_back(MoveBuilder::BasicCapture(p, Position(org_file + 1, org_rank - 1)));
+            king_moves.push_back(MoveBuilder::basic_move(p, Position(org_file + 1, org_rank - 1)));
+            king_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file + 1, org_rank - 1)));
             return std::list<Move>();
         }
     };

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <boost/numeric/ublas/matrix.hpp>
+#include <map>
+#include <optional>
 #include <vector>
 
 
@@ -41,16 +43,18 @@ namespace board {
         //turns elapsed since a piece was last taken or a pawn moved
         unsigned int turns_since_last_piece_taken_or_pawn_moved_;
 
+        std::optional<Position> en_passant_target_square_;
+
         //map containing hashed representations of all boards since start (to_string'ed)
         //if a key has 3 values it means the '3 fold' rule applies and the game is a draw
-        std::unordered_multimap<int, std::string> all_moves_since_start_;
+        std::unordered_multimap<int, std::string> all_boards_since_start_;
 
 
         public:
         Chessboard() : board_(8,8), pieces_(),
             is_white_turn_(true), did_white_king_castling_(false), did_white_queen_castling_(false),
             did_black_king_castling_(false), did_black_queen_castling_(false), current_turn_(0),
-            turns_since_last_piece_taken_or_pawn_moved_(0), all_moves_since_start_() {
+            turns_since_last_piece_taken_or_pawn_moved_(0), en_passant_target_square_(), all_boards_since_start_() {
                 //White Pawns
                 pieces_.push_back(Piece(Position(File::A, Rank::TWO), Color::WHITE, PieceType::PAWN));
                 pieces_.push_back(Piece(Position(File::B, Rank::TWO), Color::WHITE, PieceType::PAWN));

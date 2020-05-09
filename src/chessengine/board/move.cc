@@ -4,7 +4,7 @@
 namespace board
 {
 
-    void Move::setDoublePawnPush() {
+    void Move::set_double_pawn_push() {
         if (
                 piece_ == PieceType::PAWN
                 && ((
@@ -18,7 +18,7 @@ namespace board
 
     }
 
-    void Move::setKingCastling() {
+    void Move::set_king_castling() {
     if (
             piece_ == PieceType::KING
             && start_position_.file_get() == File::E
@@ -28,7 +28,7 @@ namespace board
         }
     }
 
-    void Move::setQueenCastling() {
+    void Move::set_queen_castling() {
     if (
             piece_ == PieceType::KING
             && start_position_.file_get() == File::E
@@ -38,7 +38,7 @@ namespace board
         }
     }
 
-    void Move::setEnPassant() {
+    void Move::set_en_passant() {
         if (piece_ == PieceType::PAWN
             && (
                 (
@@ -74,10 +74,10 @@ namespace board
             is_double_pawn_push_(false), is_king_castling_(false), is_queen_castling_(false), is_en_passant_(false) {
 
         // detecting special moves..
-        setDoublePawnPush();
-        setKingCastling();
-        setQueenCastling();
-        setEnPassant();
+        set_double_pawn_push();
+        set_king_castling();
+        set_queen_castling();
+        set_en_passant();
     }
 
     std::string Move::to_string() {

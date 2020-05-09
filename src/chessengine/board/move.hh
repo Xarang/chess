@@ -49,9 +49,9 @@ namespace board
         std::string to_string();
 
         private:
-        void setDoublePawnPush();
-        void setKingCastling();
-        void setQueenCastling();
-        void setEnPassant();
+        void set_double_pawn_push();
+        void set_king_castling();
+        void set_queen_castling();
+        void set_en_passant();
     };
 }

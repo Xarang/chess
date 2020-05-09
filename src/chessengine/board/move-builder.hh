@@ -7,10 +7,11 @@
 namespace board {
     class MoveBuilder {
         public:
-            static Move BasicMove(Piece p, Position target);
-            static Move BasicCapture(Piece p, Position target);
-            static Move DoublePawnPush(Piece p);
-            static Move KingCastling(Piece p);
-            static Move QueenCastling(Piece p);
+            static Move basic_move(Piece p, Position target);
+            static Move basic_capture(Piece p, Position target);
+            static Move with_promotion(Move m, PieceType type);
+            static Move double_pawn_push(Piece p);
+            static Move king_castling(Piece p);
+            static Move queen_castling(Piece p);
     };
 }

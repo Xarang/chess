@@ -6,23 +6,21 @@
 namespace board {
 
     void Chessboard::do_move(Move move) {
+        current_turn_++;
+        turns_since_last_piece_taken_or_pawn_moved_++;
         int j = 0;
-        Color color;
-        Rank end;
 
-        if (is_white_turn_) {
-            color = Color::WHITE;
-            end = Rank::EIGHT;
-        }
-        else {
-            color = Color::BLACK;
-            end = Rank::ONE;
-        }
+        //TODO: hash the current state of the board (string ?) and store it inside the all_boards_since_start_ multimap
+
+        
+        //if the board previously had a 'en passant target square', this do_move "consumes" it
+        en_passant_target_square_ = std::nullopt;
 
         for (auto ite = pieces_.begin(); ite < pieces_.end(); ite++)
         {
             if (ite->position_ == move.end_position_)
             {
+                turns_since_last_piece_taken_or_pawn_moved_ = 0;
                 pieces_.erase(ite);
             }
         }
@@ -31,6 +29,9 @@ namespace board {
         {
             if (pieces_[i].position_ == move.start_position_)
             {
+                if (move.piece_ == PieceType::PAWN) {
+                    turns_since_last_piece_taken_or_pawn_moved_ = 0;
+                }
                 pieces_[i].position_ = move.end_position_;
                 pieces_[i].has_already_moved_ = true;
                 j = i;
@@ -41,12 +42,19 @@ namespace board {
         (*this)[move.end_position_] = std::make_optional(pieces_[j]);
         (*this)[move.start_position_] = std::nullopt;
 
-        if ((*this)[move.end_position_].value().type_ == PieceType::PAWN && move.end_position_.rank_get() == end)
+        if (move.promotion_.has_value())
         {
-            //Progression to queen ?
-            Piece piece(move.end_position_, color, PieceType::QUEEN);
-            (*this)[move.end_position_] = piece;
+            (*this)[move.end_position_] = Piece(move.end_position_, whose_turn_is_it(), move.promotion_.value());
         }
+
+        if (move.is_double_pawn_push_) {
+            //mark the square that can be "prise en passant"'ed next turn
+            int direction = whose_turn_is_it() == Color::WHITE ? +1 : -1;
+            en_passant_target_square_ = std::make_optional<Position>(move.start_position_.file_get(), move.start_position_.rank_get() + direction);
+            //TODO: unsure about this, make sure it marks the good square as eligible en passant target for next move
+        }
+
+
         is_white_turn_ = !is_white_turn_;
     }
 
