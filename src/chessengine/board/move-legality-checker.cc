@@ -3,29 +3,29 @@
 namespace board {
 
     bool MoveLegalityChecker::is_move_legal_QUEEN(Chessboard chessboard, Move move) {
-        if (move.is_queen_castling_)
-        {
-            auto king = chessboard.board_((int)move.start_position_.file_get(), (int)move.start_position_.rank_get());
+        if (move.is_queen_castling_) {
+            auto king = chessboard.board_((int) move.start_position_.file_get(), (int) move.start_position_.rank_get());
             if (king.value().has_already_moved_)
                 return false;
-            if (chessboard.is_white_turn_)
-            {
-                auto rook = chessboard.board_(((int)File::H, (int)Rank::ONE));
+            if (chessboard.is_white_turn_) {
+                auto rook = chessboard.board_((int) File::H, (int) Rank::ONE);
                 if (!rook.has_value() || rook.value().has_already_moved_)
                     return false;
 
-                if (chessboard.board_((int)File::F, (int)Rank::ONE).has_value() || chessboard.board_((int)File::G, (int)Rank::ONE).has_value())
+                if (chessboard.board_((int) File::F, (int) Rank::ONE).has_value() ||
+                    chessboard.board_((int) File::G, (int) Rank::ONE).has_value())
                     return false;
-            } else
-            {
-                auto rook = chessboard.board_(((int)File::H, (int)Rank::EIGHT));
+            } else {
+                auto rook = chessboard.board_((int) File::H, (int) Rank::EIGHT);
                 if (!rook.has_value() || rook.value().has_already_moved_)
                     return false;
 
-                if (chessboard.board_((int)File::F, (int)Rank::EIGHT).has_value() || chessboard.board_((int)File::G, (int)Rank::EIGHT).has_value())
+                if (chessboard.board_((int) File::F, (int) Rank::EIGHT).has_value() ||
+                    chessboard.board_((int) File::G, (int) Rank::EIGHT).has_value())
                     return false;
             }
             return true;
+        }
         if (is_move_legal_BISHOP(chessboard, move))
             return true;
         return is_move_legal_ROOK(chessboard, move);
@@ -41,7 +41,7 @@ namespace board {
                 return false;
             if (chessboard.is_white_turn_)
             {
-               auto rook = chessboard.board_(((int)File::A, (int)Rank::ONE));
+               auto rook = chessboard.board_((int)File::A, (int)Rank::ONE);
                if (!rook.has_value() || rook.value().has_already_moved_)
                    return false;
 
@@ -49,7 +49,7 @@ namespace board {
                    return false;
             } else
             {
-                auto rook = chessboard.board_(((int)File::A, (int)Rank::EIGHT));
+                auto rook = chessboard.board_((int)File::A, (int)Rank::EIGHT);
                 if (!rook.has_value() || rook.value().has_already_moved_)
                     return false;
 
