@@ -155,7 +155,7 @@ class BestListener2022 : public listener::Listener {
         ** @param color: The color of the player who is disqualified.
         */
         void on_player_disqualified(const board::Color color) {
-            std::cout << "[PAT] " + board::color_to_string(color) + " is pat" << "\n"; 
+            std::cout << "[END] " + board::color_to_string((board::Color)(!(bool)color)) + " won" << "\n"; 
         }
 
         /**
