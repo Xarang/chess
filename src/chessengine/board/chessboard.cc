@@ -309,6 +309,7 @@ namespace board {
             }
             
         }
+        std::cout << res << "\n";
         return res;
     }
 
