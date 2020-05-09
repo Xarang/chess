@@ -5,6 +5,28 @@
 
 namespace board {
 
+    void Chessboard::do_move_en_passant(Move move) {
+        Position position;
+        if (is_white_turn_)
+        {
+            position = Position(move.end_position_.file_get(), move.end_position_.rank_get() - 1);
+
+        } else
+        {
+            position = Position(move.end_position_.file_get(), move.end_position_.rank_get() + 1);
+        }
+        auto ite = pieces_.begin();
+        while (ite != pieces_.end()) {
+            if (ite->position_ != position) {
+                ite++;
+            } else {
+                turns_since_last_piece_taken_or_pawn_moved_ = 0;
+                (*this)[position] = std::nullopt;
+                pieces_.erase(ite);
+                break;
+            }
+        }
+    }
     void Chessboard::do_move(Move move) {
         current_turn_++;
         turns_since_last_piece_taken_or_pawn_moved_++;
@@ -13,18 +35,21 @@ namespace board {
         //if the board previously had a 'en passant target square', this do_move "consumes" it
         en_passant_target_square_ = std::nullopt;
 
-        if (board_((int)move.end_position_.file_get(), (int)move.end_position_.rank_get()).has_value()) {
+        if (move.is_capture_ && !move.is_en_passant_) {
             auto ite = pieces_.begin();
-            ++ite;
             while (ite != pieces_.end()) {
                 if (ite->position_ != move.end_position_) {
-                    ++ite;
+                    ite++;
                 } else {
                     turns_since_last_piece_taken_or_pawn_moved_ = 0;
                     pieces_.erase(ite);
                     break;
                 }
             }
+        }
+        if (move.piece_ == PieceType::PAWN && move.is_en_passant_)
+        {
+            do_move_en_passant(move);
         }
 
         for (unsigned  long i = 0; i < pieces_.size(); i++)
@@ -54,7 +79,6 @@ namespace board {
                 break;
             }
         }
-
 
 
         if (move.is_double_pawn_push_) {
@@ -120,6 +144,10 @@ namespace board {
             if (piece.value().color_ == Color::WHITE && is_white_turn_)
                 return false;
             if (piece.value().color_ == Color::BLACK && !is_white_turn_)
+                return false;
+        }
+        else if (move.is_capture_) {
+            if ((move.piece_ == PieceType::PAWN && !move.is_en_passant_) || move.piece_ != PieceType::PAWN)
                 return false;
         }
         switch (move.piece_) {
