@@ -2,7 +2,25 @@
 
 #include <iostream>
 
+#include "../utype.hh"
 #include "../listeners/listener.hh"
+
+static std::string piece_name(int value) {
+    switch (value) {
+        case 0:
+            return "QUEEN";
+        case 1:
+            return "ROOK";
+        case 2:
+            return "BISHOP";
+        case 3:
+            return "KNIGHT";
+        case 4:
+            return "PAWN";
+        default:
+            return "KING";
+    }
+}
 
 class BestListener2022 : public listener::Listener {
     private:
@@ -45,7 +63,7 @@ class BestListener2022 : public listener::Listener {
         void on_piece_moved(const board::PieceType piece,
                                     const board::Position& from,
                                     const board::Position& to) {
-            std::cout << "[MOVE] piece " + std::string("" + board::piece_to_char(piece)) + " moved from " + from.to_string() + " to " + to.to_string() + "\n";
+            std::cout << "[MOVE] " << piece_name(utils::utype(piece)) << " moved from " + from.to_string() + " to " + to.to_string() + "\n";
             std::cout << board_string_representation();
         }
 
