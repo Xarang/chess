@@ -29,8 +29,8 @@ namespace board {
                 if (!rook.has_value() || rook.value().has_already_moved_)
                     return false;
 
-                if (chessboard.board_((int) File::F, (int) Rank::EIGHT).has_value() ||
-                    chessboard.board_((int) File::G, (int) Rank::EIGHT).has_value())
+                if (chessboard.board_((int) File::B, (int) Rank::EIGHT).has_value() ||
+                    chessboard.board_((int) File::C, (int) Rank::EIGHT).has_value())
                     return false;
             }
             return true;

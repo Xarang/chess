@@ -84,7 +84,6 @@ namespace board {
         is_white_turn_ = !is_white_turn_;
     }
 
-
     bool Chessboard::is_move_legal(Move move) {
 
         if (!(*this)[move.start_position_].has_value())
