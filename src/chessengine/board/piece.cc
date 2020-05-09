@@ -28,6 +28,10 @@ namespace board {
                     promotion_moves.push_front(MoveBuilder::with_promotion(move, PieceType::QUEEN));
                 }
             }
+            for (auto move : promotion_moves)
+            {
+                moves.push_back(move);
+            }
             return moves;
         }
 
@@ -55,9 +59,9 @@ namespace board {
                 {
                     curr_file = curr_file + add_file;
                     curr_rank = curr_rank + add_rank;
-                    int check_file = static_cast<int>(curr_file);
-                    int check_rank = static_cast<int>(curr_file);
-                    if (check_file == -1 || check_rank == -1)
+                    /*int check_file = static_cast<int>(curr_file);
+                    int check_rank = static_cast<int>(curr_file);*/
+                    if (curr_file == File::OUTOFBOUNDS || curr_rank == Rank::OUTOFBOUNDS)
                     {
                         break;
                     }
@@ -87,17 +91,17 @@ namespace board {
             knight_moves.push_back(MoveBuilder::basic_move(p, Position(org_file + 2, org_rank + 1)));
             knight_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file + 2, org_rank + 1)));
 
-            knight_moves.push_back(MoveBuilder::basic_move(p, Position(org_file + 1, org_rank + 2)));
-            knight_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::basic_move(p, Position(org_file - 1, org_rank - 2)));
+            knight_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file - 1, org_rank - 2)));
 
-            knight_moves.push_back(MoveBuilder::basic_move(p, Position(org_file + 1, org_rank + 2)));
-            knight_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::basic_move(p, Position(org_file - 2, org_rank - 1)));
+            knight_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file - 2 , org_rank - 1)));
 
-            knight_moves.push_back(MoveBuilder::basic_move(p, Position(org_file + 1, org_rank + 2)));
-            knight_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::basic_move(p, Position(org_file - 2, org_rank + 1)));
+            knight_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file - 2, org_rank + 1)));
 
-            knight_moves.push_back(MoveBuilder::basic_move(p, Position(org_file + 1, org_rank + 2)));
-            knight_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::basic_move(p, Position(org_file + 2, org_rank - 1)));
+            knight_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file + 2, org_rank - 1)));
 
             return knight_moves;
         }
@@ -127,9 +131,9 @@ namespace board {
                 {
                     curr_file = curr_file + add_file;
                     curr_rank = curr_rank + add_rank;
-                    int check_file = static_cast<int>(curr_file);
-                    int check_rank = static_cast<int>(curr_file);
-                    if (check_file == -1 || check_rank == -1)
+                    /*int check_file = static_cast<int>(curr_file);
+                    int check_rank = static_cast<int>(curr_file);*/
+                    if (curr_file == File::OUTOFBOUNDS || curr_rank == Rank::OUTOFBOUNDS)
                     {
                         break;
                     }
@@ -170,9 +174,9 @@ namespace board {
                 {
                     curr_file = curr_file + add_file;
                     curr_rank = curr_rank + add_rank;
-                    int check_file = static_cast<int>(curr_file);
-                    int check_rank = static_cast<int>(curr_file);
-                    if (check_file == -1 || check_rank == -1)
+                    /*int check_file = static_cast<int>(curr_file);
+                    int check_rank = static_cast<int>(curr_file);*/
+                    if (curr_file == File::OUTOFBOUNDS || curr_rank == Rank::OUTOFBOUNDS)
                     {
                         break;
                     }

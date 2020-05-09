@@ -174,16 +174,15 @@ namespace board {
 
         //build the list of all "potential" moves, not accounting for OOB and blocked paths
         for (auto piece : pieces_) {
-            if ((bool)piece.color_ != is_white_turn_) {
+            if (piece.color_ == whose_turn_is_it()) {
                 std::list<Move> pieceMoves = piece.getAllPotentialMoves();
                 for (auto move : pieceMoves) {
                     allMoves.push_front(move);
                 }
             }
         }
-        
+
         allMoves.remove_if([this](Move m){return !this->is_move_legal(m); });
-    
         return allMoves;
     }
 
