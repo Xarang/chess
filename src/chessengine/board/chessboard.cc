@@ -27,6 +27,7 @@ namespace board {
             }
         }
     }
+
     void Chessboard::do_move(Move move) {
         current_turn_++;
         turns_since_last_piece_taken_or_pawn_moved_++;
@@ -35,7 +36,7 @@ namespace board {
         //if the board previously had a 'en passant target square', this do_move "consumes" it
         en_passant_target_square_ = std::nullopt;
 
-        if (move.is_capture_ && !move.is_en_passant_) {
+        if ((*this)[move.end_position_].has_value()) {
             auto ite = pieces_.begin();
             while (ite != pieces_.end()) {
                 if (ite->position_ != move.end_position_) {
