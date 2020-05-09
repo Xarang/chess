@@ -2,8 +2,7 @@
 
 #include <iostream>
 
-#include "../utype.hh"
-#include "../listeners/listener.hh"
+#include "listener.hh"
 
 static std::string piece_name(int value) {
     switch (value) {
@@ -25,7 +24,9 @@ static std::string piece_name(int value) {
 class BestListener2022 : public listener::Listener {
     private:
         const board::ChessboardInterface* interface_;
+        int move_count = 0;
         std::string board_string_representation();
+
 
     public:
 
@@ -63,7 +64,8 @@ class BestListener2022 : public listener::Listener {
         void on_piece_moved(const board::PieceType piece,
                                     const board::Position& from,
                                     const board::Position& to) {
-            std::cout << "[MOVE] " << piece_name(utils::utype(piece)) << " moved from " + from.to_string() + " to " + to.to_string() + "\n";
+            std::cout << "[MOVE] #" << move_count << " " << piece_name(utils::utype(piece)) << " moved from " + from.to_string() + " to " + to.to_string() + "\n";
+            move_count++;
             std::cout << board_string_representation();
         }
 
