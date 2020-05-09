@@ -185,7 +185,6 @@ namespace board {
         }
 
         allMoves.remove_if([this](Move m){return !this->is_move_legal(m); });
-        
         std::cout << "potential moves:\n";
         for (auto move : allMoves) {
             std::cout << move.to_string();

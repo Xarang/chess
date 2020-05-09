@@ -115,7 +115,6 @@ namespace board {
             Rank org_rank = p.position_.rank_get();
             File curr_file = org_file;
             Rank curr_rank = org_rank;
-
             std::pair<int, int> pairs[4] = {
                 std::make_pair(1, 0),
                 std::make_pair(-1, 0),
