@@ -143,7 +143,7 @@ namespace board {
         throw "not implemented";
     }
 
-    Chessboard::Chessboard(std::string fen_string) {
+    Chessboard::Chessboard(std::string fen_string) : board_(8,8) {
         auto fen_string_stream = std::istringstream(fen_string);
         std::vector<std::string> fields;
         std::string s;
@@ -163,10 +163,11 @@ namespace board {
             int fileIndex = 0;
             for (auto it = rank.begin(); it != rank.end(); it++) {
                 if (isdigit(*it)) {
-                    fileIndex += std::stoi("" + *it);
+                    fileIndex += '0' - (int)*it;
                 }
                 else {
                     pieces_.push_back(Piece(Position((File)fileIndex, (Rank)rankIndex), islower(*it) ? Color::BLACK : Color::WHITE, char_to_piece(toupper(*it))));
+                    fileIndex++;
                 }
             }
             rankIndex++;
