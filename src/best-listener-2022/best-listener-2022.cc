@@ -41,8 +41,10 @@ std::string BestListener2022::board_string_representation() {
                 res += "\033[1;" + backgroundColor(i, j) + charColor + " " + type + " " + "\033[0m";
                 currFile = currFile + 1;
             }
+            res += " " + std::to_string(i + 1);
             res += "\n";
             currRank = currRank - 1;
         }
+                res += "   A  B  C  D  E  F  G  H \n";
         return res;
     }
