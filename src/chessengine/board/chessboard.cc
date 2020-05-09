@@ -2,6 +2,7 @@
 #include <sstream>
 #include "chessboard.hh"
 #include "piece-type.hh"
+#include "piece.hh"
 
 namespace board {
 
@@ -182,7 +183,56 @@ namespace board {
 
     std::string Chessboard::to_string() {
         //TODO: output a FEN string representing the board (https://fr.wikipedia.org/wiki/Notation_Forsyth-Edwards)
-        throw "not implemented";
+        std::string res = "";
+        board::Rank currRank = Rank::EIGHT;
+        for (size_t i = 0; i < 8; i++)
+        {
+            board::File currFile = File::A;
+            int empty_counter = 0;
+            for (size_t j = 0; j < 8; j++)
+            {
+                Position myPos(currFile, currRank);
+                char symbol = ' ';
+
+                if ((*this)[myPos].has_value()) {
+                    auto myPiece = (*this)[myPos].value();
+
+                    symbol = myPiece.piece_to_char_fen();
+                    if (symbol == ' ')
+                        empty_counter++;
+                    else if (empty_counter != 0) {
+                        res += std::to_string(empty_counter) + symbol;
+                        empty_counter = 0;
+                    }
+                }
+                res += "/";
+            }
+            
+        }
+
+        /*
+        if (is_white_turn_)
+            res += "w ";
+        else
+            res += "b ";
+
+        std::string castling = "";
+        if (did_white_king_castling_)
+            castling += "K";
+        if (did_white_queen_castling_)
+            castling += "Q";
+        if (did_black_king_castling_)
+            castling += "k";
+        if (did_black_queen_castling_)
+            castling += "q";
+
+        if (castling == "")
+            res += "-";
+        else
+            res += castling;
+        */
+
+        return res;
     }
 
     Chessboard::Chessboard(std::string fen_string) : board_(8,8) {
