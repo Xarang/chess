@@ -13,7 +13,6 @@
 
 int main(int argc, const char *argv[]) {
 
-
     namespace po = boost::program_options;
     auto options = po::options_description("Usage");
 
