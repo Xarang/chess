@@ -82,9 +82,6 @@ namespace listener {
                                 register_game_draw();
                                 register_game_finished();
                             }
-
-
-
                         }
                         catch (std::exception &e) {
                             throw std::runtime_error("error happened while executing move: " + move.to_string() + " : " + e.what() + "\n");
@@ -92,7 +89,8 @@ namespace listener {
 
                     }
                     else {
-                        throw std::logic_error("move was not legal.");
+                        register_lose(board_->whose_turn_is_it());
+                        return;
                     }
                 }
                 catch (std::logic_error &e) {
