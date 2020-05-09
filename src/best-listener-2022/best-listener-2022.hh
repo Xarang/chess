@@ -11,7 +11,7 @@ class BestListener2022 : public listener::Listener {
 
     public:
 
-        BestListener2022() = default; 
+        BestListener2022() : interface_(nullptr) {}; 
 
     /**
         ** \brief Register the ChessboardInterface for later use.
@@ -22,6 +22,8 @@ class BestListener2022 : public listener::Listener {
         */
         void register_board(const board::ChessboardInterface& board_interface) {
             interface_ = &board_interface;
+            std::cout << "[LISTENER] registered board interface: " << interface_ << "\n";
+            std::cout << board_string_representation();
         }
 
         /**
@@ -30,6 +32,7 @@ class BestListener2022 : public listener::Listener {
         */
         void on_game_finished() {
             std::cout << "[END] game over" << "\n";
+            std::cout << board_string_representation();
         }
 
         /**
@@ -43,6 +46,7 @@ class BestListener2022 : public listener::Listener {
                                     const board::Position& from,
                                     const board::Position& to) {
             std::cout << "[MOVE] piece " + std::string("" + board::piece_to_char(piece)) + " moved from " + from.to_string() + " to " + to.to_string() + "\n";
+            std::cout << board_string_representation();
         }
 
         /**
@@ -55,7 +59,6 @@ class BestListener2022 : public listener::Listener {
         void on_piece_taken(const board::PieceType piece,
                                     const board::Position& at) {
             std::cout << "[TAKE] piece " + std::string("" + board::piece_to_char(piece)) + " captured on position " + at.to_string() << "\n";
-
         }
 
         /**
@@ -68,6 +71,7 @@ class BestListener2022 : public listener::Listener {
         void on_piece_promoted(const board::PieceType piece,
                                        const board::Position& at) {
             std::cout << "[PROMOTION] piece promoted to " + std::string("" + board::piece_to_char(piece)) + " on position " + at.to_string() << "\n";
+            std::cout << board_string_representation();
         }
 
         /**
@@ -138,5 +142,10 @@ class BestListener2022 : public listener::Listener {
         */
         void on_draw() {
             std::cout << "[END] game is a draw" << "\n";
+            std::cout << board_string_representation();
         }
 };
+
+ extern "C" listener::Listener* listener_create() {
+    return new BestListener2022();
+}
