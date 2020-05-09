@@ -126,7 +126,7 @@ namespace board {
     }
 
     bool Chessboard::is_draw() {
-        //player has 0 legal moves
+        //player has 0 legal moves (but is not checked)
         //or
         //same board configuration happened 3 times
         //or
