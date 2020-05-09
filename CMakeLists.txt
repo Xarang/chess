@@ -23,41 +23,77 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Og -g3")
 # -fsanitize=address")
 
 # LIBRARIES
-set(Boost_USE_STATIC_LIBS ON)
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+    set(Boost_USE_STATIC_LIBS ON)
+endif()
 find_package(Boost REQUIRED COMPONENTS system program_options)
-set(LIBRARIES Boost::system Boost::program_options)
+set(LIBRARIES Boost::system Boost::program_options ${CMAKE_DL_LIBS})
 
 
 # SOURCES : FIXME
 
-set(SRC_ENGINE_DIRECTORY src/chessengine)
-set(CHESSENGINE_LIBRARY CHESSENGINE)
-set(SRC_LISTENERS_DIRECTORY src/listeners)
-set(LISTENERS_LIBRARY LISTENERS)
+set(SRC
+    src/chessengine/board/chessboard-interface-impl.cc
+    src/chessengine/board/chessboard.cc
+    src/chessengine/board/color.cc
+    src/chessengine/board/move-builder.cc
+    src/chessengine/board/move-legality-checker.cc
+    src/chessengine/board/move.cc
+    src/chessengine/board/piece.cc
+    src/chessengine/board/position.cc
+    src/chessengine/pgn/pgn-exception.cc
+    src/chessengine/pgn/pgn-move.cc
+    src/chessengine/pgn/pgn-parser.cc
+    src/listeners/listener-manager.cc
+    src/ai/uci.cc)
 
-include_directories(${SRC_ENGINE_DIRECTORY})
-add_subdirectory(${SRC_ENGINE_DIRECTORY})
-include_directories(${SRC_LISTENERS_DIRECTORY})
-add_subdirectory(${SRC_LISTENERS_DIRECTORY})
+include_directories(
+    src/chessengine
+    src/ai
+    src/listeners
+)
 
 # END SOURCES
 
 # CUSTOM LISTENER
 
 add_library(best-listener-2022 SHARED
-    src/best-listener-2022/best-listener-2022.cc)
-
-target_link_libraries(best-listener-2022 PRIVATE ${CHESSENGINE_LIBRARY})
+    src/best-listener-2022/best-listener-2022.cc
+    ${SRC})
 
 set_target_properties(best-listener-2022
     PROPERTIES
     EXCLUDE_FROM_ALL "true")
 
-add_custom_target(listener
-    DEPENDS best-listener-2022)
+add_custom_target(listener DEPENDS best-listener-2022)
 
 
 # CHESSENGINE
-add_executable(chessengine
-    src/main.cc)
-target_link_libraries(chessengine PRIVATE ${LIBRARIES} ${CHESSENGINE_LIBRARY} ${LISTENERS_LIBRARY})
+add_executable(chessengine)
+target_sources(chessengine PRIVATE "src/main.cc" ${SRC})
+target_link_libraries(chessengine PRIVATE ${LIBRARIES})
+
+
+# TESTS
+# Check if GTest is installed
+find_package(GTest)
+
+# If it is, create a dedicated target "tests"
+if(GTest_FOUND)
+  include(GoogleTest)
+
+  add_executable(tests)
+  target_sources(tests PRIVATE 
+    ${SRC_GTEST}
+    ${SRC_ENGINE}
+  )
+  target_compile_options(tests PRIVATE -Wall -Werror -Wextra)
+  target_link_libraries(tests PRIVATE GTest::GTest ${LIBRARIES})
+endif()
+
+# STATIC TARGET
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+    add_executable(chessengine-static)
+    target_sources(chessengine-static PRIVATE "src/main.cc" ${SRC})
+    target_link_libraries(chessengine-static PRIVATE ${LIBRARIES} -static)
+endif()

@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "move.hh"
+#include "board/move.hh"
 
 namespace pgn_parser
 {

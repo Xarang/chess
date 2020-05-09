@@ -4,7 +4,7 @@
 #include <regex>
 
 #include "pgn-exception.hh"
-#include "piece-type.hh"
+#include "board/piece-type.hh"
 
 namespace pgn_parser
 {
