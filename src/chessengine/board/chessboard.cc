@@ -8,11 +8,8 @@ namespace board {
     void Chessboard::do_move(Move move) {
         current_turn_++;
         turns_since_last_piece_taken_or_pawn_moved_++;
-        int j = 0;
-
         //TODO: hash the current state of the board (string ?) and store it inside the all_boards_since_start_ multimap
 
-        
         //if the board previously had a 'en passant target square', this do_move "consumes" it
         en_passant_target_square_ = std::nullopt;
 
@@ -37,20 +34,28 @@ namespace board {
                 if (move.piece_ == PieceType::PAWN) {
                     turns_since_last_piece_taken_or_pawn_moved_ = 0;
                 }
+
+                //this is how to properly move a piece on the board
                 pieces_[i].position_ = move.end_position_;
                 pieces_[i].has_already_moved_ = true;
-                j = i;
+                (*this)[move.end_position_] = pieces_[i];
+                (*this)[move.start_position_] = std::nullopt;
+
+
+                //board_((int)move.end_position_.file_get(), (int)move.end_position_.rank_get()) = std::make_optional(pieces_[j]);
+                //board_((int)move.start_position_.file_get(), (int)move.start_position_.rank_get()) = std::nullopt;
+
+                if (move.promotion_.has_value())
+                {
+                    pieces_[i].type_ = move.promotion_.value();
+                    (*this)[move.end_position_] = Piece(move.end_position_, whose_turn_is_it(), move.promotion_.value());
+                }
+                //j = i;
                 break;
             }
         }
 
-        board_((int)move.end_position_.file_get(), (int)move.end_position_.rank_get()) = std::make_optional(pieces_[j]);
-        board_((int)move.start_position_.file_get(), (int)move.start_position_.rank_get()) = std::nullopt;
 
-        if (move.promotion_.has_value())
-        {
-            (*this)[move.end_position_] = Piece(move.end_position_, whose_turn_is_it(), move.promotion_.value());
-        }
 
         if (move.is_double_pawn_push_) {
             //mark the square that can be "prise en passant"'ed next turn
