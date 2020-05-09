@@ -16,17 +16,17 @@ namespace board {
         //if the board previously had a 'en passant target square', this do_move "consumes" it
         en_passant_target_square_ = std::nullopt;
 
-        auto ite = pieces_.begin();
-        ++ite;
-        while (ite != pieces_.end())
-        {
-            if (ite->position_ != move.end_position_)
-            {
-                ++ite;
-            } else {
-                turns_since_last_piece_taken_or_pawn_moved_ = 0;
-                pieces_.erase(ite);
-                break;
+        if (board_((int)move.end_position_.file_get(), (int)move.end_position_.rank_get()).has_value()) {
+            auto ite = pieces_.begin();
+            ++ite;
+            while (ite != pieces_.end()) {
+                if (ite->position_ != move.end_position_) {
+                    ++ite;
+                } else {
+                    turns_since_last_piece_taken_or_pawn_moved_ = 0;
+                    pieces_.erase(ite);
+                    break;
+                }
             }
         }
 
@@ -80,6 +80,14 @@ namespace board {
             }
             board_((int)endRookFile, (int)rookRank) = board_((int)rookFile, (int)rookRank);
             board_((int)rookFile, (int)rookRank) = std::nullopt;
+
+            for (unsigned  long i = 0; i < pieces_.size(); i++)
+            {
+                if (pieces_[i].position_.file_get() == rookFile && pieces_[i].position_.rank_get() == rookRank)
+                {
+                   pieces_[i].position_ = Position(endRookFile, rookRank);
+                }
+            }
         }
         is_white_turn_ = !is_white_turn_;
     }
