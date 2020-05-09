@@ -46,7 +46,7 @@ namespace listener {
 
     //tasks
 
-     void ListenerManager::runPgnFile(std::string& filename) {
+     void ListenerManager::run_pgn_file(std::string& filename) {
         try {
             std::vector<board::PgnMove> moves = pgn_parser::parse_pgn(filename);
             for (board::PgnMove m : moves) {
@@ -79,6 +79,24 @@ namespace listener {
         }
     }
 
+    static unsigned long perft(board::Chessboard b, int depth) {
+        if (depth == 0) {
+            return 0;
+        }
+        unsigned long sum = 0;
+        auto moves = b.generateLegalMoves();
+        sum += moves.size();
+        for (auto move : moves) {
+            auto projection = b.project(move);
+            sum += perft(projection, depth - 1);
+        }
+        return sum;
+    }
+
+    void ListenerManager::run_perft(int depth) {
+        auto n = perft(board_.value(), depth);
+        std::cout << n << "\n";
+    }
 
 
     //listener calls

@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 
@@ -40,21 +41,29 @@ int main(int argc, const char *argv[]) {
     if (variables.count("pgn")) {
         auto board = board::Chessboard();
         listenerManager.register_board(board);
-
-         //pgn here
-         std::string pgnfilename = variables["pgn"].as<std::string>();
-         try {
-             listenerManager.runPgnFile(pgnfilename);
-         }
-         catch (std::exception &e) {
-             std::cerr << e.what() << "\n";
-         }
+        //pgn here
+        std::string pgnfilename = variables["pgn"].as<std::string>();
+        try {
+            listenerManager.run_pgn_file(pgnfilename);
+        }
+        catch (std::exception &e) {
+            std::cerr << e.what() << "\n";
+        }
     }
     else if (variables.count("perft")) {
-         //generator here
-         auto board = board::Chessboard(variables["perft"].as<std::string>());
-         board.generateLegalMoves();
-        
+        //generator here
+        std::ifstream ifs(variables["perft"].as<std::string>());
+        std::string content((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+        std::string depth;
+        while (content.back() != ' ') {
+            depth = depth + content.back();
+            content.erase(content.size() - 1, 1);
+        }
+        content.erase(content.size() - 1, 1);
+
+        auto board = board::Chessboard(content);
+        listenerManager.register_board(board);
+        listenerManager.run_perft(std::atoi(depth.c_str()));
     }
     else {
         //ai here

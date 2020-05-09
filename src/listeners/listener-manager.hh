@@ -25,7 +25,8 @@ namespace listener {
             ListenerManager() = default;
 
             //tasks
-            void runPgnFile(std::string& filename);
+            void run_pgn_file(std::string& filename);
+            void run_perft(int depth);
 
             //send informations about what happened on the chessboard to all listeners
             void register_move(board::Color color, board::Move move, std::optional<board::Piece> destinationSquare);
