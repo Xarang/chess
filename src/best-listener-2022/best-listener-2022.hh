@@ -79,7 +79,7 @@ class BestListener2022 : public listener::Listener {
         */
         void on_piece_taken(const board::PieceType piece,
                                     const board::Position& at) {
-            std::cout << "[TAKE] piece " + std::string("" + board::piece_to_char(piece)) + " captured on position " + at.to_string() << "\n";
+            std::cout << "[TAKE] piece " << std::string(piece_name((int)piece)) << " captured on position " << at.to_string() << "\n";
         }
 
         /**
@@ -91,7 +91,7 @@ class BestListener2022 : public listener::Listener {
         */
         void on_piece_promoted(const board::PieceType piece,
                                        const board::Position& at) {
-            std::cout << "[PROMOTION] piece promoted to " + std::string("" + board::piece_to_char(piece)) + " on position " + at.to_string() << "\n";
+            std::cout << "[PROMOTION] piece promoted to " + std::string(piece_name((int)piece)) + " on position " + at.to_string() << "\n";
             std::cout << board_string_representation();
         }
 
@@ -155,7 +155,7 @@ class BestListener2022 : public listener::Listener {
         ** @param color: The color of the player who is disqualified.
         */
         void on_player_disqualified(const board::Color color) {
-            std::cout << "[PAT] " + board::color_to_string(color) + " is pat" << "\n"; 
+            std::cout << "[END] " + board::color_to_string((board::Color)(!(bool)color)) + " won" << "\n"; 
         }
 
         /**

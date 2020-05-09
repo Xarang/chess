@@ -191,50 +191,33 @@ namespace board {
         //TODO: the position hold in b.en_passant_target_square_ (if any) should be a valid capture position, even if it is empty. In this case, the captured piece
         //is not on move.end_position_ so we will have to handle this case.
 
-        if (b.is_white_turn_)
+        int rank_direction = b.is_white_turn_ ? 1 : -1;
+        Rank initial_rank = b.is_white_turn_ ? Rank::TWO : Rank::SEVEN;
+        if (move.start_position_.rank_get() + rank_direction != move.end_position_.rank_get())
         {
-            if (move.start_position_.rank_get() + 1 != move.end_position_.rank_get())
-            {
-                    if (move.start_position_.rank_get() == Rank::TWO && move.start_position_.rank_get() + 2 == move.end_position_.rank_get()) {
-                        if (b.board_((int)move.end_position_.file_get(), (int)move.end_position_.rank_get() - 1).has_value())
-                            return false;
-                        move.is_double_pawn_push_ = false;
-                        return true;
-                    }
-                    if (move.is_capture_)
-                    {
-                        if (move.start_position_.rank_get() - 1 == move.end_position_.rank_get() && move.start_position_.file_get() - 1 == move.start_position_.file_get())
-                            return true;
-
-                        if (move.start_position_.rank_get() + 1 == move.end_position_.rank_get() && move.start_position_.file_get() - 1 == move.start_position_.file_get())
-                            return true;
-                    }
-                    return false;
-            }
-            return true;
-        } else
-        {
-            if (move.start_position_.rank_get() - 1 != move.end_position_.rank_get())
-            {
-                if (move.start_position_.rank_get() == Rank::SEVEN && move.start_position_.rank_get() - 2 == move.end_position_.rank_get())
-                {
-                    if (b.board_((int)move.end_position_.file_get(), (int)move.end_position_.rank_get() + 1).has_value())
+                if (move.start_position_.rank_get() == initial_rank && move.start_position_.rank_get() + rank_direction * 2 == move.end_position_.rank_get()) {
+                    if (b.board_((int)move.end_position_.file_get(), (int)move.end_position_.rank_get() - rank_direction).has_value())
                         return false;
                     move.is_double_pawn_push_ = false;
                     return true;
                 }
                 if (move.is_capture_)
                 {
-                    if (move.start_position_.rank_get() + 1 == move.end_position_.rank_get() && move.start_position_.file_get() - 1 == move.start_position_.file_get())
+                    if (b[move.end_position_] == std::nullopt) {
+                        if (!move.is_en_passant_) {
+                            return false;
+                        }
+                        return move.end_position_ == b.en_passant_target_square_;
+                    }
+                    if (move.start_position_.file_get() - 1 == move.end_position_.file_get() && move.start_position_.rank_get() + rank_direction == move.end_position_.rank_get())
                         return true;
 
-                    if (move.start_position_.rank_get() + 1 == move.end_position_.rank_get() && move.start_position_.file_get() + 1 == move.start_position_.file_get())
+                    if (move.start_position_.file_get() + 1 == move.end_position_.file_get() && move.start_position_.rank_get() + rank_direction == move.end_position_.rank_get())
                         return true;
                 }
                 return false;
-            }
-            return true;
         }
+        return true;
     }
 
     bool MoveLegalityChecker::is_move_legal_ROOK(Chessboard b, Move move) {

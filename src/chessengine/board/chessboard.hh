@@ -102,6 +102,7 @@ namespace board {
         //recreates a chessboard from an ongoing game using a fen string
         Chessboard(std::string fen_string);
 
+        void do_move_en_passant(Move);
         void do_move(Move);
         bool is_move_legal(Move);
         std::list<Move> generateLegalMoves();
