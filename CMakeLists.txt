@@ -17,9 +17,10 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -pedantic -g")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -pedantic -fpic")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${OPT_FLAGS}")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Og -g3 -fsanitize=address")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Og -g3")
+# -fsanitize=address")
 
 # LIBRARIES
 set(Boost_USE_STATIC_LIBS ON)
@@ -40,6 +41,21 @@ include_directories(${SRC_LISTENERS_DIRECTORY})
 add_subdirectory(${SRC_LISTENERS_DIRECTORY})
 
 # END SOURCES
+
+# CUSTOM LISTENER
+
+add_library(best-listener-2022 SHARED
+    src/best-listener-2022/best-listener-2022.cc)
+
+target_link_libraries(best-listener-2022 PRIVATE ${CHESSENGINE_LIBRARY})
+
+set_target_properties(best-listener-2022
+    PROPERTIES
+    EXCLUDE_FROM_ALL "true")
+
+add_custom_target(listener
+    DEPENDS best-listener-2022)
+
 
 # CHESSENGINE
 add_executable(chessengine

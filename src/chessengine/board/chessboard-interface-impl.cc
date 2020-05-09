@@ -1,6 +1,10 @@
 #include "pgn/pgn-parser.hh"
 #include "pgn/pgn-move.hh"
 #include "chessboard-interface-impl.hh"
+#include "piece-type.hh"
+
+#include "position.hh"
+#include "color.hh"
 
 namespace board {
     using side_piece_t = std::pair<PieceType, Color>;
@@ -13,7 +17,6 @@ namespace board {
         }
         return std::nullopt;
     }
-
    
 
 }

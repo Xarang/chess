@@ -20,7 +20,6 @@ namespace board {
             ** @return Piece and Color, or nullopt_t if the square is empty
             */
             opt_piece_t operator[](const Position& position) const;
-
     };
 
 }
