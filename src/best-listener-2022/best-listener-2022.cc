@@ -12,12 +12,14 @@ std::string BestListener2022::board_string_representation() {
         std::string res = "";
 
         
-        board::Rank currRank = board::Rank::ONE; 
+        board::Rank currRank = board::Rank::EIGHT; 
         std::string background = "";
 
-        for (int i = 0; i < 8; i++)
+        res += "   A  B  C  D  E  F  G  H \n";
+        for (int i = 7; i >= 0; i--)
         {
             board::File currFile = board::File::A;
+            res += std::to_string(i + 1) + " ";
             for (int j = 0; j < 8; j++)
             {
                 board::Position myPos(currFile, currRank);
@@ -40,7 +42,7 @@ std::string BestListener2022::board_string_representation() {
                 currFile = currFile + 1;
             }
             res += "\n";
-            currRank = currRank + 1;
+            currRank = currRank - 1;
         }
         return res;
     }
