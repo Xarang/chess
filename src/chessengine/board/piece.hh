@@ -16,11 +16,11 @@ namespace board
         PieceType type_;
         bool has_already_moved_;
 
+        Piece() = default;
+
         Piece(Position newPos, Color newColor, PieceType newPieceType) 
         : position_(newPos), color_(newColor), type_(newPieceType), has_already_moved_(false)
         {}
-
-        Piece();
 
         std::list<struct Move> getAllPotentialMoves();
     };
