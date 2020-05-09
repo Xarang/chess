@@ -64,7 +64,8 @@ class BestListener2022 : public listener::Listener {
         void on_piece_moved(const board::PieceType piece,
                                     const board::Position& from,
                                     const board::Position& to) {
-            std::cout << "[MOVE] #" << move_count << " " << piece_name(utils::utype(piece)) << " moved from " + from.to_string() + " to " + to.to_string() + "\n";
+            auto player = move_count % 2 == 0 ? "White" : "Black";
+            std::cout << "[MOVE] " << player << " #" << move_count / 2 << " " << piece_name(utils::utype(piece)) << " moved from " + from.to_string() + " to " + to.to_string() + "\n";
             move_count++;
             std::cout << board_string_representation();
         }
