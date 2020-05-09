@@ -143,12 +143,12 @@ namespace board {
 
     bool Chessboard::is_check() {
         //generate legal moves for opponent and check if one on them captures your king.
-        throw "not implemented";
+        return false;
     }
 
     bool Chessboard::is_checkmate() {
         //is check + project all your legal moves as long as you don't find one in which you are not checked. if you can't find one, you are checkmated
-        throw "not implemented";
+        return false;
     }
 
     bool Chessboard::is_draw() {
@@ -157,7 +157,7 @@ namespace board {
         //same board configuration happened 3 times
         //or
         //no pawn moved or piece captured in last 50 turns
-        throw "not implemented";
+        return false;
     }
 
     std::optional<Piece>& Chessboard::operator[](Position pos) {
@@ -169,7 +169,7 @@ namespace board {
         throw "not implemented";
     }
 
-    Chessboard::Chessboard(std::string fen_string) {
+    Chessboard::Chessboard(std::string fen_string) : board_(8,8) {
         auto fen_string_stream = std::istringstream(fen_string);
         std::vector<std::string> fields;
         std::string s;
@@ -189,10 +189,11 @@ namespace board {
             int fileIndex = 0;
             for (auto it = rank.begin(); it != rank.end(); it++) {
                 if (isdigit(*it)) {
-                    fileIndex += std::stoi("" + *it);
+                    fileIndex += '0' - (int)*it;
                 }
                 else {
                     pieces_.push_back(Piece(Position((File)fileIndex, (Rank)rankIndex), islower(*it) ? Color::BLACK : Color::WHITE, char_to_piece(toupper(*it))));
+                    fileIndex++;
                 }
             }
             rankIndex++;

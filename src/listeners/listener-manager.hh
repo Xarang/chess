@@ -3,9 +3,9 @@
 #include <string>
 #include <vector>
 
-#include "../chessengine/board/chessboard.hh"
-#include "../chessengine/board/chessboard-interface-impl.hh"
-#include "../chessengine/board/move.hh"
+#include "board/chessboard.hh"
+#include "board/chessboard-interface-impl.hh"
+#include "board/move.hh"
 
 #include "listener.hh"
 
