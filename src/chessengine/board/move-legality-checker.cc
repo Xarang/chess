@@ -9,7 +9,32 @@ namespace board {
     }
 
     //TODO: use chessboard to assess legality (currently not using it)
-    bool MoveLegalityChecker::is_move_legal_KING(Chessboard, Move move) {
+    bool MoveLegalityChecker::is_move_legal_KING(Chessboard chessboard, Move move) {
+
+        if (move.is_king_castling_)
+        {
+            auto king = chessboard.board_((int)move.start_position_.file_get(), (int)move.start_position_.rank_get());
+            if (king.value().has_already_moved_)
+                return false;
+            if (chessboard.is_white_turn_)
+            {
+               auto rook = chessboard.board_(((int)File::A, (int)Rank::ONE));
+               if (!rook.has_value() || rook.value().has_already_moved_)
+                   return false;
+
+               if (chessboard.board_((int)File::B, (int)Rank::ONE).has_value() || chessboard.board_((int)File::C, (int)Rank::ONE).has_value())
+                   return false;
+            } else
+            {
+                auto rook = chessboard.board_(((int)File::A, (int)Rank::EIGHT));
+                if (!rook.has_value() || rook.value().has_already_moved_)
+                    return false;
+
+                if (chessboard.board_((int)File::B, (int)Rank::EIGHT).has_value() || chessboard.board_((int)File::C, (int)Rank::EIGHT).has_value())
+                    return false;
+            }
+            return true;
+        }
         auto startFile = move.start_position_.file_get();
         auto startRank = move.start_position_.rank_get();
         auto endFile = move.end_position_.file_get();
