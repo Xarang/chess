@@ -54,7 +54,6 @@ namespace board {
             //TODO: unsure about this, make sure it marks the good square as eligible en passant target for next move
         }
 
-
         is_white_turn_ = !is_white_turn_;
     }
 
@@ -117,12 +116,12 @@ namespace board {
 
     bool Chessboard::is_check() {
         //generate legal moves for opponent and check if one on them captures your king.
-        throw "not implemented";
+        return false;
     }
 
     bool Chessboard::is_checkmate() {
         //is check + project all your legal moves as long as you don't find one in which you are not checked. if you can't find one, you are checkmated
-        throw "not implemented";
+        return false;
     }
 
     bool Chessboard::is_draw() {
@@ -131,7 +130,7 @@ namespace board {
         //same board configuration happened 3 times
         //or
         //no pawn moved or piece captured in last 50 turns
-        throw "not implemented";
+        return false;
     }
 
     std::optional<Piece>& Chessboard::operator[](Position pos) {

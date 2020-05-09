@@ -32,7 +32,7 @@ namespace board
     if (
             piece_ == PieceType::KING
             && start_position_.file_get() == File::E
-            && end_position_.file_get() == File::B
+            && end_position_.file_get() == File::C
         ) {
             is_queen_castling_ = true;
         }

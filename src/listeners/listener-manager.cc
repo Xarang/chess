@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 
-#include "../chessengine/pgn/pgn-parser.hh"
+#include "pgn/pgn-parser.hh"
 
 #include "listener-manager.hh"
 
@@ -27,7 +27,7 @@ namespace listener {
 
     void ListenerManager::register_board(board::Chessboard& b) {
         board_ = std::make_optional<board::Chessboard>(b);
-        interface_ = std::make_optional<board::ChessboardInterfaceImpl>(b);
+        interface_ = std::make_optional<board::ChessboardInterfaceImpl>(board_.value());
         for (auto listener : listeners_) {
             listener->register_board(interface_.value());
         }
@@ -57,7 +57,25 @@ namespace listener {
                         try {
                             board_->do_move(move);
                             register_move(board_->whose_turn_is_it(), move, (*board_)[move.end_position_]);
-                            //TODO: do all the other move registrations
+
+                            if (board_->is_checkmate()) {
+                                register_mat(board_->whose_turn_is_it());
+                                register_lose(board_->whose_turn_is_it());
+                            }
+                            else if (board_->is_check()) {
+                                register_check(board_->whose_turn_is_it());
+                            }                        
+                            else if (false) {/*(board_->generateLegalMoves().size() == 0) {  put this when move generation is stable*/
+                                register_pat(board_->whose_turn_is_it());
+                                register_game_draw();
+                            }
+                            else if (board_->is_draw()) {
+                                register_game_draw();
+                                register_game_finished();
+                            }
+
+
+
                         }
                         catch (std::exception &e) {
                             throw std::runtime_error("error happened while executing move: " + move.to_string() + " : " + e.what() + "\n");
