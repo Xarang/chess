@@ -8,8 +8,7 @@
 
 namespace listener {
 
-    ListenerManager::ListenerManager(::board::Chessboard& board, std::vector<std::string> plugins)
-        : board_(board), interface_(board::ChessboardInterfaceImpl(board_)) {
+    void ListenerManager::load_plugins(std::vector<std::string> plugins) {
         for (auto listener : plugins) {
             void *lib = dlopen(listener.c_str(), RTLD_LAZY);
             if (!lib) {
@@ -20,10 +19,17 @@ namespace listener {
             void *listenerFunc = dlsym(lib, "listener_create");
             std::cout << "[LOAD] extracted 'listener_create' from lib: " << listenerFunc << "\n";
             listener::Listener* lst = reinterpret_cast<listener::Listener*(*)()>(listenerFunc)();
-            lst->register_board(interface_);
             listeners_.push_back(lst);
             plugins_.push_back(lib);
             std::cout << "[LOAD] plugin " << listener << " ready to go!" << "(" << plugins_.size() << "/" << plugins.size() << ")\n";
+        }
+    }
+
+    void ListenerManager::register_board(board::Chessboard& b) {
+        board_ = std::make_optional<board::Chessboard>(b);
+        interface_ = std::make_optional<board::ChessboardInterfaceImpl>(b);
+        for (auto listener : listeners_) {
+            listener->register_board(interface_.value());
         }
     }
 
@@ -47,10 +53,10 @@ namespace listener {
                 auto move = board::Move(m);
                 //std::cout << move.to_string();
                 try {
-                    if (board_.is_move_legal(move)) {
+                    if (board_->is_move_legal(move)) {
                         try {
-                            board_.do_move(move);
-                            register_move(board_.whose_turn_is_it(), move, board_[move.end_position_]);
+                            board_->do_move(move);
+                            register_move(board_->whose_turn_is_it(), move, (*board_)[move.end_position_]);
                             //TODO: do all the other move registrations
                         }
                         catch (std::exception &e) {

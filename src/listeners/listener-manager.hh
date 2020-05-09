@@ -15,18 +15,17 @@ namespace listener {
             std::vector<void*> plugins_;
             std::vector<Listener*> listeners_;
 
-            board::Chessboard board_;
-            board::ChessboardInterfaceImpl interface_;
+            std::optional<board::Chessboard> board_;
+            std::optional<board::ChessboardInterfaceImpl> interface_;
 
         public:
             void close_listeners();
-            ListenerManager(::board::Chessboard& board) : board_(board), interface_(board::ChessboardInterfaceImpl(board_)) {};
-            ListenerManager(::board::Chessboard& board, std::vector<std::string> plugins);
+            void load_plugins(std::vector<std::string> plugins);
+            void register_board(::board::Chessboard& board);
+            ListenerManager() = default;
 
             //tasks
-
             void runPgnFile(std::string& filename);
-
 
             //send informations about what happened on the chessboard to all listeners
             void register_move(board::Color color, board::Move move, std::optional<board::Piece> destinationSquare);
@@ -36,7 +35,5 @@ namespace listener {
             void register_lose(board::Color color);
             void register_game_draw();
             void register_game_finished();
-
-            ListenerManager() = default;
     };
 }

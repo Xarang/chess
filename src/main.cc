@@ -12,6 +12,7 @@
 
 int main(int argc, const char *argv[]) {
 
+
     namespace po = boost::program_options;
     auto options = po::options_description("Usage");
 
@@ -31,18 +32,19 @@ int main(int argc, const char *argv[]) {
         return 1;
     }
 
-    auto board = board::Chessboard();
-    std::unique_ptr<listener::ListenerManager> listenerManager = std::make_unique<listener::ListenerManager>(board);
+    auto listenerManager = listener::ListenerManager();
     if (variables.count("listeners")) {
-        auto listeners = variables["listeners"].as<std::vector<std::string>>();
-        listenerManager = std::make_unique<listener::ListenerManager>(board, listeners);
+        listenerManager.load_plugins(variables["listeners"].as<std::vector<std::string>>());
     }
 
     if (variables.count("pgn")) {
+        auto board = board::Chessboard();
+        listenerManager.register_board(board);
+
          //pgn here
          std::string pgnfilename = variables["pgn"].as<std::string>();
          try {
-             listenerManager->runPgnFile(pgnfilename);
+             listenerManager.runPgnFile(pgnfilename);
          }
          catch (std::exception &e) {
              std::cerr << e.what() << "\n";
@@ -50,16 +52,14 @@ int main(int argc, const char *argv[]) {
     }
     else if (variables.count("perft")) {
          //generator here
-        //TODO: incorprate this in listenerManager like pgn
-         auto moves = board.generateLegalMoves();
-         for (auto move : moves) {
-             std::cout << move.to_string();
-         }
+         auto board = board::Chessboard(variables["perft"].as<std::string>());
+         board.generateLegalMoves();
+        
     }
     else {
         //ai here
     }
 
-    listenerManager->close_listeners();
+    listenerManager.close_listeners();
     return 0;
 }

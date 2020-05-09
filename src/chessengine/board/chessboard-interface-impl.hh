@@ -13,6 +13,11 @@ namespace board {
             using opt_piece_t = std::optional<side_piece_t>;
 
             ChessboardInterfaceImpl(Chessboard& cb) : cb_(cb) {}
+            ChessboardInterfaceImpl(const ChessboardInterfaceImpl& other) = default;
+            ChessboardInterfaceImpl& operator=(const ChessboardInterfaceImpl &other) {
+                cb_ = other.cb_;
+                return *this;
+            }
 
             /*!
             ** Access operator.
