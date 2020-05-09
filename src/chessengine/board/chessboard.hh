@@ -47,7 +47,7 @@ namespace board {
 
         //map containing hashed representations of all boards since start (to_string'ed)
         //if a key has 3 values it means the '3 fold' rule applies and the game is a draw
-        std::unordered_multimap<int, std::string> all_boards_since_start_;
+        std::list<std::string> all_boards_since_start_;
 
 
         public:

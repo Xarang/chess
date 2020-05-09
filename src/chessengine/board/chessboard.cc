@@ -196,11 +196,93 @@ namespace board {
 
     bool Chessboard::is_check() {
         //generate legal moves for opponent and check if one on them captures your king.
+        is_white_turn_ = !is_white_turn_;
+        std::list<Move> opponent_moves = generateLegalMoves();
+        is_white_turn_ = !is_white_turn_;
+
+        File king_file = File::OUTOFBOUNDS;
+        Rank king_rank = Rank::OUTOFBOUNDS;
+        for (auto piece : pieces_)
+        {
+            if (piece.type_ == PieceType::KING && (bool)piece.color_ != is_white_turn_)
+            {
+                king_file = piece.position_.file_get();
+                king_rank = piece.position_.rank_get();
+                break;
+            }
+        }
+
+        for (auto move : opponent_moves)
+        {
+            if (move.end_position_.file_get() == king_file &&
+                move.end_position_.rank_get() == king_rank)
+            {
+                return true;
+            }
+        }
         return false;
     }
 
     bool Chessboard::is_checkmate() {
         //is check + project all your legal moves as long as you don't find one in which you are not checked. if you can't find one, you are checkmated
+        is_white_turn_ = !is_white_turn_;
+        std::list<Move> opponent_moves = generateLegalMoves();
+        is_white_turn_ = !is_white_turn_;
+
+        File king_file = File::OUTOFBOUNDS;
+        Rank king_rank = Rank::OUTOFBOUNDS;
+
+        struct Piece king;
+
+        for (auto piece : pieces_)
+        {
+            if (piece.type_ == PieceType::KING && (bool)piece.color_ != is_white_turn_)
+            {
+                king = piece;
+                king_file = piece.position_.file_get();
+                king_rank = piece.position_.rank_get();
+                break;
+            }
+        }
+
+        bool is_check = false;
+        for (auto move : opponent_moves)
+        {
+            if (move.end_position_.file_get() == king_file &&
+                move.end_position_.rank_get() == king_rank)
+            {
+                is_check = true;
+                break;
+            }
+        }
+
+        if (!is_check)
+        {
+            return false;
+        }
+
+
+        std::list<Move> king_moves = king.getAllPotentialMoves();
+
+        for (auto move : king_moves)
+        {
+            king_file = move.end_position_.file_get();
+            king_rank = move.end_position_.rank_get();
+            bool not_checkmate = true;
+            for (auto opponent_move : opponent_moves)
+            {
+                if (opponent_move.end_position_.file_get() == king_file &&
+                    opponent_move.end_position_.rank_get() == king_rank)
+                {
+                    not_checkmate = false;
+                    break;
+                }
+            }
+            if (not_checkmate)
+            {
+                return false;
+            }
+        }
         return false;
     }
 
@@ -210,6 +292,31 @@ namespace board {
         //same board configuration happened 3 times
         //or
         //no pawn moved or piece captured in last 50 turns
+
+        std::list<Move> legal_moves = generateLegalMoves();
+        if (legal_moves.empty() && !is_check())
+        {
+            return true;
+        }
+        if (turns_since_last_piece_taken_or_pawn_moved_ >= 50)
+        {
+            return true;
+        }
+
+        std::string s = to_string();
+
+        int count = 0;
+        for (std::string board : all_boards_since_start_)
+        {
+            if (board == s)
+            {
+                count++;
+                if (count == 3)
+                {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
