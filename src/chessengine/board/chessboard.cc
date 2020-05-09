@@ -211,7 +211,7 @@ namespace board {
                 break;
             }
         }
-
+        
         for (auto move : opponent_moves)
         {
             if (move.end_position_.file_get() == king_file &&
@@ -225,65 +225,20 @@ namespace board {
 
     bool Chessboard::is_checkmate() {
         //is check + project all your legal moves as long as you don't find one in which you are not checked. if you can't find one, you are checkmated
-        is_white_turn_ = !is_white_turn_;
-        std::list<Move> opponent_moves = generateLegalMoves();
-        is_white_turn_ = !is_white_turn_;
-
-        File king_file = File::OUTOFBOUNDS;
-        Rank king_rank = Rank::OUTOFBOUNDS;
-
-        struct Piece king;
-
-        for (auto piece : pieces_)
-        {
-            if (piece.type_ == PieceType::KING && (bool)piece.color_ != is_white_turn_)
-            {
-                king = piece;
-                king_file = piece.position_.file_get();
-                king_rank = piece.position_.rank_get();
-                break;
-            }
-        }
-
-        bool is_check = false;
-        for (auto move : opponent_moves)
-        {
-            if (move.end_position_.file_get() == king_file &&
-                move.end_position_.rank_get() == king_rank)
-            {
-                is_check = true;
-                break;
-            }
-        }
-
-        if (!is_check)
+        if (!is_check())
         {
             return false;
         }
 
-
-        std::list<Move> king_moves = king.getAllPotentialMoves();
-
-        for (auto move : king_moves)
-        {
-            king_file = move.end_position_.file_get();
-            king_rank = move.end_position_.rank_get();
-            bool not_checkmate = true;
-            for (auto opponent_move : opponent_moves)
-            {
-                if (opponent_move.end_position_.file_get() == king_file &&
-                    opponent_move.end_position_.rank_get() == king_rank)
-                {
-                    not_checkmate = false;
-                    break;
-                }
-            }
-            if (not_checkmate)
-            {
+        std::list<Move> moves = generateLegalMoves();
+        for (auto move : moves) {
+            auto projection = project(move);
+            projection.is_white_turn_ = !projection.is_white_turn_;
+            if (!projection.is_check()) {
                 return false;
             }
         }
-        return false;
+        return true;
     }
 
     bool Chessboard::is_draw() {
