@@ -85,7 +85,7 @@ if(GTest_FOUND)
   add_executable(tests)
   target_sources(tests PRIVATE 
     ${SRC_GTEST}
-    ${SRC_ENGINE}
+    ${SRC}
   )
   target_compile_options(tests PRIVATE -Wall -Werror -Wextra)
   target_link_libraries(tests PRIVATE GTest::GTest ${LIBRARIES})
