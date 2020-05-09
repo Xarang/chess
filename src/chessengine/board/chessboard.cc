@@ -63,6 +63,13 @@ namespace board {
         if (!(*this)[move.start_position_].has_value())
             return false;
 
+        //check if this move would make/leave the king vulnerable
+        auto projection = project(move);
+        projection.is_white_turn_ = !projection.is_white_turn_;
+        if (projection.is_check()) {
+            return false;
+        }
+
         auto piece = (*this)[move.end_position_];
         if (piece.has_value())
         {
