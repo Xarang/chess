@@ -122,6 +122,10 @@ namespace board {
     }
 
     bool MoveLegalityChecker::is_move_legal_PAWN(Chessboard b, Move move) {
+
+        //TODO: the position hold in b.en_passant_target_square_ (if any) should be a valid capture position, even if it is empty. In this case, the captured piece
+        //is not on move.end_position_ so we will have to handle this case.
+
         if (b.is_white_turn_)
         {
             if (move.start_position_.rank_get() + 1 != move.end_position_.rank_get())
