@@ -16,12 +16,17 @@ namespace board {
         //if the board previously had a 'en passant target square', this do_move "consumes" it
         en_passant_target_square_ = std::nullopt;
 
-        for (auto ite = pieces_.begin(); ite < pieces_.end(); ite++)
+        auto ite = pieces_.begin();
+        ++ite;
+        while (ite != pieces_.end())
         {
-            if (ite->position_ == move.end_position_)
+            if (ite->position_ != move.end_position_)
             {
+                ++ite;
+            } else {
                 turns_since_last_piece_taken_or_pawn_moved_ = 0;
                 pieces_.erase(ite);
+                break;
             }
         }
 
@@ -39,8 +44,8 @@ namespace board {
             }
         }
 
-        (*this)[move.end_position_] = std::make_optional(pieces_[j]);
-        (*this)[move.start_position_] = std::nullopt;
+        board_((int)move.end_position_.file_get(), (int)move.end_position_.rank_get()) = std::make_optional(pieces_[j]);
+        board_((int)move.start_position_.file_get(), (int)move.start_position_.rank_get()) = std::nullopt;
 
         if (move.promotion_.has_value())
         {
@@ -53,8 +58,29 @@ namespace board {
             en_passant_target_square_ = std::make_optional<Position>(move.start_position_.file_get(), move.start_position_.rank_get() + direction);
             //TODO: unsure about this, make sure it marks the good square as eligible en passant target for next move
         }
-
-
+        if (move.is_king_castling_ || move.is_queen_castling_)
+        {
+            File rookFile;
+            Rank rookRank;
+            File endRookFile;
+            if (move.is_queen_castling_) {
+                rookFile = File::A;
+                endRookFile = File::D;
+            }
+            else
+            {
+                rookFile = File::H;
+                endRookFile = File::F;
+            }
+            if (is_white_turn_) {
+                rookRank = Rank::ONE;
+            }
+            else {
+                rookRank = Rank::EIGHT;
+            }
+            board_((int)endRookFile, (int)rookRank) = board_((int)rookFile, (int)rookRank);
+            board_((int)rookFile, (int)rookRank) = std::nullopt;
+        }
         is_white_turn_ = !is_white_turn_;
     }
 
