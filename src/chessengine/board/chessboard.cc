@@ -60,6 +60,11 @@ namespace board {
 
     bool Chessboard::is_move_legal(Move move) {
 
+        if (move.start_position_.file_get() == File::OUTOFBOUNDS || move.start_position_.rank_get() == Rank::OUTOFBOUNDS
+            || move.end_position_.file_get() == File::OUTOFBOUNDS || move.end_position_.rank_get() == Rank::OUTOFBOUNDS) {
+                return false;
+            }
+
         if (!(*this)[move.start_position_].has_value())
             return false;
 
