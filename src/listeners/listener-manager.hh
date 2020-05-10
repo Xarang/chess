@@ -35,6 +35,5 @@ namespace listener {
             void register_pat(board::Color color);
             void register_lose(board::Color color);
             void register_game_draw();
-            void register_game_finished();
     };
 }

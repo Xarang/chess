@@ -73,27 +73,22 @@ namespace listener {
                             board_->change_turn();
                             //player 2
 
-
-                            auto moves = board_->generateLegalMoves();
-                            for (auto move : moves) {
-                                std::cout << move.to_string();
-                            }
                             if (board_->is_checkmate()) {
                                 register_mat(board_->whose_turn_is_it());
                                 register_lose(board_->whose_turn_is_it());
                             }
-                            else if (board_->is_check()) {
-                                register_check(board_->whose_turn_is_it());
+                            else {
+                                if (board_->is_check()) {
+                                    register_check(board_->whose_turn_is_it());
+                                }
+                                if (board_->generateLegalMoves().size() == 0) {
+                                    register_pat(board_->whose_turn_is_it());
+                                    register_game_draw();
+                                }
+                                else if (board_->is_draw()) {
+                                    register_game_draw();
+                                }
                             }
-                            else if (board_->generateLegalMoves().size() == 0) {
-                                register_pat(board_->whose_turn_is_it());
-                                register_game_draw();
-                            }
-                            else if (board_->is_draw()) {
-                                register_game_draw();
-                                register_game_finished();
-                            }
-                            
                             //player 2
                         }
                         catch (std::bad_alloc &e /*std::exception &e we dont want to catch for now */) {
@@ -187,17 +182,13 @@ namespace listener {
     void ListenerManager::register_lose(board::Color color) {
         for (auto listener : listeners_) {
             listener->on_player_disqualified(color);
+            listener->on_game_finished();
         }
     }
 
     void ListenerManager::register_game_draw() {
         for (auto listener : listeners_) {
             listener->on_draw();
-        }
-    }
-
-    void ListenerManager::register_game_finished() {
-        for (auto listener : listeners_) {
             listener->on_game_finished();
         }
     }

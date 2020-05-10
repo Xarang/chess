@@ -47,10 +47,10 @@ namespace board {
         unsigned int turns_since_last_piece_taken_or_pawn_moved_ = 0;
 
         std::optional<Position> en_passant_target_square_ = std::nullopt;
-
+        
         //map containing hashed representations of all boards since start (to_string'ed)
         //if a key has 3 values it means the '3 fold' rule applies and the game is a draw
-        std::list<std::string> all_boards_since_start_ = std::list<std::string>();
+        std::unordered_map<std::string, int> all_boards_since_start_ = std::unordered_map<std::string, int>();
 
 
         //these 3 methods are used by do_move
@@ -59,6 +59,7 @@ namespace board {
         void promote_piece(const Piece& p, PieceType type);
 
         public:
+
 
         // constructors 
 
@@ -105,7 +106,7 @@ namespace board {
                 for (Piece piece : pieces_) {
                     (*this)[Position(piece.position_.file_get(), piece.position_.rank_get())] = piece;
                 }
-                all_boards_since_start_.push_front(to_string());
+                all_boards_since_start_.insert(std::pair<std::string, int>(to_string(), 1));
         }
 
         //copy constructor (overloaded for assertions)
@@ -130,7 +131,6 @@ namespace board {
 
         void change_turn() { is_white_turn_ = !is_white_turn_; }
         friend class MoveLegalityChecker;
-
 
         //make a copy of the board with the move passed as argument executed
         Chessboard project(Move move);

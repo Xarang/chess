@@ -61,8 +61,13 @@ namespace board {
             promote_piece((*this)[move.end_position_].value(), move.promotion_.value());
         }
 
-
-        all_boards_since_start_.push_front(to_string());
+        auto fen = to_string();
+        if (all_boards_since_start_.find(fen) != all_boards_since_start_.end()) {
+            all_boards_since_start_.insert_or_assign(fen, all_boards_since_start_.find(fen)->second + 1);
+            //std::cout << fen << " ---> " << all_boards_since_start_.find(fen)->second << "\n";
+        } else {
+            all_boards_since_start_.insert(std::pair<std::string, int>(fen, 1));
+        }
         is_white_turn_ = !is_white_turn_;
     }
 
@@ -217,18 +222,10 @@ namespace board {
             return true;
         }
 
-        std::string s = to_string();
-
-        int count = 0;
-        for (std::string board : all_boards_since_start_)
-        {
-            if (board == s)
-            {
-                count++;
-                if (count == 3)
-                {
-                    return true;
-                }
+        for (std::pair<std::string, int> pair : all_boards_since_start_) {
+            //std::cout << pair.first << " ----------> " << pair.second << "\n";
+            if (pair.second >= 3) {
+                return true;
             }
         }
         return false;
@@ -276,11 +273,8 @@ namespace board {
             res += "/";
             currRank = currRank + 1;
         }
-        std::cout << res << "\n";
+        //std::cout << res << "\n";
         return res;
-
-        //TODO: fix this
-        return std::to_string(rand() % 1000000); //random string so that we dont get draw after 3 moves
     }
 
     /*
@@ -326,6 +320,8 @@ namespace board {
         did_black_queen_castling_ = fields[2].find("q") != fields[2].npos;
         did_white_queen_castling_ = fields[2].find("Q") != fields[2].npos;
 
+
+        all_boards_since_start_.insert(std::pair<std::string, int>(to_string(), 1));
         //TODO: add potential en-passant spot
 
     }
