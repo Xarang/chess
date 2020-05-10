@@ -2,7 +2,7 @@
 
 namespace board {
 
-    bool MoveLegalityChecker::is_move_legal_QUEEN(Chessboard chessboard, Move move) {
+    bool MoveLegalityChecker::is_move_legal_QUEEN(const Chessboard& chessboard, const Move& move) {
 
         bool b = is_move_legal_BISHOP(chessboard, move);
         if (b)
@@ -13,7 +13,7 @@ namespace board {
     }
 
     //TODO: use chessboard to assess legality (currently not using it)
-    bool MoveLegalityChecker::is_move_legal_KING(Chessboard chessboard, Move move) {
+    bool MoveLegalityChecker::is_move_legal_KING(const Chessboard& chessboard, const Move& move) {
         auto king = chessboard.board_((int)move.start_position_.file_get(), (int)move.start_position_.rank_get());
         if (move.is_queen_castling_) {
             if (king.value().has_already_moved_)
@@ -91,7 +91,7 @@ namespace board {
     }
 
     //TODO: use chessboard to assess legality (currently not using it)
-    bool MoveLegalityChecker::is_move_legal_KNIGHT(Chessboard, Move move){
+    bool MoveLegalityChecker::is_move_legal_KNIGHT(const Chessboard&, const Move& move){
         auto startFile = move.start_position_.file_get();
         auto startRank = move.start_position_.rank_get();
         auto endFile = move.end_position_.file_get();
@@ -115,7 +115,7 @@ namespace board {
         return startFile + 1 == endFile && startRank + 2 == endRank;
     }
 
-    bool MoveLegalityChecker::is_move_legal_BISHOP(Chessboard b, Move move) {
+    bool MoveLegalityChecker::is_move_legal_BISHOP(const Chessboard& b, const Move& move) {
         int Fi = 1;
         int Ri = 1;
         bool bo = true;
@@ -197,7 +197,7 @@ namespace board {
         return bo;
     }
 
-    bool MoveLegalityChecker::is_move_legal_PAWN(Chessboard b, Move move) {
+    bool MoveLegalityChecker::is_move_legal_PAWN(const Chessboard& b, const Move& move) {
 
         //TODO: the position hold in b.en_passant_target_square_ (if any) should be a valid capture position, even if it is empty. In this case, the captured piece
         //is not on move.end_position_ so we will have to handle this case.
@@ -209,12 +209,11 @@ namespace board {
                 if (move.start_position_.rank_get() == initial_rank && move.start_position_.rank_get() + rank_direction * 2 == move.end_position_.rank_get()) {
                     if (b.board_((int)move.end_position_.file_get(), (int)move.end_position_.rank_get() - rank_direction).has_value())
                         return false;
-                    move.is_double_pawn_push_ = false;
                     return true;
                 }
                 if (move.is_capture_)
                 {
-                    if (b[move.end_position_] == std::nullopt) {
+                    if (b.read(move.end_position_) == std::nullopt) {
                         if (!move.is_en_passant_) {
                             return false;
                         }
@@ -231,7 +230,7 @@ namespace board {
         return true;
     }
 
-    bool MoveLegalityChecker::is_move_legal_ROOK(Chessboard b, Move move) {
+    bool MoveLegalityChecker::is_move_legal_ROOK(const Chessboard& b, const Move& move) {
         int Fi = 1;
         int Ri = 1;
         if (move.start_position_.file_get() < move.end_position_.file_get() && move.start_position_.rank_get() == move.end_position_.rank_get())
@@ -292,6 +291,25 @@ namespace board {
                 Ri += 1;
             }
             return true;
+        }
+    }
+
+    bool MoveLegalityChecker::is_move_legal(const Chessboard& b, const Move &move) {
+        switch (move.piece_) {
+            case PieceType::PAWN:
+                return is_move_legal_PAWN(b, move);
+            case PieceType::BISHOP:
+                return is_move_legal_BISHOP(b, move);
+            case PieceType::KNIGHT:
+                return is_move_legal_KNIGHT(b, move);
+            case PieceType::ROOK:
+                return is_move_legal_ROOK(b, move);
+            case PieceType::QUEEN:
+                return is_move_legal_QUEEN(b, move);
+            case PieceType::KING:
+                return is_move_legal_KING(b, move);
+            default:
+                return false;
         }
     }
 

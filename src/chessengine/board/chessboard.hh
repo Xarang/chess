@@ -22,39 +22,48 @@ namespace board {
     */
     class Chessboard {
 
-        //matrix representation of the board [FILE][RANK]
-        boost::numeric::ublas::matrix<std::optional<struct Piece>> board_;
 
+        private:
+
+        //matrix representation of the board [FILE][RANK]
+        //squares hold a nullptr if empty, a pointer to a piece in the piece list otherwise
+        boost::numeric::ublas::matrix<std::optional<Piece>> board_ = boost::numeric::ublas::matrix<std::optional<Piece>>(8,8);
         //all our pieces
-        std::vector<struct Piece> pieces_;
+        std::vector<Piece> pieces_ = std::vector<Piece>();
 
         //whose turn is it ?
-        bool is_white_turn_;
+        bool is_white_turn_ = true;
 
         //keep track of some events to assess legality of some moves
-        bool did_white_king_castling_;
-        bool did_white_queen_castling_;
-        bool did_black_king_castling_;
-        bool did_black_queen_castling_;
+        bool did_white_king_castling_ = false;
+        bool did_white_queen_castling_ = false;
+        bool did_black_king_castling_ = false;
+        bool did_black_queen_castling_ = false;
 
         //turns elapsed since start
-        unsigned int current_turn_;
+        unsigned int current_turn_ = 0;
 
         //turns elapsed since a piece was last taken or a pawn moved
-        unsigned int turns_since_last_piece_taken_or_pawn_moved_;
+        unsigned int turns_since_last_piece_taken_or_pawn_moved_ = 0;
 
-        std::optional<Position> en_passant_target_square_;
+        std::optional<Position> en_passant_target_square_ = std::nullopt;
 
         //map containing hashed representations of all boards since start (to_string'ed)
         //if a key has 3 values it means the '3 fold' rule applies and the game is a draw
-        std::list<std::string> all_boards_since_start_;
+        std::list<std::string> all_boards_since_start_ = std::list<std::string>();
 
+
+        //these 3 methods are used by do_move
+        void remove_piece(const Piece& p);
+        void move_piece(const Piece& p, Position new_position);
+        void promote_piece(const Piece& p, PieceType type);
 
         public:
-        Chessboard() : board_(8,8), pieces_(),
-            is_white_turn_(true), did_white_king_castling_(false), did_white_queen_castling_(false),
-            did_black_king_castling_(false), did_black_queen_castling_(false), current_turn_(0),
-            turns_since_last_piece_taken_or_pawn_moved_(0), en_passant_target_square_(), all_boards_since_start_() {
+
+        // constructors 
+
+        //default constructor
+        Chessboard() {
                 //White Pawns
                 pieces_.push_back(Piece(Position(File::A, Rank::TWO), Color::WHITE, PieceType::PAWN));
                 pieces_.push_back(Piece(Position(File::B, Rank::TWO), Color::WHITE, PieceType::PAWN));
@@ -94,16 +103,42 @@ namespace board {
 
                 //fill the initial matrix
                 for (Piece piece : pieces_) {
-                    board_((int)piece.position_.file_get(), (int)piece.position_.rank_get()) = piece;
-                    //todo: ^ make sure cast to int works, and file and rank are in good order
+                    (*this)[Position(piece.position_.file_get(), piece.position_.rank_get())] = piece;
                 }
                 all_boards_since_start_.push_front(to_string());
         }
 
-        //recreates a chessboard from an ongoing game using a fen string
+        //copy constructor (overloaded for assertions)
+        Chessboard(const Chessboard& other) {
+            //basic history related booleans
+            this->is_white_turn_ = other.is_white_turn_;
+            this->did_black_king_castling_ = other.did_black_king_castling_;
+            this->did_black_queen_castling_ = other.did_black_queen_castling_;
+            this->did_white_king_castling_ = other.did_white_king_castling_;
+            this->did_white_queen_castling_ = other.did_white_queen_castling_;
+            this->en_passant_target_square_ = other.en_passant_target_square_;
+            this->turns_since_last_piece_taken_or_pawn_moved_ = other.turns_since_last_piece_taken_or_pawn_moved_;
+            this->current_turn_ = other.current_turn_;
+
+            // actual data
+            this->all_boards_since_start_ = other.all_boards_since_start_;
+            this->board_ = other.board_;
+            this->pieces_ = other.pieces_;
+
+            //assertions to make sure the copy happened properly
+            assert(this->all_boards_since_start_ == other.all_boards_since_start_);
+            for (auto i = Rank::ONE; i != Rank::OUTOFBOUNDS; i = i + 1) {
+                for (auto j = File::A; j != File::OUTOFBOUNDS; j = j + 1) {
+                    assert((*this)[Position(j,i)] == other.read(Position(j,i)));
+                }
+            }
+            assert(this->pieces_ == other.pieces_);
+        }
+
+        //FEN string based constructor
         Chessboard(std::string fen_string);
 
-        void do_move_en_passant(Move);
+        //main methods
         void do_move(Move);
         bool is_move_legal(Move, bool check_self_check = true);
         std::list<Move> generateLegalMoves(bool check_self_check = true);
@@ -115,24 +150,25 @@ namespace board {
         //utils
         std::string to_string();
         Color whose_turn_is_it() { return is_white_turn_ ? Color::WHITE : Color::BLACK; }
+        const std::optional<Piece> read(Position p) const; //same as operator[], but read-only
 
         friend class MoveLegalityChecker;
 
-        Chessboard(const Chessboard& other) = default;
+
         //make a copy of the board with the move passed as argument executed
         Chessboard project(Move move);
 
-        void printMove(Move move);
     };
 
     class MoveLegalityChecker {
         public:
-        static bool is_move_legal_QUEEN(Chessboard b, Move move);
-        static bool is_move_legal_KING(Chessboard b, Move move);
-        static bool is_move_legal_ROOK(Chessboard b, Move move);
-        static bool is_move_legal_KNIGHT(Chessboard b, Move move);
-        static bool is_move_legal_BISHOP(Chessboard b, Move move);
-        static bool is_move_legal_PAWN(Chessboard b, Move move);
+        static bool is_move_legal_QUEEN(const Chessboard& b, const Move& move);
+        static bool is_move_legal_KING(const Chessboard& b, const Move& move);
+        static bool is_move_legal_ROOK(const Chessboard& b, const Move& move);
+        static bool is_move_legal_KNIGHT(const Chessboard& b, const Move& move);
+        static bool is_move_legal_BISHOP(const Chessboard& b, const Move& move);
+        static bool is_move_legal_PAWN(const Chessboard& b, const Move& move);
+        static bool is_move_legal(const Chessboard& b, const Move& move);
     };
 
 

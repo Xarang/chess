@@ -22,6 +22,10 @@ namespace board
 
         std::list<struct Move> getAllPotentialMoves();
 
+        bool operator==(const Piece& other) const {
+            return position_ == other.position_ && color_ == other.color_ && type_ == other.type_ && has_already_moved_ == other.has_already_moved_;
+        }
+
         inline char piece_to_char_fen() {
             if (this->color_ == Color::WHITE) {
                 switch (this->type_) {

@@ -10,9 +10,14 @@
 #include "chessengine/board/chessboard-interface-impl.hh"
 #include "listener-manager.hh"
 #include "listener.hh"
+#include "pgn/pgn-parser.hh"
+#include "pgn/pgn-exception.hh"
 
 int main(int argc, const char *argv[]) {
-
+        
+    assert(std::is_copy_constructible<board::Chessboard>::value);
+    assert(std::is_copy_constructible_v<board::Chessboard>);
+    
     namespace po = boost::program_options;
     auto options = po::options_description("Usage");
 
@@ -45,7 +50,7 @@ int main(int argc, const char *argv[]) {
         try {
             listenerManager.run_pgn_file(pgnfilename);
         }
-        catch (std::exception &e) {
+        catch (pgn_parser::PgnParsingException &e) {
             std::cerr << e.what() << "\n";
         }
     }

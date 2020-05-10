@@ -65,7 +65,7 @@ namespace listener {
                                 }
                             }
                             board_->do_move(move);
-                            register_move(board_->whose_turn_is_it(), move, captured_piece);
+                            register_move(((board::Color)!(bool)board_->whose_turn_is_it()), move, captured_piece); //do_move changes the player so we have to get the other player here (!whose_turn_is_it)
 
                             if (board_->is_checkmate()) {
                                 register_mat(board_->whose_turn_is_it());
@@ -78,12 +78,12 @@ namespace listener {
                                 register_pat(board_->whose_turn_is_it());
                                 register_game_draw();
                             }
-                            else if (board_->is_draw()) {
+                            else if (false) {//board_->is_draw()) { put this when move generation is stable
                                 register_game_draw();
                                 register_game_finished();
                             }
                         }
-                        catch (std::exception &e) {
+                        catch (std::logic_error &e/*std::exception &e*/) {
                             throw std::runtime_error("error happened while executing move: " + move.to_string() + " : " + e.what() + "\n");
                         }
 
@@ -99,7 +99,7 @@ namespace listener {
                 }
             }
         }
-        catch (std::exception &e) {
+        catch (std::logic_error &e/*std::exception &e*/) {
             std::cerr << "Error while running PGN file: " << e.what() << "\n";
         }
     }
