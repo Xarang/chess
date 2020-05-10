@@ -66,10 +66,10 @@ namespace listener {
                                     captured_piece = std::make_optional<board::Piece>(((*board_)[move.end_position_]).value());
                                 }
                             }
-                            board_->do_move(move);
+                            //board_->do_move(move);
                     
                             //check current game state for the player that did the move
-                            board_->change_turn();
+                            //board_->change_turn();
                             register_move(board_->whose_turn_is_it(), move, captured_piece); //do_move changes the player so we have to get the other player here (!whose_turn_is_it)
                             if (board_->is_checkmate()) {
                                 register_mat(board_->whose_turn_is_it());
@@ -77,7 +77,7 @@ namespace listener {
                             }
                             else if (board_->is_check()) {
                                 register_check(board_->whose_turn_is_it());
-                            }                        
+                            }
                             else if (false) {/*(board_->generateLegalMoves().size() == 0) {  put this when move generation is stable*/
                                 register_pat(board_->whose_turn_is_it());
                                 register_game_draw();
@@ -86,6 +86,7 @@ namespace listener {
                                 register_game_draw();
                                 register_game_finished();
                             }
+                            board_->do_move(move);
                             board_->change_turn();
 
 

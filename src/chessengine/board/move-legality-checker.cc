@@ -116,7 +116,7 @@ namespace board {
         return startFile + 1 == endFile && startRank + 2 == endRank;
     }
 
-    bool MoveLegalityChecker::is_move_legal_BISHOP(const Chessboard&, Move& move) {
+    bool MoveLegalityChecker::is_move_legal_BISHOP(const Chessboard& b, Move& move) {
         int Fi = 1;
         int Ri = 1;
         bool bo = true;
@@ -132,7 +132,8 @@ namespace board {
                 if (move.start_position_.file_get() + Fi == move.end_position_.file_get() &&
                     move.start_position_.rank_get() + Ri == move.end_position_.rank_get())
                 {return true;}
-
+                if (b.board_((int)move.start_position_.file_get() + Fi, (int)move.start_position_.rank_get() + Ri).has_value())
+                    return false;
                 Fi += 1;
                 Ri += 1;
 
@@ -150,7 +151,8 @@ namespace board {
                     bo = false;
                     break;
                 }
-
+                if (b.board_((int)move.start_position_.file_get() + Fi, (int)move.start_position_.rank_get() - Ri).has_value())
+                    return false;
                 Fi += 1;
                 Ri += 1;
             }
@@ -168,14 +170,14 @@ namespace board {
                     bo = false;
                     break;
                 }
-
+                if (b.board_((int)move.start_position_.file_get() - Fi, (int)move.start_position_.rank_get() + Ri).has_value())
+                    return false;
                 Fi += 1;
                 Ri += 1;
             }
         }
         else
         {
-
             while (true)
             {
                 if (move.start_position_.file_get() - Fi == move.end_position_.file_get() &&
@@ -186,6 +188,11 @@ namespace board {
                     bo = false;
                     break;
                 }
+                if (b.board_((int)move.start_position_.file_get() - Fi, (int)move.start_position_.rank_get() - Ri).has_value())
+                {
+                    return false;
+                }
+
                 Fi += 1;
                 Ri += 1;
             }
@@ -272,7 +279,7 @@ namespace board {
         */return true;
     }
 
-    bool MoveLegalityChecker::is_move_legal_ROOK(const Chessboard&, Move& move) {
+    bool MoveLegalityChecker::is_move_legal_ROOK(const Chessboard& b, Move& move) {
         int Fi = 1;
         int Ri = 1;
 
@@ -284,9 +291,11 @@ namespace board {
                 {
                     return false;
                 }
+                if (b.board_((int)move.start_position_.file_get() + Fi, (int)move.start_position_.rank_get()).has_value())
+                    break;
                 Fi += 1;
             }
-            return true;
+            return move.start_position_.file_get() + Fi == move.end_position_.file_get();
         }
 
         else if (move.start_position_.file_get() > move.end_position_.file_get() && move.start_position_.rank_get() == move.end_position_.rank_get())
@@ -297,9 +306,11 @@ namespace board {
                 {
                     return false;
                 }
+                if (b.board_((int)move.start_position_.file_get() - Fi, (int)move.start_position_.rank_get()).has_value())
+                    break;
                 Fi += 1;
             }
-            return true;
+            return move.start_position_.file_get() - Fi == move.end_position_.file_get();
         }
 
         else if (move.start_position_.file_get() == move.end_position_.file_get() && move.start_position_.rank_get() < move.end_position_.rank_get())
@@ -310,9 +321,11 @@ namespace board {
                 {
                     return false;
                 }
+                if (b.board_((int)move.start_position_.file_get(), (int)move.start_position_.rank_get() + Ri).has_value())
+                    break;
                 Ri += 1;
             }
-            return true;
+            return move.start_position_.rank_get() + Ri == move.end_position_.rank_get();
         }
 
         else
@@ -323,9 +336,17 @@ namespace board {
                 {
                     return false;
                 }
+                if (b.board_((int)move.start_position_.file_get(), (int)move.start_position_.rank_get() - Ri).has_value()) {
+                    /*if (move.piece_ == PieceType::QUEEN) {
+                        auto piece = b.board_((int)move.start_position_.file_get(), (int)move.start_position_.rank_get() - Ri);
+                        auto p = move.start_position_.rank_get() - Ri == move.end_position_.rank_get() && piece.has_value();
+                        std::cout << p << " " << Ri << " " << move.to_string();
+                    }*/
+                    break;
+                }
                 Ri += 1;
             }
-            return true;
+            return move.start_position_.rank_get() - Ri == move.end_position_.rank_get();
         }
     }
 
