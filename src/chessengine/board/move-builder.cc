@@ -15,6 +15,7 @@ namespace board {
         auto m = Move();
         m.start_position_ = p.position_;
         m.end_position_ = target;
+        m.piece_ = p.type_;
         m.is_capture_ = true;
         return m;
     }

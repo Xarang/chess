@@ -30,6 +30,10 @@ namespace board {
                     promotion_moves.push_front(MoveBuilder::with_promotion(move, PieceType::QUEEN));
                 }
             }
+            for (auto move : promotion_moves)
+            {
+                moves.push_back(move);
+            }
             return moves;
         }
 
@@ -37,8 +41,7 @@ namespace board {
             std::list<Move> bishop_moves;
             File org_file = p.position_.file_get();
             Rank org_rank = p.position_.rank_get();
-            File curr_file = org_file;
-            Rank curr_rank = org_rank;
+
 
             std::pair<int, int> pairs[4] = {
                 std::make_pair(1, 1),
@@ -50,6 +53,8 @@ namespace board {
             for (int i = 0; i < 4; i++)
             {
                 std::pair<int, int> pair = pairs[i];
+                File curr_file = org_file;
+                Rank curr_rank = org_rank;
                 int add_file = pair.first;
                 int add_rank = pair.second;
 
@@ -57,9 +62,9 @@ namespace board {
                 {
                     curr_file = curr_file + add_file;
                     curr_rank = curr_rank + add_rank;
-                    int check_file = static_cast<int>(curr_file);
-                    int check_rank = static_cast<int>(curr_file);
-                    if (check_file == -1 || check_rank == -1)
+                    /*int check_file = static_cast<int>(curr_file);
+                    int check_rank = static_cast<int>(curr_file);*/
+                    if (curr_file == File::OUTOFBOUNDS || curr_rank == Rank::OUTOFBOUNDS)
                     {
                         break;
                     }
@@ -89,17 +94,17 @@ namespace board {
             knight_moves.push_back(MoveBuilder::basic_move(p, Position(org_file + 2, org_rank + 1)));
             knight_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file + 2, org_rank + 1)));
 
-            knight_moves.push_back(MoveBuilder::basic_move(p, Position(org_file + 1, org_rank + 2)));
-            knight_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::basic_move(p, Position(org_file - 1, org_rank - 2)));
+            knight_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file - 1, org_rank - 2)));
 
-            knight_moves.push_back(MoveBuilder::basic_move(p, Position(org_file + 1, org_rank + 2)));
-            knight_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::basic_move(p, Position(org_file - 2, org_rank - 1)));
+            knight_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file - 2 , org_rank - 1)));
 
-            knight_moves.push_back(MoveBuilder::basic_move(p, Position(org_file + 1, org_rank + 2)));
-            knight_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::basic_move(p, Position(org_file - 2, org_rank + 1)));
+            knight_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file - 2, org_rank + 1)));
 
-            knight_moves.push_back(MoveBuilder::basic_move(p, Position(org_file + 1, org_rank + 2)));
-            knight_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file + 1, org_rank + 2)));
+            knight_moves.push_back(MoveBuilder::basic_move(p, Position(org_file + 2, org_rank - 1)));
+            knight_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file + 2, org_rank - 1)));
 
             return knight_moves;
         }
@@ -111,7 +116,6 @@ namespace board {
             Rank org_rank = p.position_.rank_get();
             File curr_file = org_file;
             Rank curr_rank = org_rank;
-
             std::pair<int, int> pairs[4] = {
                 std::make_pair(1, 0),
                 std::make_pair(-1, 0),
@@ -129,9 +133,9 @@ namespace board {
                 {
                     curr_file = curr_file + add_file;
                     curr_rank = curr_rank + add_rank;
-                    int check_file = static_cast<int>(curr_file);
-                    int check_rank = static_cast<int>(curr_file);
-                    if (check_file == -1 || check_rank == -1)
+                    /*int check_file = static_cast<int>(curr_file);
+                    int check_rank = static_cast<int>(curr_file);*/
+                    if (curr_file == File::OUTOFBOUNDS || curr_rank == Rank::OUTOFBOUNDS)
                     {
                         break;
                     }
@@ -172,9 +176,9 @@ namespace board {
                 {
                     curr_file = curr_file + add_file;
                     curr_rank = curr_rank + add_rank;
-                    int check_file = static_cast<int>(curr_file);
-                    int check_rank = static_cast<int>(curr_file);
-                    if (check_file == -1 || check_rank == -1)
+                    /*int check_file = static_cast<int>(curr_file);
+                    int check_rank = static_cast<int>(curr_file);*/
+                    if (curr_file == File::OUTOFBOUNDS || curr_rank == Rank::OUTOFBOUNDS)
                     {
                         break;
                     }
@@ -219,14 +223,14 @@ namespace board {
 
             king_moves.push_back(MoveBuilder::basic_move(p, Position(org_file + 1, org_rank - 1)));
             king_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file + 1, org_rank - 1)));
-            return std::list<Move>();
+            
+            return king_moves;
         }
     };
 
 
 
     std::list<Move> Piece::getAllPotentialMoves() {
-        std::cout << "get all potential moves of piece at position " << position_.to_string() << "\n";
         switch (type_) {
             case PieceType::PAWN:
                 return PieceMoveGenerator::Pawn(*this);

@@ -3,7 +3,6 @@
 #include <utility>
 
 #include <string>
-#include "../../utype.hh"
 
 namespace board
 {

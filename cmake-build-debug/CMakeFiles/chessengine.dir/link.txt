@@ -1,1 +1,0 @@
-/usr/bin/c++   -Wall -Werror -Wextra -pedantic -g -Og -g3 -fsanitize=address   CMakeFiles/chessengine.dir/src/main.cc.o  -o chessengine  /usr/lib64/libboost_system.a /usr/lib64/libboost_program_options.a -ldl -static src/chessengine/libCHESSENGINE.a src/chessengine/pgn/libPGN.a src/chessengine/board/libBOARD.a src/chessengine/ai/libAI.a 

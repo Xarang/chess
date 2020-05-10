@@ -53,7 +53,9 @@ namespace listener {
                 auto move = board::Move(m);
                 //std::cout << move.to_string();
                 try {
+                    //std::cout << "next move: " + move.to_string();
                     if (board_->is_move_legal(move)) {
+                        //std::cout << "will execute: " + move.to_string();
                         try {
                             std::optional<board::Piece> captured_piece;
                             if (move.is_capture_) {
@@ -65,7 +67,7 @@ namespace listener {
                                 }
                             }
                             board_->do_move(move);
-                            register_move(board_->whose_turn_is_it(), move, captured_piece);
+                            register_move(((board::Color)!(bool)board_->whose_turn_is_it()), move, captured_piece); //do_move changes the player so we have to get the other player here (!whose_turn_is_it)
 
                             if (board_->is_checkmate()) {
                                 register_mat(board_->whose_turn_is_it());
@@ -78,12 +80,12 @@ namespace listener {
                                 register_pat(board_->whose_turn_is_it());
                                 register_game_draw();
                             }
-                            else if (board_->is_draw()) {
+                            else if (false) {//board_->is_draw()) { put this when move generation is stable
                                 register_game_draw();
                                 register_game_finished();
                             }
                         }
-                        catch (std::exception &e) {
+                        catch (std::bad_alloc &e /*std::exception &e we dont want to catch for now */) {
                             throw std::runtime_error("error happened while executing move: " + move.to_string() + " : " + e.what() + "\n");
                         }
 
@@ -93,13 +95,13 @@ namespace listener {
                         return;
                     }
                 }
-                catch (std::logic_error &e) {
+                catch (std::bad_alloc &e /*we dont want to catch for now*/) {
                     std::cerr << "Error happened while assessing legality of move: " + move.to_string() + "  : " << e.what() << "\n";
                     break;
                 }
             }
         }
-        catch (std::exception &e) {
+        catch (std::bad_alloc &e /*std::exception &e we dont want to catch for now */) {
             std::cerr << "Error while running PGN file: " << e.what() << "\n";
         }
     }
