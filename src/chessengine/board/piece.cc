@@ -231,7 +231,6 @@ namespace board {
 
 
     std::list<Move> Piece::getAllPotentialMoves() {
-        //std::cout << "get all potential moves of piece at position " << position_.to_string() << "\n";
         switch (type_) {
             case PieceType::PAWN:
                 return PieceMoveGenerator::Pawn(*this);

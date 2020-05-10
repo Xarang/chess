@@ -132,15 +132,12 @@ namespace board {
         */
 
         allMoves.remove_if([this, check_self_check](Move m){return !this->is_move_legal(m, check_self_check); });
-      
         /*
         std::cout << "removed all illegal moves; legal moves remaining: " << allMoves.size() << "\n";
         for (auto move : allMoves) {
             std::cout << move.to_string();
         }
         */
-
-        //std::cout << (whose_turn_is_it() == Color::WHITE ? "White" : "Black") << " got " << allMoves.size() << " moves" << "\n";
         return allMoves;
     }
 
