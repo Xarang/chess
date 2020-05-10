@@ -47,7 +47,7 @@ namespace board {
 
         //map containing hashed representations of all boards since start (to_string'ed)
         //if a key has 3 values it means the '3 fold' rule applies and the game is a draw
-        std::unordered_multimap<int, std::string> all_boards_since_start_;
+        std::list<std::string> all_boards_since_start_;
 
 
         public:
@@ -97,6 +97,7 @@ namespace board {
                     board_((int)piece.position_.file_get(), (int)piece.position_.rank_get()) = piece;
                     //todo: ^ make sure cast to int works, and file and rank are in good order
                 }
+                all_boards_since_start_.push_front(to_string());
         }
 
         //recreates a chessboard from an ongoing game using a fen string
@@ -104,8 +105,8 @@ namespace board {
 
         void do_move_en_passant(Move);
         void do_move(Move);
-        bool is_move_legal(Move);
-        std::list<Move> generateLegalMoves();
+        bool is_move_legal(Move, bool check_self_check = true);
+        std::list<Move> generateLegalMoves(bool check_self_check = true);
         bool is_check();
         bool is_checkmate();
         bool is_draw();

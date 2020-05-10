@@ -2,6 +2,7 @@
 #include <sstream>
 #include "chessboard.hh"
 #include "piece-type.hh"
+#include "piece.hh"
 
 namespace board {
 
@@ -119,10 +120,11 @@ namespace board {
                 }
             }
         }
+        all_boards_since_start_.push_front(to_string());
         is_white_turn_ = !is_white_turn_;
     }
 
-    bool Chessboard::is_move_legal(Move move) {
+    bool Chessboard::is_move_legal(Move move, bool check_self_check) {
 
         if (move.start_position_.file_get() == File::OUTOFBOUNDS || move.start_position_.rank_get() == Rank::OUTOFBOUNDS
             || move.end_position_.file_get() == File::OUTOFBOUNDS || move.end_position_.rank_get() == Rank::OUTOFBOUNDS) {
@@ -133,18 +135,18 @@ namespace board {
             return false;
 
         //check if this move would make/leave the king vulnerable
-        auto projection = project(move);
-        projection.is_white_turn_ = !projection.is_white_turn_;
-        if (projection.is_check()) {
-            return false;
+        if (check_self_check) {
+            auto projection = project(move);
+            projection.is_white_turn_ = !projection.is_white_turn_;
+            if (projection.is_check()) {
+                return false;
+            }
         }
 
         auto piece = (*this)[move.end_position_];
         if (piece.has_value())
         {
-            if (piece.value().color_ == Color::WHITE && is_white_turn_)
-                return false;
-            if (piece.value().color_ == Color::BLACK && !is_white_turn_)
+            if (piece.value().color_ == whose_turn_is_it())
                 return false;
         }
         else if (move.is_capture_) {
@@ -169,7 +171,7 @@ namespace board {
         }
       }
 
-    std::list<Move> Chessboard::generateLegalMoves() {
+    std::list<Move> Chessboard::generateLegalMoves(bool check_self_check) {
         std::list<Move> allMoves;
  
         std::cout << (whose_turn_is_it() == Color::WHITE ? "White" : "Black") << "\n";
@@ -184,13 +186,14 @@ namespace board {
             }
         }
 
-        allMoves.remove_if([this](Move m){return !this->is_move_legal(m); });
+        
         std::cout << "potential moves:\n";
         for (auto move : allMoves) {
             std::cout << move.to_string();
         }
-
-        allMoves.remove_if([this](Move m){return !this->is_move_legal(m); });
+      
+        allMoves.remove_if([this, check_self_check](Move m){return !this->is_move_legal(m, check_self_check); });
+      
         std::cout << "removed all illegal moves; legal moves remaining: " << allMoves.size() << "\n";
         for (auto move : allMoves) {
             std::cout << move.to_string();
@@ -208,12 +211,49 @@ namespace board {
 
     bool Chessboard::is_check() {
         //generate legal moves for opponent and check if one on them captures your king.
+        is_white_turn_ = !is_white_turn_;
+        std::list<Move> opponent_moves = generateLegalMoves(false);
+        is_white_turn_ = !is_white_turn_;
+
+        File king_file = File::OUTOFBOUNDS;
+        Rank king_rank = Rank::OUTOFBOUNDS;
+        for (auto piece : pieces_)
+        {
+            if (piece.type_ == PieceType::KING && (bool)piece.color_ != is_white_turn_)
+            {
+                king_file = piece.position_.file_get();
+                king_rank = piece.position_.rank_get();
+                break;
+            }
+        }
+        
+        for (auto move : opponent_moves)
+        {
+            if (move.end_position_.file_get() == king_file &&
+                move.end_position_.rank_get() == king_rank)
+            {
+                return true;
+            }
+        }
         return false;
     }
 
     bool Chessboard::is_checkmate() {
         //is check + project all your legal moves as long as you don't find one in which you are not checked. if you can't find one, you are checkmated
-        return false;
+        if (!is_check())
+        {
+            return false;
+        }
+
+        std::list<Move> moves = generateLegalMoves();
+        for (auto move : moves) {
+            auto projection = project(move);
+            projection.is_white_turn_ = !projection.is_white_turn_;
+            if (!projection.is_check()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     bool Chessboard::is_draw() {
@@ -222,6 +262,31 @@ namespace board {
         //same board configuration happened 3 times
         //or
         //no pawn moved or piece captured in last 50 turns
+
+        std::list<Move> legal_moves = generateLegalMoves();
+        if (legal_moves.empty() && !is_check())
+        {
+            return true;
+        }
+        if (turns_since_last_piece_taken_or_pawn_moved_ >= 50)
+        {
+            return true;
+        }
+
+        std::string s = to_string();
+
+        int count = 0;
+        for (std::string board : all_boards_since_start_)
+        {
+            if (board == s)
+            {
+                count++;
+                if (count == 3)
+                {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -230,8 +295,38 @@ namespace board {
     }
 
     std::string Chessboard::to_string() {
-        //TODO: output a FEN string representing the board (https://fr.wikipedia.org/wiki/Notation_Forsyth-Edwards)
-        throw "not implemented";
+       /* //TODO: output a FEN string representing the board (https://fr.wikipedia.org/wiki/Notation_Forsyth-Edwards)
+        std::string res = "";
+        board::Rank currRank = Rank::EIGHT;
+        for (size_t i = 0; i < 8; i++)
+        {
+            board::File currFile = File::A;
+            int empty_counter = 0;
+            for (size_t j = 0; j < 8; j++)
+            {
+                Position myPos(currFile, currRank);
+                char symbol = ' ';
+
+                if ((*this)[myPos].has_value()) {
+                    auto myPiece = (*this)[myPos].value();
+
+                    symbol = myPiece.piece_to_char_fen();
+                    if (symbol == ' ')
+                        empty_counter++;
+                    else if (empty_counter != 0) {
+                        res += std::to_string(empty_counter) + symbol;
+                        empty_counter = 0;
+                    }
+                }
+                res += "/";
+            }
+            
+        }
+        std::cout << res << "\n";
+        return res;*/
+
+        //TODO: fix this
+        return std::to_string(rand() % 1000000); //random string so that we dont get draw after 3 moves
     }
 
     Chessboard::Chessboard(std::string fen_string) : board_(8,8) {

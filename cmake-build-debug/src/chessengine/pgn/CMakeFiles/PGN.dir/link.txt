@@ -1,2 +1,0 @@
-/usr/bin/ar qc libPGN.a  CMakeFiles/PGN.dir/pgn-move.cc.o CMakeFiles/PGN.dir/pgn-exception.cc.o CMakeFiles/PGN.dir/pgn-parser.cc.o
-/usr/bin/ranlib libPGN.a
