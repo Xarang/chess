@@ -41,8 +41,7 @@ namespace board {
             std::list<Move> bishop_moves;
             File org_file = p.position_.file_get();
             Rank org_rank = p.position_.rank_get();
-            File curr_file = org_file;
-            Rank curr_rank = org_rank;
+
 
             std::pair<int, int> pairs[4] = {
                 std::make_pair(1, 1),
@@ -54,6 +53,8 @@ namespace board {
             for (int i = 0; i < 4; i++)
             {
                 std::pair<int, int> pair = pairs[i];
+                File curr_file = org_file;
+                Rank curr_rank = org_rank;
                 int add_file = pair.first;
                 int add_rank = pair.second;
 
@@ -222,7 +223,8 @@ namespace board {
 
             king_moves.push_back(MoveBuilder::basic_move(p, Position(org_file + 1, org_rank - 1)));
             king_moves.push_back(MoveBuilder::basic_capture(p, Position(org_file + 1, org_rank - 1)));
-            return std::list<Move>();
+            
+            return king_moves;
         }
     };
 

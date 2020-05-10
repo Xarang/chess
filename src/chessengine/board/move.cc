@@ -39,7 +39,7 @@ namespace board
     }
 
     void Move::set_en_passant() {
-        if (piece_ == PieceType::PAWN
+        if (piece_ == PieceType::PAWN && is_capture_
             && (
                 (
                     start_position_.rank_get() == Rank::FIVE
@@ -56,10 +56,6 @@ namespace board
                 is_en_passant_ = true;
             }
     }
-
-
-
-
 
 
     //take the informations we want from pgnmove and re-reformate them in a handier way.
@@ -84,7 +80,7 @@ namespace board
         std::string str = "[MOVE] ";
         str += piece_to_char(piece_);
         str += "  ";
-        str += start_position_.to_string() + " -> " + end_position_.to_string();
+        str += start_position_.to_string() + " -" + (is_capture_ ? "X" : "-") + "> " + end_position_.to_string();
         str += "  ";
         std::list<std::string> tags;
         if (is_king_castling_) {

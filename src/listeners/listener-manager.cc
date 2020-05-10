@@ -53,7 +53,9 @@ namespace listener {
                 auto move = board::Move(m);
                 //std::cout << move.to_string();
                 try {
+                    //std::cout << "next move: " + move.to_string();
                     if (board_->is_move_legal(move)) {
+                        //std::cout << "will execute: " + move.to_string();
                         try {
                             std::optional<board::Piece> captured_piece;
                             if (move.is_capture_) {
@@ -83,7 +85,7 @@ namespace listener {
                                 register_game_finished();
                             }
                         }
-                        catch (std::logic_error &e/*std::exception &e*/) {
+                        catch (std::bad_alloc &e /*std::exception &e we dont want to catch for now */) {
                             throw std::runtime_error("error happened while executing move: " + move.to_string() + " : " + e.what() + "\n");
                         }
 
@@ -93,13 +95,13 @@ namespace listener {
                         return;
                     }
                 }
-                catch (std::logic_error &e) {
+                catch (std::bad_alloc &e /*we dont want to catch for now*/) {
                     std::cerr << "Error happened while assessing legality of move: " + move.to_string() + "  : " << e.what() << "\n";
                     break;
                 }
             }
         }
-        catch (std::logic_error &e/*std::exception &e*/) {
+        catch (std::bad_alloc &e /*std::exception &e we dont want to catch for now */) {
             std::cerr << "Error while running PGN file: " << e.what() << "\n";
         }
     }

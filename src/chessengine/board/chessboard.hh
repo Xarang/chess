@@ -109,38 +109,14 @@ namespace board {
         }
 
         //copy constructor (overloaded for assertions)
-        Chessboard(const Chessboard& other) {
-            //basic history related booleans
-            this->is_white_turn_ = other.is_white_turn_;
-            this->did_black_king_castling_ = other.did_black_king_castling_;
-            this->did_black_queen_castling_ = other.did_black_queen_castling_;
-            this->did_white_king_castling_ = other.did_white_king_castling_;
-            this->did_white_queen_castling_ = other.did_white_queen_castling_;
-            this->en_passant_target_square_ = other.en_passant_target_square_;
-            this->turns_since_last_piece_taken_or_pawn_moved_ = other.turns_since_last_piece_taken_or_pawn_moved_;
-            this->current_turn_ = other.current_turn_;
-
-            // actual data
-            this->all_boards_since_start_ = other.all_boards_since_start_;
-            this->board_ = other.board_;
-            this->pieces_ = other.pieces_;
-
-            //assertions to make sure the copy happened properly
-            assert(this->all_boards_since_start_ == other.all_boards_since_start_);
-            for (auto i = Rank::ONE; i != Rank::OUTOFBOUNDS; i = i + 1) {
-                for (auto j = File::A; j != File::OUTOFBOUNDS; j = j + 1) {
-                    assert((*this)[Position(j,i)] == other.read(Position(j,i)));
-                }
-            }
-            assert(this->pieces_ == other.pieces_);
-        }
+        Chessboard(const Chessboard& other) = default;
 
         //FEN string based constructor
         Chessboard(std::string fen_string);
 
         //main methods
         void do_move(Move);
-        bool is_move_legal(Move, bool check_self_check = true);
+        bool is_move_legal(Move&, bool check_self_check = true);
         std::list<Move> generateLegalMoves(bool check_self_check = true);
         bool is_check();
         bool is_checkmate();
@@ -162,13 +138,13 @@ namespace board {
 
     class MoveLegalityChecker {
         public:
-        static bool is_move_legal_QUEEN(const Chessboard& b, const Move& move);
-        static bool is_move_legal_KING(const Chessboard& b, const Move& move);
-        static bool is_move_legal_ROOK(const Chessboard& b, const Move& move);
-        static bool is_move_legal_KNIGHT(const Chessboard& b, const Move& move);
-        static bool is_move_legal_BISHOP(const Chessboard& b, const Move& move);
-        static bool is_move_legal_PAWN(const Chessboard& b, const Move& move);
-        static bool is_move_legal(const Chessboard& b, const Move& move);
+        static bool is_move_legal_QUEEN(const Chessboard& b, Move& move);
+        static bool is_move_legal_KING(const Chessboard& b, Move& move);
+        static bool is_move_legal_ROOK(const Chessboard& b, Move& move);
+        static bool is_move_legal_KNIGHT(const Chessboard& b, Move& move);
+        static bool is_move_legal_BISHOP(const Chessboard& b, Move& move);
+        static bool is_move_legal_PAWN(const Chessboard& b, Move& move);
+        static bool is_move_legal(const Chessboard& b, Move& move);
     };
 
 

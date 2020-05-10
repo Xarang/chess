@@ -1,4 +1,3 @@
-#include <err.h>
 #include <sstream>
 #include "chessboard.hh"
 #include "piece-type.hh"
@@ -11,37 +10,25 @@ namespace board {
         turns_since_last_piece_taken_or_pawn_moved_++;
         //TODO: hash the current state of the board (string ?) and store it inside the all_boards_since_start_ multimap
 
-        //if the board previously had a 'en passant target square', this do_move "consumes" it
-        en_passant_target_square_ = std::nullopt;
 
+        //handle capture (+ special behaviour for en-passant)
         if (move.is_capture_) {
-            if (move.is_en_passant_) {
+            if (!move.is_en_passant_) {
+                remove_piece((*this)[move.end_position_].value());
+            } else {
                 int direction = whose_turn_is_it() == Color::WHITE ? 1 : -1;
                 remove_piece((*this)[Position(en_passant_target_square_->file_get(), en_passant_target_square_->rank_get() - direction)].value());
-            } else {
-                remove_piece((*this)[move.end_position_].value());
             }
         }   
 
-        if (move.is_en_passant_)
+        //handle movement (+ special behaviour for en-passant)
+        if (!move.is_en_passant_)
         {
+            move_piece((*this)[move.start_position_].value(), move.end_position_);
+        } else {
             move_piece((*this)[move.start_position_].value(), en_passant_target_square_.value());
         }
-        else {
-            move_piece((*this)[move.start_position_].value(), move.end_position_);
-        }
 
-        if (move.promotion_.has_value())
-        {
-            promote_piece((*this)[move.start_position_].value(), move.promotion_.value());
-        }
-
-        if (move.is_double_pawn_push_) {
-            //mark the square that can be "prise en passant"'ed next turn
-            int direction = whose_turn_is_it() == Color::WHITE ? +1 : -1;
-            en_passant_target_square_ = std::make_optional<Position>(move.start_position_.file_get(), move.start_position_.rank_get() + direction);
-            //TODO: unsure about this, make sure it marks the good square as eligible en passant target for next move
-        }
         if (move.is_king_castling_ || move.is_queen_castling_)
         {
             File rookFile;
@@ -50,25 +37,36 @@ namespace board {
             if (move.is_queen_castling_) {
                 rookFile = File::A;
                 endRookFile = File::D;
-            }
-            else
-            {
+            } else {
                 rookFile = File::H;
                 endRookFile = File::F;
             }
-            if (is_white_turn_) {
-                rookRank = Rank::ONE;
-            }
-            else {
-                rookRank = Rank::EIGHT;
-            }
+            rookRank = whose_turn_is_it() == Color::WHITE ? Rank::ONE : Rank::EIGHT;
             move_piece((*this)[Position(rookFile, rookRank)].value(), Position(endRookFile, rookRank));
         }
+
+        //if the board previously had a 'en passant target square', it is now consumed
+        en_passant_target_square_ = std::nullopt;
+
+        if (move.is_double_pawn_push_) {
+            //mark the square that can be "prise en passant"'ed next turn
+            int direction = whose_turn_is_it() == Color::WHITE ? +1 : -1;
+            en_passant_target_square_ = std::make_optional<Position>(move.start_position_.file_get(), move.start_position_.rank_get() + direction);
+            //TODO: unsure about this, make sure it marks the good square as eligible en passant target for next move
+        }
+
+        if (move.promotion_.has_value())
+        {
+            //move already happened so we use the endposition
+            promote_piece((*this)[move.end_position_].value(), move.promotion_.value());
+        }
+
+
         all_boards_since_start_.push_front(to_string());
         is_white_turn_ = !is_white_turn_;
     }
 
-    bool Chessboard::is_move_legal(Move move, bool check_self_check) {
+    bool Chessboard::is_move_legal(Move& move, bool check_self_check) {
 
         //do not consider moves that have OOB positions
         if (move.start_position_.file_get() == File::OUTOFBOUNDS || move.start_position_.rank_get() == Rank::OUTOFBOUNDS
@@ -325,6 +323,9 @@ namespace board {
     }
 
     //private methods used to factorise basic move operations
+
+    //heavily asserted for now, to make sure they do what we want them to do
+
     void Chessboard::remove_piece(const Piece& p) {
         assert(std::find(pieces_.begin(), pieces_.end(), p) != pieces_.end() && "queried piece not in piece list");
         auto piece_it = std::find(pieces_.begin(), pieces_.end(), p);
@@ -364,5 +365,9 @@ namespace board {
         auto piece_it = std::find(pieces_.begin(), pieces_.end(), p);
         piece_it->type_ = new_type;
         (*this)[piece_it->position_] = std::make_optional<Piece>(*piece_it);
+        
+        assert(std::find(pieces_.begin(), pieces_.end(), p)->type_ == new_type && "promotion did not take effect in piece list");
+        assert((*this)[p.position_]->type_ == new_type && "promotion did not take effect in piece list");
+        assert(*std::find(pieces_.begin(), pieces_.end(), p) == (*this)[p.position_].value());
     }
 }
