@@ -53,9 +53,7 @@ namespace listener {
                 auto move = board::Move(m);
                 //std::cout << move.to_string();
                 try {
-                    //std::cout << "next move: " + move.to_string();
                     if (board_->is_move_legal(move)) {
-                        //std::cout << "will execute: " + move.to_string();
                         try {
                             std::optional<board::Piece> captured_piece;
                             if (move.is_capture_) {
@@ -66,11 +64,15 @@ namespace listener {
                                     captured_piece = std::make_optional<board::Piece>(((*board_)[move.end_position_]).value());
                                 }
                             }
-                            //board_->do_move(move);
-                    
                             //check current game state for the player that did the move
-                            //board_->change_turn();
-                            register_move(board_->whose_turn_is_it(), move, captured_piece); //do_move changes the player so we have to get the other player here (!whose_turn_is_it)
+                            board_->do_move(move); //player 1
+                            //player 2
+                            board_->change_turn();
+                            //player 1
+                            register_move(board_->whose_turn_is_it(), move, captured_piece); //do_move changes the player so we have to get the other player here (!whose_turn_is_it)   
+                            board_->change_turn();
+                            //player 2
+
                             if (board_->is_checkmate()) {
                                 register_mat(board_->whose_turn_is_it());
                                 register_lose(board_->whose_turn_is_it());
@@ -78,23 +80,19 @@ namespace listener {
                             else if (board_->is_check()) {
                                 register_check(board_->whose_turn_is_it());
                             }
-                            else if (false) {/*(board_->generateLegalMoves().size() == 0) {  put this when move generation is stable*/
+                            else if (board_->generateLegalMoves().size() == 0) {
                                 register_pat(board_->whose_turn_is_it());
                                 register_game_draw();
                             }
-                            else if (false) {//board_->is_draw()) { put this when move generation is stable
+                            else if (board_->is_draw()) {
                                 register_game_draw();
                                 register_game_finished();
                             }
-                            board_->do_move(move);
-                            board_->change_turn();
-
-
+                            //player 2
                         }
                         catch (std::bad_alloc &e /*std::exception &e we dont want to catch for now */) {
                             throw std::runtime_error("error happened while executing move: " + move.to_string() + " : " + e.what() + "\n");
                         }
-
                     }
                     else {
                         std::cout << "[PGN RUNNER] move illegal: " + move.to_string();

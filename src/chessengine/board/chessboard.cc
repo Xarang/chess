@@ -154,9 +154,9 @@ namespace board {
     bool Chessboard::is_check() {
         //std::cout << "is check ?" << "\n";
         //generate legal moves for opponent and check if one on them captures your king.
-        is_white_turn_ = !is_white_turn_;
+        change_turn();
         std::list<Move> opponent_moves = generateLegalMoves(false); //this false means that this call to generateLegalMoves will not check for check itself (since the other player has initiative anyway)
-        is_white_turn_ = !is_white_turn_;
+        change_turn();
 
         File king_file = File::OUTOFBOUNDS;
         Rank king_rank = Rank::OUTOFBOUNDS;
@@ -169,11 +169,9 @@ namespace board {
                 break;
             }
         }
-        
+
         for (auto move : opponent_moves)
         {
-            /*if (move.piece_ == PieceType::QUEEN && is_white_turn_)
-                    std::cout << move.to_string();*/
             if (move.end_position_.file_get() == king_file &&
                 move.end_position_.rank_get() == king_rank)
             {
