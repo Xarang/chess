@@ -48,6 +48,7 @@ set(SRC
     src/ai/uci.cc)
 
 include_directories(
+    src/
     src/chessengine
     src/ai
     src/listeners

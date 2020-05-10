@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "utype.hh"
+
 #include "board/chessboard-interface.hh"
 #include "board/color.hh"
 #include "board/piece-type.hh"
