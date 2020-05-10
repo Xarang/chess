@@ -9,7 +9,8 @@ namespace board {
             return true;
         if (move.start_position_.rank_get() != move.end_position_.rank_get() && move.start_position_.file_get() != move.end_position_.file_get())
             return false;
-        return is_move_legal_ROOK(chessboard, move);
+        b = is_move_legal_ROOK(chessboard, move);
+        return b;
     }
 
     //TODO: use chessboard to assess legality (currently not using it)
@@ -115,7 +116,7 @@ namespace board {
         return startFile + 1 == endFile && startRank + 2 == endRank;
     }
 
-    bool MoveLegalityChecker::is_move_legal_BISHOP(const Chessboard& b, Move& move) {
+    bool MoveLegalityChecker::is_move_legal_BISHOP(const Chessboard&, Move& move) {
         int Fi = 1;
         int Ri = 1;
         bool bo = true;
@@ -131,8 +132,7 @@ namespace board {
                 if (move.start_position_.file_get() + Fi == move.end_position_.file_get() &&
                     move.start_position_.rank_get() + Ri == move.end_position_.rank_get())
                 {return true;}
-                if (b.board_((int)move.start_position_.file_get() + Fi, (int)move.start_position_.rank_get() + Ri).has_value())
-                    return false;
+
                 Fi += 1;
                 Ri += 1;
 
@@ -150,8 +150,7 @@ namespace board {
                     bo = false;
                     break;
                 }
-                if (b.board_((int)move.start_position_.file_get() + Fi, (int)move.start_position_.rank_get() - Ri).has_value())
-                    return false;
+
                 Fi += 1;
                 Ri += 1;
             }
@@ -169,8 +168,7 @@ namespace board {
                     bo = false;
                     break;
                 }
-                if (b.board_((int)move.start_position_.file_get() - Fi, (int)move.start_position_.rank_get() + Ri).has_value())
-                    return false;
+
                 Fi += 1;
                 Ri += 1;
             }
@@ -188,8 +186,6 @@ namespace board {
                     bo = false;
                     break;
                 }
-                if (b.board_((int)move.start_position_.file_get() - Fi, (int)move.start_position_.rank_get() - Ri).has_value())
-                    return false;
                 Fi += 1;
                 Ri += 1;
             }
@@ -276,9 +272,10 @@ namespace board {
         */return true;
     }
 
-    bool MoveLegalityChecker::is_move_legal_ROOK(const Chessboard& b, Move& move) {
+    bool MoveLegalityChecker::is_move_legal_ROOK(const Chessboard&, Move& move) {
         int Fi = 1;
         int Ri = 1;
+
         if (move.start_position_.file_get() < move.end_position_.file_get() && move.start_position_.rank_get() == move.end_position_.rank_get())
         {
             while (move.start_position_.file_get() + Fi != move.end_position_.file_get())
@@ -287,8 +284,6 @@ namespace board {
                 {
                     return false;
                 }
-                if (b.board_((int)move.start_position_.file_get() + Fi, (int)move.start_position_.rank_get()).has_value())
-                    return false;
                 Fi += 1;
             }
             return true;
@@ -302,8 +297,6 @@ namespace board {
                 {
                     return false;
                 }
-                if (b.board_((int)move.start_position_.file_get() - Fi, (int)move.start_position_.rank_get()).has_value())
-                    return false;
                 Fi += 1;
             }
             return true;
@@ -317,8 +310,6 @@ namespace board {
                 {
                     return false;
                 }
-                if (b.board_((int)move.start_position_.file_get(), (int)move.start_position_.rank_get() + Ri).has_value())
-                    return false;
                 Ri += 1;
             }
             return true;
@@ -332,8 +323,6 @@ namespace board {
                 {
                     return false;
                 }
-                if (b.board_((int)move.start_position_.file_get(), (int)move.start_position_.rank_get() - Ri).has_value())
-                    return false;
                 Ri += 1;
             }
             return true;

@@ -124,14 +124,17 @@ namespace board {
             }
         }
 
-        /*
-        std::cout << "potential moves:\n";
+        /*std::cout << "potential moves:\n";
         for (auto move : allMoves) {
-            std::cout << move.to_string();
-        }
-        */
+            if (move.piece_ == PieceType::QUEEN)
+                std::cout << move.to_string();
+        }*/
 
         allMoves.remove_if([this, check_self_check](Move m){return !this->is_move_legal(m, check_self_check); });
+        /*for (auto move : allMoves) {
+            if (move.piece_ == PieceType::QUEEN)
+                std::cout << move.to_string();
+        }*/
         /*
         std::cout << "removed all illegal moves; legal moves remaining: " << allMoves.size() << "\n";
         for (auto move : allMoves) {
@@ -169,6 +172,8 @@ namespace board {
         
         for (auto move : opponent_moves)
         {
+            /*if (move.piece_ == PieceType::QUEEN && is_white_turn_)
+                    std::cout << move.to_string();*/
             if (move.end_position_.file_get() == king_file &&
                 move.end_position_.rank_get() == king_rank)
             {
