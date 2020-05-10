@@ -124,7 +124,7 @@ namespace board {
         is_white_turn_ = !is_white_turn_;
     }
 
-    bool Chessboard::is_move_legal(Move move) {
+    bool Chessboard::is_move_legal(Move move, bool check_self_check) {
 
         if (move.start_position_.file_get() == File::OUTOFBOUNDS || move.start_position_.rank_get() == Rank::OUTOFBOUNDS
             || move.end_position_.file_get() == File::OUTOFBOUNDS || move.end_position_.rank_get() == Rank::OUTOFBOUNDS) {
@@ -135,18 +135,18 @@ namespace board {
             return false;
 
         //check if this move would make/leave the king vulnerable
-        auto projection = project(move);
-        projection.is_white_turn_ = !projection.is_white_turn_;
-        if (projection.is_check()) {
-            return false;
+        if (check_self_check) {
+            auto projection = project(move);
+            projection.is_white_turn_ = !projection.is_white_turn_;
+            if (projection.is_check()) {
+                return false;
+            }
         }
 
         auto piece = (*this)[move.end_position_];
         if (piece.has_value())
         {
-            if (piece.value().color_ == Color::WHITE && is_white_turn_)
-                return false;
-            if (piece.value().color_ == Color::BLACK && !is_white_turn_)
+            if (piece.value().color_ == whose_turn_is_it())
                 return false;
         }
         else if (move.is_capture_) {
@@ -171,12 +171,12 @@ namespace board {
         }
       }
 
-    std::list<Move> Chessboard::generateLegalMoves() {
+    std::list<Move> Chessboard::generateLegalMoves(bool check_self_check) {
         std::list<Move> allMoves;
 
         //build the list of all "potential" moves, not accounting for OOB and blocked paths
         for (auto piece : pieces_) {
-            if ((bool)piece.color_ != is_white_turn_) {
+            if (piece.color_ != whose_turn_is_it()) {
                 std::list<Move> pieceMoves = piece.getAllPotentialMoves();
                 for (auto move : pieceMoves) {
                     allMoves.push_front(move);
@@ -184,7 +184,7 @@ namespace board {
             }
         }
         
-        allMoves.remove_if([this](Move m){return !this->is_move_legal(m); });
+        allMoves.remove_if([this, check_self_check](Move m){return !this->is_move_legal(m, check_self_check); });
     
         return allMoves;
     }
@@ -199,7 +199,7 @@ namespace board {
     bool Chessboard::is_check() {
         //generate legal moves for opponent and check if one on them captures your king.
         is_white_turn_ = !is_white_turn_;
-        std::list<Move> opponent_moves = generateLegalMoves();
+        std::list<Move> opponent_moves = generateLegalMoves(false);
         is_white_turn_ = !is_white_turn_;
 
         File king_file = File::OUTOFBOUNDS;

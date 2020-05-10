@@ -105,8 +105,8 @@ namespace board {
 
         void do_move_en_passant(Move);
         void do_move(Move);
-        bool is_move_legal(Move);
-        std::list<Move> generateLegalMoves();
+        bool is_move_legal(Move, bool check_self_check = true);
+        std::list<Move> generateLegalMoves(bool check_self_check = true);
         bool is_check();
         bool is_checkmate();
         bool is_draw();
