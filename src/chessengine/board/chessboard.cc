@@ -81,6 +81,9 @@ namespace board {
         auto piece = (*this)[move.end_position_];
         if (piece.has_value())
         {
+            if (!move.is_capture_) {
+                return false;
+            }
             //do not consider moves that end on a square occupied by an allied piece
             if (piece.value().color_ == whose_turn_is_it())
                 return false;
