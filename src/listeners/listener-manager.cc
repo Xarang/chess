@@ -97,6 +97,7 @@ namespace listener {
 
                     }
                     else {
+                        std::cout << "[PGN RUNNER] move illegal: " + move.to_string();
                         register_lose(board_->whose_turn_is_it());
                         return;
                     }
