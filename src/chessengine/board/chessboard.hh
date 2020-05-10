@@ -122,6 +122,7 @@ namespace board {
         //make a copy of the board with the move passed as argument executed
         Chessboard project(Move move);
 
+        void printMove(Move move);
     };
 
     class MoveLegalityChecker {
