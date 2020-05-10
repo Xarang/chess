@@ -53,6 +53,7 @@ namespace board {
             for (int i = 0; i < 4; i++)
             {
                 std::pair<int, int> pair = pairs[i];
+                
                 File curr_file = org_file;
                 Rank curr_rank = org_rank;
                 int add_file = pair.first;
@@ -129,6 +130,9 @@ namespace board {
                 int add_file = pair.first;
                 int add_rank = pair.second;
 
+                curr_file = org_file;
+                curr_rank = org_rank;
+
                 while (true)
                 {
                     curr_file = curr_file + add_file;
@@ -171,6 +175,9 @@ namespace board {
                 std::pair<int, int> pair = pairs[i];
                 int add_file = pair.first;
                 int add_rank = pair.second;
+
+                curr_file = org_file;
+                curr_rank = org_rank;
 
                 while (true)
                 {
