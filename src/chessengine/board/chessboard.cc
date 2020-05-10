@@ -241,9 +241,9 @@ namespace board {
 
 
     std::string Chessboard::to_string() {
-       /* //TODO: output a FEN string representing the board (https://fr.wikipedia.org/wiki/Notation_Forsyth-Edwards)
+        //TODO: output a FEN string representing the board (https://fr.wikipedia.org/wiki/Notation_Forsyth-Edwards)
         std::string res = "";
-        board::Rank currRank = Rank::EIGHT;
+        board::Rank currRank = Rank::ONE;
         for (size_t i = 0; i < 8; i++)
         {
             board::File currFile = File::A;
@@ -257,19 +257,24 @@ namespace board {
                     auto myPiece = (*this)[myPos].value();
 
                     symbol = myPiece.piece_to_char_fen();
-                    if (symbol == ' ')
-                        empty_counter++;
-                    else if (empty_counter != 0) {
-                        res += std::to_string(empty_counter) + symbol;
-                        empty_counter = 0;
-                    }
+                    if (empty_counter != 0)
+                        res += std::to_string(empty_counter);
+                    res += symbol;
+                    empty_counter = 0;
+
                 }
-                res += "/";
+                else
+                    empty_counter++;
+                currFile = currFile + 1;
+
             }
-            
+            if (empty_counter != 0)
+                res += std::to_string(empty_counter);
+            res += "/";
+            currRank = currRank + 1;
         }
         std::cout << res << "\n";
-        return res;*/
+        return res;
 
         //TODO: fix this
         return std::to_string(rand() % 1000000); //random string so that we dont get draw after 3 moves
