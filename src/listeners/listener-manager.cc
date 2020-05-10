@@ -69,6 +69,8 @@ namespace listener {
                             board_->do_move(move);
                             register_move(((board::Color)!(bool)board_->whose_turn_is_it()), move, captured_piece); //do_move changes the player so we have to get the other player here (!whose_turn_is_it)
 
+                            //check current game state for the player that did the move
+                            board_->change_turn();
                             if (board_->is_checkmate()) {
                                 register_mat(board_->whose_turn_is_it());
                                 register_lose(board_->whose_turn_is_it());
@@ -84,6 +86,9 @@ namespace listener {
                                 register_game_draw();
                                 register_game_finished();
                             }
+                            board_->change_turn();
+
+
                         }
                         catch (std::bad_alloc &e /*std::exception &e we dont want to catch for now */) {
                             throw std::runtime_error("error happened while executing move: " + move.to_string() + " : " + e.what() + "\n");

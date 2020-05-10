@@ -128,6 +128,7 @@ namespace board {
         Color whose_turn_is_it() { return is_white_turn_ ? Color::WHITE : Color::BLACK; }
         const std::optional<Piece> read(Position p) const; //same as operator[], but read-only
 
+        void change_turn() { is_white_turn_ = !is_white_turn_; }
         friend class MoveLegalityChecker;
 
 
