@@ -112,15 +112,14 @@ namespace listener {
 
     static unsigned long perft(board::Chessboard b, int depth) {
         if (depth == 0) {
-            return 0;
+            return 1;
         }
         unsigned long sum = 0;
         auto moves = b.generateLegalMoves();
-        sum += moves.size();
         for (auto move : moves) {
             auto projection = b.project(move);
             sum += perft(projection, depth - 1);
-        }
+        }   
         return sum;
     }
 
