@@ -72,7 +72,7 @@ int main(int argc, const char *argv[]) {
         listenerManager.run_perft(std::atoi(depth.c_str()));
     }
     else {
-        //ai here
+        listenerManager.run_ai();
     }
 
     listenerManager.close_listeners();

@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 
+#include "ai/uci.hh"
 #include "pgn/pgn-parser.hh"
 
 #include "listener-manager.hh"
@@ -137,6 +138,29 @@ namespace listener {
         output_file.close();
         auto n = perft(board_.value(), depth);
         std::cout << n << "\n";
+    }
+
+
+    //TODO: figure this out
+    void ListenerManager::run_ai() {
+        ai::init("Kasparov");
+
+        while (true) { //end when ?
+            std::string board_str = ai::get_board();
+
+            //this will not work; board_str is not always a fen string
+            //so we will have to create another Chessboard constructor for this
+            //but you get the idea
+            auto board = board::Chessboard(board_str);
+
+            //ai get best move for board;
+            auto moves = board_->generateLegalMoves();
+            auto best_move = moves.front().uci();
+
+            //send move
+            ai::play_move(best_move);
+        }
+        
     }
 
 
