@@ -93,6 +93,9 @@ namespace board {
 
     //TODO: use chessboard to assess legality (currently not using it)
     bool MoveLegalityChecker::is_move_legal_KNIGHT(const Chessboard&, Move& move){
+        if (move.start_position_ == Position(File::E, Rank::FIVE)) {
+            std::cout << "is_move_legal_knight ? " << move.uci() << "\n";
+        }
         auto startFile = move.start_position_.file_get();
         auto startRank = move.start_position_.rank_get();
         auto endFile = move.end_position_.file_get();
@@ -306,11 +309,6 @@ namespace board {
                     return false;
                 }
                 if (b.board_((int)move.start_position_.file_get(), (int)move.start_position_.rank_get() - Ri).has_value()) {
-                    /*if (move.piece_ == PieceType::QUEEN) {
-                        auto piece = b.board_((int)move.start_position_.file_get(), (int)move.start_position_.rank_get() - Ri);
-                        auto p = move.start_position_.rank_get() - Ri == move.end_position_.rank_get() && piece.has_value();
-                        std::cout << p << " " << Ri << " " << move.to_string();
-                    }*/
                     break;
                 }
                 Ri += 1;
