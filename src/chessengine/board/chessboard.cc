@@ -223,7 +223,6 @@ namespace board {
         }
 
         for (std::pair<std::string, int> pair : all_boards_since_start_) {
-            //std::cout << pair.first << " ----------> " << pair.second << "\n";
             if (pair.second >= 3) {
                 return true;
             }
@@ -300,7 +299,7 @@ namespace board {
             int fileIndex = 0;
             for (auto it = rank.begin(); it != rank.end(); it++) {
                 if (isdigit(*it)) {
-                    fileIndex += '0' - (int)*it;
+                    fileIndex += (int)*it - '0';
                 }
                 else {
                     pieces_.push_back(Piece(Position((File)fileIndex, (Rank)rankIndex), islower(*it) ? Color::BLACK : Color::WHITE, char_to_piece(toupper(*it))));
@@ -314,15 +313,24 @@ namespace board {
         }
 
         //parse informations regarding the current state of the game
+        //whose turn is it
         is_white_turn_ = fields[1] == "w";
+
+        //castling situation
         did_black_king_castling_ = fields[2].find("k") != fields[2].npos;
         did_white_king_castling_ = fields[2].find("K") != fields[2].npos;
         did_black_queen_castling_ = fields[2].find("q") != fields[2].npos;
         did_white_queen_castling_ = fields[2].find("Q") != fields[2].npos;
 
 
-        all_boards_since_start_.insert(std::pair<std::string, int>(to_string(), 1));
         //TODO: add potential en-passant spot
+        if (fields[3] != "-") {
+            File f = (File)(fields[3].at(0) - 'a');
+            Rank r = (Rank)(fields[3].at(1) - '0');
+            en_passant_target_square_ = Position(f, r);
+        }
+
+        all_boards_since_start_.insert(std::pair<std::string, int>(to_string(), 1));
 
     }
 
