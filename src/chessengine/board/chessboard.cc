@@ -73,9 +73,6 @@ namespace board {
 
     bool Chessboard::is_move_legal(Move& move, bool check_self_check) {
 
-        if (move.start_position_ == Position(File::E, Rank::FIVE)) {
-            std::cout << "is_move_legal ? " << move.to_string() << "\n";
-        }
         //do not consider moves that have OOB positions
         if (move.start_position_.file_get() == File::OUTOFBOUNDS || move.start_position_.rank_get() == Rank::OUTOFBOUNDS
             || move.end_position_.file_get() == File::OUTOFBOUNDS || move.end_position_.rank_get() == Rank::OUTOFBOUNDS) {

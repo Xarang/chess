@@ -93,9 +93,7 @@ namespace board {
 
     //TODO: use chessboard to assess legality (currently not using it)
     bool MoveLegalityChecker::is_move_legal_KNIGHT(const Chessboard&, Move& move){
-        if (move.start_position_ == Position(File::E, Rank::FIVE)) {
-            std::cout << "is_move_legal_knight ? " << move.uci() << "\n";
-        }
+
         auto startFile = move.start_position_.file_get();
         auto startRank = move.start_position_.rank_get();
         auto endFile = move.end_position_.file_get();
