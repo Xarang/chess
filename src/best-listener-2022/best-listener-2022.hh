@@ -135,6 +135,7 @@ class BestListener2022 : public listener::Listener {
         */
         void on_player_mat(const board::Color color) {
             std::cout << "[MAT] " + board::color_to_string(color) + " is mat" << "\n";
+            std::cout << "[RESULT] " + board::color_to_string((board::Color)(!(bool)color)) + " won\n";
         }
 
         /**
@@ -155,14 +156,14 @@ class BestListener2022 : public listener::Listener {
         ** @param color: The color of the player who is disqualified.
         */
         void on_player_disqualified(const board::Color color) {
-            std::cout << "[END] " + board::color_to_string((board::Color)(!(bool)color)) + " won" << "\n"; 
+            std::cout << "[RESULT] " << "Illegal move by " << board::color_to_string(color) << ", disqualified." << "\n"; 
         }
 
         /**
         ** \brief Event when there is a draw game.
         */
         void on_draw() {
-            std::cout << "[END] game is a draw" << "\n";
+            std::cout << "[RESULT] Draw" << "\n";
             std::cout << board_string_representation();
         }
 };
