@@ -45,7 +45,12 @@ set(SRC
     src/chessengine/pgn/pgn-move.cc
     src/chessengine/pgn/pgn-parser.cc
     src/listeners/listener-manager.cc
-    src/ai/uci.cc)
+        )
+
+set (SRC_AI
+        src/ai/uci.cc
+        src/ai/negamax.cc
+        )
 
 include_directories(
     src/
@@ -55,6 +60,12 @@ include_directories(
 )
 
 # END SOURCES
+
+# AI
+
+add_library(ai
+        ${SRC_AI})
+
 
 # CUSTOM LISTENER
 
@@ -72,7 +83,7 @@ add_custom_target(listener DEPENDS best-listener-2022)
 # CHESSENGINE
 add_executable(chessengine)
 target_sources(chessengine PRIVATE "src/main.cc" ${SRC})
-target_link_libraries(chessengine PRIVATE ${LIBRARIES})
+target_link_libraries(chessengine PRIVATE ${LIBRARIES} ai)
 
 
 # TESTS
