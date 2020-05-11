@@ -59,23 +59,24 @@ include_directories(
 # CUSTOM LISTENER
 
 add_library(best-listener-2022 SHARED
-    src/best-listener-2022/best-listener-2022.cc
+    src/custom-listeners/best-listener-2022.cc
     ${SRC})
 
-add_library(listener-test-suit SHARED
-        src/best-listener-2022/listener-test-suit.cc
+add_library(listener-test-suite SHARED
+        src/custom-listeners/listener-test-suite.cc
         ${SRC})
 
 set_target_properties(best-listener-2022
     PROPERTIES
     EXCLUDE_FROM_ALL "true")
 
-set_target_properties(listener-test-suit
+set_target_properties(listener-test-suite
         PROPERTIES
         EXCLUDE_FROM_ALL "true")
 
 add_custom_target(listener DEPENDS best-listener-2022)
-add_custom_target(listenerTestSuit DEPENDS listener-test-suit)
+add_custom_target(listener-test DEPENDS listener-test-suite)
+
 
 
 # CHESSENGINE

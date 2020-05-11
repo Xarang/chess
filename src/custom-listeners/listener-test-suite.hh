@@ -4,33 +4,15 @@
 
 #include "listener.hh"
 
-static std::string piece_name(int value) {
-    switch (value) {
-        case 0:
-            return "QUEEN";
-        case 1:
-            return "ROOK";
-        case 2:
-            return "BISHOP";
-        case 3:
-            return "KNIGHT";
-        case 4:
-            return "PAWN";
-        default:
-            return "KING";
-    }
-}
-
-class BestListener2022 : public listener::Listener {
+class ListenerTestSuite : public listener::Listener {
 private:
     const board::ChessboardInterface* interface_;
     int move_count = 0;
-    std::string board_string_representation();
 
 
 public:
 
-    BestListener2022() : interface_(nullptr) {};
+    ListenerTestSuite() : interface_(nullptr) {};
 
     /**
         ** \brief Register the ChessboardInterface for later use.
@@ -40,6 +22,7 @@ public:
         ** the adapter design pattern
         */
     void register_board(const board::ChessboardInterface& board_interface) {
+        interface_ = &board_interface;
     }
 
     /**
@@ -57,9 +40,9 @@ public:
     ** @param from:  The initial position of the piece.
     ** @param to:    The final position of the piece.
     */
-    void on_piece_moved(const board::PieceType piece,
-                        const board::Position& from,
-                        const board::Position& to) {
+    void on_piece_moved(const board::PieceType,
+                        const board::Position&,
+                        const board::Position&) {
 
     }
 
@@ -70,8 +53,8 @@ public:
     ** @param piece: The taken piece.
     ** @param at:    The position where the piece is taken.
     */
-    void on_piece_taken(const board::PieceType piece,
-                        const board::Position& at) {
+    void on_piece_taken(const board::PieceType,
+                        const board::Position&) {
 
     }
 
@@ -82,8 +65,8 @@ public:
     ** @param piece: The chosen type of piece of the promotion.
     ** @param at:    The position of the piece promoted.
     */
-    void on_piece_promoted(const board::PieceType piece,
-                           const board::Position& at) {
+    void on_piece_promoted(const board::PieceType,
+                           const board::Position&) {
 
     }
 
@@ -94,7 +77,7 @@ public:
     **
     ** @param color: The color of the player concerned by the castling.
     */
-    void on_kingside_castling(const board::Color color) {
+    void on_kingside_castling(const board::Color) {
 
     }
 
@@ -105,7 +88,7 @@ public:
     **
     ** @param color: The color of the player concerned by the castling
     */
-    void on_queenside_castling(const board::Color color) {
+    void on_queenside_castling(const board::Color) {
 
     }
 
@@ -115,7 +98,7 @@ public:
     **
     ** @param color: The color of the player whose King is in check
     */
-    void on_player_check(const board::Color color) {
+    void on_player_check(const board::Color) {
 
     }
 
@@ -136,7 +119,7 @@ public:
     **
     ** @param color: The color of the player who is pat.
     */
-    void on_player_pat(const board::Color color) {
+    void on_player_pat(const board::Color) {
 
     }
 
@@ -160,5 +143,5 @@ public:
 };
 
 extern "C" listener::Listener* listener_create() {
-    return new BestListener2022();
+    return new ListenerTestSuite();
 }
