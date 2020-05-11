@@ -334,6 +334,45 @@ namespace board {
 
     }
 
+    Chessboard Chessboard::parse_uci(std::string uci_position) {
+        auto uci_string_stream = std::istringstream(uci_position);
+        std::string s;
+        uci_string_stream >> s;
+
+        if (s == "fen") {
+            try {
+                std::string fen;
+                std::string word;
+                while (uci_string_stream >> word) {
+                    fen += word + " "; 
+                }
+                return Chessboard(fen);
+            }
+            catch (std::exception &e) {
+                std::cerr << "error while recreating board position from uci fen string";
+            }
+
+        }
+        else if (s == "startpos") {
+            try {
+                auto board = Chessboard();
+                std::string move;
+                while (uci_string_stream >> move) {
+                    File file_from = (File)(move.at(0) - 'a');
+                    Rank rank_from = (Rank)(move.at(1) - '0');
+                    File file_to = (File)(move.at(2) - 'a');
+                    Rank rank_to = (Rank)(move.at(3) - '0');
+                    board.move_piece(board[Position(file_from, rank_from)].value(), Position(file_to, rank_to));
+                }
+            }
+            catch (std::exception &e) {
+               std::cerr << "error while recreating board position from uci move list";
+            }
+        }
+        else throw std::runtime_error("unrecognised uci board position");
+        return Chessboard();
+    }
+
     //private methods used to factorise basic move operations
 
     //heavily asserted for now, to make sure they do what we want them to do

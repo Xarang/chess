@@ -115,6 +115,8 @@ namespace board {
         //FEN string based constructor
         Chessboard(std::string fen_string);
 
+        static Chessboard parse_uci(std::string uci_position);
+
         //main methods
         void do_move(Move);
         bool is_move_legal(Move&, bool check_self_check = true);
