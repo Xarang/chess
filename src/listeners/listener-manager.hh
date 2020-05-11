@@ -33,7 +33,7 @@ namespace listener {
             void register_check(board::Color color);
             void register_mat(board::Color color);
             void register_pat(board::Color color);
-            void register_lose(board::Color color);
+            void register_player_disqualification(board::Color color);
             void register_game_draw();
     };
 }

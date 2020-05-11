@@ -75,7 +75,6 @@ namespace listener {
 
                             if (board_->is_checkmate()) {
                                 register_mat(board_->whose_turn_is_it());
-                                register_lose(board_->whose_turn_is_it());
                             }
                             else {
                                 if (board_->is_check()) {
@@ -83,7 +82,6 @@ namespace listener {
                                 }
                                 if (board_->generateLegalMoves().size() == 0) {
                                     register_pat(board_->whose_turn_is_it());
-                                    register_game_draw();
                                 }
                                 else if (board_->is_draw()) {
                                     register_game_draw();
@@ -96,8 +94,8 @@ namespace listener {
                         }
                     }
                     else {
-                        std::cout << "[PGN RUNNER] move illegal: " + move.to_string();
-                        register_lose(board_->whose_turn_is_it());
+                        //std::cout << "[PGN RUNNER] move illegal: " + move.to_string();
+                        register_player_disqualification(board_->whose_turn_is_it());
                         return;
                     }
                 }
@@ -170,19 +168,14 @@ namespace listener {
     void ListenerManager::register_mat(board::Color color) {
         for (auto listener : listeners_) {
             listener->on_player_mat(color);
+            listener->on_game_finished();
         }
     }
 
     void ListenerManager::register_pat(board::Color color) {
         for (auto listener : listeners_) {
             listener->on_player_pat(color);
-        }
-    }
-
-    void ListenerManager::register_lose(board::Color color) {
-        for (auto listener : listeners_) {
-            listener->on_player_disqualified(color);
-            listener->on_game_finished();
+            register_game_draw();
         }
     }
 
@@ -192,6 +185,10 @@ namespace listener {
             listener->on_game_finished();
         }
     }
-
-
+    void ListenerManager::register_player_disqualification(board::Color color) {
+        for (auto listener : listeners_) {
+            listener->on_player_disqualified(color);
+            listener->on_game_finished();
+        }
+    }
 }
