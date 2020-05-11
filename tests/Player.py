@@ -19,7 +19,7 @@ def findWinner(pgnFile):
     if winner == "*":
         return Player("*")
     if winner == "1-0":
-        return Player("White")
+        return Player("White won")
     if winner == "0-1":
-        return Player("Black")
+        return Player("Black won")
     return Player("Draw")

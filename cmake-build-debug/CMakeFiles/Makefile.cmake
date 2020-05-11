@@ -64,7 +64,9 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/best-listener-2022.dir/DependInfo.cmake"
-  "CMakeFiles/listener.dir/DependInfo.cmake"
   "CMakeFiles/chessengine.dir/DependInfo.cmake"
+  "CMakeFiles/best-listener-2022.dir/DependInfo.cmake"
+  "CMakeFiles/listener-test-suit.dir/DependInfo.cmake"
+  "CMakeFiles/listener.dir/DependInfo.cmake"
+  "CMakeFiles/listenerTestSuit.dir/DependInfo.cmake"
   )
