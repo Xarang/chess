@@ -10,7 +10,16 @@ namespace ai {
         int res = 0;
         auto pieces = myBoard.get_pieces();
         for (auto piece : pieces)
-            res += material_values[piece.type_];
+        {
+            if (color_ = piece.color_)
+            {
+                res += material_values[piece.type_];
+            }
+            else
+            {
+                res -= material_values[piece.type_];
+            }
+        }
         return res;
     }
 
@@ -57,6 +66,8 @@ namespace ai {
     board::Move AI::searchMove(board::Chessboard& myBoard) {
         float bestValue = -INFINITY;
         board::Move bestMove;
+
+        color_ = myBoard.whose_turn_is_it();
 
         auto moves = myBoard.generateLegalMoves();
         for (auto move : moves) {
