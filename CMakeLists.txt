@@ -49,7 +49,7 @@ set(SRC
 
 set (SRC_AI
         src/ai/uci.cc
-        src/ai/negamax.cc
+        src/ai/minimax.cc
         )
 
 include_directories(

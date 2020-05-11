@@ -124,6 +124,12 @@ namespace board {
         bool is_draw();
         std::optional<Piece>& operator[](Position p);
 
+
+        //Getters
+        std::vector<Piece> get_pieces() {
+            return pieces_;
+        }
+
         //utils
         std::string to_string();
         Color whose_turn_is_it() { return is_white_turn_ ? Color::WHITE : Color::BLACK; }
@@ -148,6 +154,6 @@ namespace board {
         static bool is_move_legal(const Chessboard& b, Move& move);
     };
 
-
+    //extern Chessboard myBoard;
 
 }

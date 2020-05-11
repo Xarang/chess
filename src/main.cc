@@ -13,6 +13,8 @@
 #include "pgn/pgn-parser.hh"
 #include "pgn/pgn-exception.hh"
 
+//board::Chessboard myBoard();
+
 int main(int argc, const char *argv[]) {
         
     assert(std::is_copy_constructible<board::Chessboard>::value);
