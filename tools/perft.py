@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 
 from chess import Board
+from chess import Move
 import sys
+import json
 
 
 def perft(depth, board):
     if depth == 1:
+        with open('pythonchess_perft_output.out', 'w') as f:
+            for move in list(board.legal_moves):
+                f.write(move.uci() + "\n")
         return len(list(board.legal_moves))
 
     res = 0

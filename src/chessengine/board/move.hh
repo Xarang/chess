@@ -1,7 +1,7 @@
 #pragma once
 
 #include "position.hh"
-#include "../pgn/pgn-move.hh"
+#include "pgn/pgn-move.hh"
 
 namespace board
 {
@@ -47,6 +47,7 @@ namespace board
 
 
         std::string to_string();
+        std::string uci();
 
         private:
         void set_double_pawn_push();
