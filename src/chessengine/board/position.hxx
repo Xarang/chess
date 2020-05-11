@@ -52,21 +52,21 @@ namespace board
     static std::string file_to_string(const File& file) {
         switch (file) {
             case File::A:
-                return "A";
+                return "a";
             case File::B:
-                return "B";
+                return "b";
             case File::C:
-                return "C";
+                return "c";
             case File::D:
-                return "D";
+                return "d";
             case File::E:
-                return "E";
+                return "e";
             case File::F:
-                return "F";
+                return "f";
             case File::G:
-                return "G";
+                return "g";
             case File::H:
-                return "H";
+                return "h";
             default:
                 return "UNKNOWN FILE";
         };

@@ -1,5 +1,6 @@
 #include <dlfcn.h>
 #include <iostream>
+#include <fstream>
 #include <string>
 
 #include "pgn/pgn-parser.hh"
@@ -110,13 +111,19 @@ namespace listener {
         }
     }
 
-    static unsigned long perft(board::Chessboard b, int depth) {
+    static unsigned long long perft(board::Chessboard b, int depth) {
         if (depth == 0) {
             return 1;
         }
-        unsigned long sum = 0;
+        unsigned long long sum = 0;
         auto moves = b.generateLegalMoves();
         for (auto move : moves) {
+            if (depth == 1) {
+                std::ofstream output_file;
+                output_file.open("chessengine_perft_output.out", std::ios_base::app);
+                output_file << move.uci() << "\n";
+                output_file.close();
+            }
             auto projection = b.project(move);
             sum += perft(projection, depth - 1);
         }   
@@ -124,6 +131,10 @@ namespace listener {
     }
 
     void ListenerManager::run_perft(int depth) {
+        std::ofstream output_file;
+        output_file.open("chessengine_perft_output.out", std::ios_base::out);
+        output_file << "";
+        output_file.close();
         auto n = perft(board_.value(), depth);
         std::cout << n << "\n";
     }

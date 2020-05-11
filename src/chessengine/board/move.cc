@@ -101,4 +101,8 @@ namespace board
         }
         return str + "\n";
     }
+
+    std::string Move::uci() {
+        return start_position_.to_string() + end_position_.to_string();
+    }
 }

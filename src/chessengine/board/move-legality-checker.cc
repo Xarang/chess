@@ -213,6 +213,9 @@ namespace board {
             if (move.start_position_.rank_get() != initial_rank || move.is_capture_) {
                 return false;
             }
+            if (b.read(Position(move.start_position_.file_get(), move.start_position_.rank_get() + rank_direction)).has_value()) {
+                return false;
+            }
             return (move.start_position_.rank_get() + rank_direction * 2 == move.end_position_.rank_get() &&
                     move.start_position_.file_get() == move.end_position_.file_get());
         }
@@ -242,41 +245,7 @@ namespace board {
             return (move.start_position_.file_get() == move.end_position_.file_get() && move.start_position_.rank_get() + rank_direction == move.end_position_.rank_get());
         }
 
-        /*if (move.start_position_.rank_get() + rank_direction != move.end_position_.rank_get())
-        {
-                if (move.start_position_.rank_get() == initial_rank && move.start_position_.rank_get() + rank_direction * 2 == move.end_position_.rank_get()) {
-                    move.is_double_pawn_push_ = true;
-                    if (b.board_((int)move.end_position_.file_get(), (int)move.end_position_.rank_get() - rank_direction).has_value())
-                        return false;
-                    return true;
-                }
-                if (move.is_capture_)
-                {
-                    std::cout << move.to_string();
-                    if (b.read(move.end_position_) == std::nullopt) {
-                        if (!move.is_en_passant_) {
-                            return false;
-                        }
-                        return move.end_position_ == b.en_passant_target_square_;
-                    }
-                    else if (move.is_en_passant_) {
-                        //if the move happens to be a regular capture (on a non-empty square) and was labelled en passant by the pgn parser or move generator,
-                        //then we know it is not an actual en passant move. we set the flag to false, and relaunch it all the way up in the is_legal_procedure
-                        //because being "potentially en passant" made us skip some verifications on this move, that we want to do now.
-                        std::cout << move.to_string() << " is actually not en passant " << "\n";
-                        move.is_en_passant_ = false;
-                        return is_move_legal(b, move);
-                    }
-                    if (move.start_position_.file_get() - 1 == move.end_position_.file_get() && move.start_position_.rank_get() + rank_direction == move.end_position_.rank_get())
-                        return true;
-
-                    if (move.start_position_.file_get() + 1 == move.end_position_.file_get() && move.start_position_.rank_get() + rank_direction == move.end_position_.rank_get())
-                        return true;
-                }
-                return false;
-        }
-        std::cout << "ok good: " + move.to_string();
-        */return true;
+       return true;
     }
 
     bool MoveLegalityChecker::is_move_legal_ROOK(const Chessboard& b, Move& move) {
