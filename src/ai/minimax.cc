@@ -5,10 +5,8 @@
 #include "ai/minimax.hh"
 #include "chessengine/board/chessboard.hh"
 
-
-
 namespace ai {
-    int Minimax::evaluate() {
+    int AI::evaluate(board::Chessboard& myBoard) {
         int res = 0;
         auto pieces = myBoard.get_pieces();
         for (auto piece : pieces)
@@ -16,7 +14,7 @@ namespace ai {
         return res;
     }
 
-    std::list<struct board::Move> getMovesFromPos(board::Position myPos, board::Chessboard myBoard) {
+    static std::list<struct board::Move> getMovesFromPos(board::Position myPos, board::Chessboard& myBoard) {
         auto pieces = myBoard.get_pieces();
 
         for (auto piece : pieces) {
@@ -26,17 +24,19 @@ namespace ai {
         return std::list<struct board::Move>();
     }
 
-    float Minimax::minimax(board::Position myPos, int depth, bool is_black) {
+    float AI::minimax(board::Position myPos, int depth, bool ai_turn, board::Chessboard& myBoard) {
          if (depth == 0 || myBoard.is_checkmate())
-             return evaluate();
+             return evaluate(myBoard);
 
          auto moves = getMovesFromPos(myPos, myBoard);
 
          // Black wants to minimize
-         if (!is_black) {
+         if (ai_turn) {
             float maxEval = -INFINITY;
             for (auto move : moves) {
-                auto eval = minimax(move.end_position_, depth - 1, !is_black);
+                auto proj = myBoard.project(move);
+                proj.change_turn();
+                auto eval = minimax(move.end_position_, depth - 1, !ai_turn, proj);
                 maxEval = std::max(maxEval, eval);
             }
             return maxEval;
@@ -45,21 +45,30 @@ namespace ai {
          else {
              float minEval = +INFINITY;
              for (auto move : moves) {
-                 auto eval = minimax(move.end_position_, depth - 1, !is_black);
+                 auto proj = myBoard.project(move);
+                 proj.change_turn();
+                 auto eval = minimax(move.end_position_, depth - 1, !ai_turn, proj);
                  minEval = std::min(minEval, eval);
              }
              return minEval;
          }
     }
-    /*
-    board::Move Minimax::searchMove() {
+
+    board::Move AI::searchMove(board::Chessboard& myBoard) {
         float bestValue = -INFINITY;
         board::Move bestMove;
 
         auto moves = myBoard.generateLegalMoves();
         for (auto move : moves) {
-            bestValue = minimax(move.start_position_, 3, false);
+            auto proj = myBoard.project(move);
+            proj.change_turn();
+            auto value = minimax(move.start_position_, 3, false, proj);
+            if (value > bestValue)
+            {
+                bestValue = value;
+                bestMove = move;
+            }
         }
+        return bestMove;
     }
-     */
 }

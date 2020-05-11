@@ -6,10 +6,9 @@
 
 namespace ai {
 
-    struct Minimax {
-        Minimax(board::Chessboard myBoard): myBoard(myBoard) {}
-
-        board::Chessboard myBoard;
+    struct AI {
+        friend board::Chessboard;
+        board::Color color_ = board::Color::WHITE;
 
         // According to Larry Kaufman's 2012 evaluation
         std::map<board::PieceType, int> material_values = {
@@ -26,7 +25,8 @@ namespace ai {
          * Value of going forward > Value of going backwards
          * Population near the possible cells we can move to
          */
-        int evaluate();
-        float minimax(board::Position myPos, int depth, bool is_black);
+        int evaluate(board::Chessboard& board);
+        float minimax(board::Position myPos, int depth, bool is_black, board::Chessboard& board);
+        board::Move searchMove(board::Chessboard& board);
     };
 }
