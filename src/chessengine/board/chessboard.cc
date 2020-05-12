@@ -107,11 +107,15 @@ namespace board {
             return false;
         }
 
+
         //now that we know the move is 'valid', we check if it is illegal due to " can not check yourself " clause
 
         //check if this move would make/leave the king vulnerable
         //if you are already checked, this is not an option
         if (check_self_check) {
+            if ((move.is_king_castling_ || move.is_queen_castling_) && is_check()) {
+                return false;
+            }
             auto projection = project(move);
             projection.is_white_turn_ = !projection.is_white_turn_;
             if (projection.is_check()) {
@@ -139,7 +143,7 @@ namespace board {
     }
 
     //copies the board and perform a move on it
-    Chessboard Chessboard::project(Move move) {
+    Chessboard Chessboard::project(Move move) const {
         auto copy = Chessboard(*this);
         copy.do_move(move);
         return copy;
@@ -225,7 +229,7 @@ namespace board {
     }
 
 
-    std::string Chessboard::to_string() {
+    std::string Chessboard::to_string() const {
         //TODO: output a FEN string representing the board (https://fr.wikipedia.org/wiki/Notation_Forsyth-Edwards)
         std::string res = "";
         board::Rank currRank = Rank::ONE;
@@ -238,8 +242,8 @@ namespace board {
                 Position myPos(currFile, currRank);
                 char symbol = ' ';
 
-                if ((*this)[myPos].has_value()) {
-                    auto myPiece = (*this)[myPos].value();
+                if (read(myPos).has_value()) {
+                    auto myPiece = read(myPos).value();
 
                     symbol = myPiece.piece_to_char_fen();
                     if (empty_counter != 0)

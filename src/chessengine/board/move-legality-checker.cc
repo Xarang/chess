@@ -2,7 +2,7 @@
 
 namespace board {
 
-    bool MoveLegalityChecker::is_move_legal_QUEEN(const Chessboard& chessboard, Move& move) {
+    bool MoveLegalityChecker::is_move_legal_QUEEN(Chessboard& chessboard, Move& move) {
 
         bool b = is_move_legal_BISHOP(chessboard, move);
         if (b)
@@ -14,85 +14,50 @@ namespace board {
     }
 
     //TODO: use chessboard to assess legality (currently not using it)
-    bool MoveLegalityChecker::is_move_legal_KING(const Chessboard& chessboard, Move& move) {
-        auto king = chessboard.board_((int)move.start_position_.file_get(), (int)move.start_position_.rank_get());
-        if (move.is_queen_castling_) {
-            if (king.value().has_already_moved_)
+    bool MoveLegalityChecker::is_move_legal_KING(Chessboard& chessboard, Move& move) {
+        auto king = chessboard.read(move.start_position_);
+
+        Position white_a_rook(File::A, Rank::ONE);
+        Position white_h_rook(File::H, Rank::ONE);
+        Position black_a_rook(File::A, Rank::EIGHT);
+        Position black_h_rook(File::H, Rank::EIGHT);
+
+        if (move.is_king_castling_ || move.is_queen_castling_) {
+            auto rook = chessboard.whose_turn_is_it() == Color::WHITE ? 
+                    chessboard.read(move.is_king_castling_ ? white_h_rook : white_a_rook)
+                    : chessboard.read(move.is_queen_castling_ ? black_h_rook : black_a_rook);
+            if (!rook.has_value()) {
                 return false;
-            if (chessboard.is_white_turn_) {
-                auto rook = chessboard.board_((int) File::A, (int) Rank::ONE);
-                if (!rook.has_value() || rook.value().has_already_moved_ || chessboard.did_white_queen_castling_)
-                    return false;
-
-                if (chessboard.board_((int) File::B, (int) Rank::ONE).has_value() ||
-                    chessboard.board_((int) File::C, (int) Rank::ONE).has_value())
-                    return false;
-            } else {
-                auto rook = chessboard.board_((int) File::A, (int) Rank::EIGHT);
-                if (!rook.has_value() || rook.value().has_already_moved_ || chessboard.did_black_queen_castling_)
-                    return false;
-
-                if (chessboard.board_((int) File::B, (int) Rank::EIGHT).has_value() ||
-                    chessboard.board_((int) File::C, (int) Rank::EIGHT).has_value())
-                    return false;
             }
+            if (king.value().has_already_moved_ || rook.value().has_already_moved_) {
+                return false;
+            }
+            if (chessboard.whose_turn_is_it() == Color::WHITE && move.is_king_castling_ && chessboard.did_white_king_castling_) {
+                return false;
+            }
+            if (chessboard.whose_turn_is_it() == Color::WHITE && move.is_queen_castling_ && chessboard.did_white_queen_castling_) {
+                return false;
+            }
+            if (chessboard.whose_turn_is_it() == Color::BLACK && move.is_king_castling_ && chessboard.did_black_king_castling_) {
+                return false;
+            }
+            if (chessboard.whose_turn_is_it() == Color::BLACK && move.is_queen_castling_ && chessboard.did_black_queen_castling_) {
+                return false;
+            }
+            //check verification will be in the encapsulating function
             return true;
         }
 
-        if (move.is_king_castling_)
-        {
-            if (king.value().has_already_moved_)
-                return false;
-            if (chessboard.is_white_turn_)
-            {
-               auto rook = chessboard.board_((int)File::H, (int)Rank::ONE);
-               if (!rook.has_value() || rook.value().has_already_moved_ || chessboard.did_white_king_castling_)
-                   return false;
+        auto start_file = move.start_position_.file_get();
+        auto start_rank = move.start_position_.rank_get();
+        auto end_file = move.end_position_.file_get();
+        auto end_rank = move.end_position_.rank_get();
 
-               if (chessboard.board_((int)File::F, (int)Rank::ONE).has_value() || chessboard.board_((int)File::G, (int)Rank::ONE).has_value())
-                   return false;
-            } else
-            {
-                auto rook = chessboard.board_((int)File::H, (int)Rank::EIGHT);
-                if (!rook.has_value() || rook.value().has_already_moved_ || chessboard.did_black_king_castling_)
-                    return false;
-
-                if (chessboard.board_((int)File::F, (int)Rank::EIGHT).has_value() || chessboard.board_((int)File::G, (int)Rank::EIGHT).has_value())
-                    return false;
-            }
-            return true;
-        }
-        auto startFile = move.start_position_.file_get();
-        auto startRank = move.start_position_.rank_get();
-        auto endFile = move.end_position_.file_get();
-        auto endRank = move.end_position_.rank_get();
-
-        if (startFile - 1 == endFile && startRank - 1 == endRank)
-            return true;
-        if (startFile == endFile && startRank - 1 == endRank)
-            return true;
-        if (startFile + 1 == endFile && startRank - 1 == endRank)
-            return true;
-
-        if (startFile - 1 == endFile && startRank == endRank)
-            return true;
-        if (startFile + 1 == endFile && startRank == endRank)
-            return true;
-
-        if (startFile - 1 == endFile && startRank + 1 == endRank)
-            return true;
-        if (startFile == endFile && startRank + 1 == endRank)
-            return true;
-        if (startFile + 1 == endFile && startRank + 1 == endRank)
-            return true;
-        return false;
-
-        //Need to figure outillegal moves, (cannot put yourself in check)
-
+        return abs((int)start_file - (int)end_file) <= 1 && abs((int)start_rank - (int)end_rank) <= 1;
     }
 
     //TODO: use chessboard to assess legality (currently not using it)
-    bool MoveLegalityChecker::is_move_legal_KNIGHT(const Chessboard&, Move& move){
+    bool MoveLegalityChecker::is_move_legal_KNIGHT(Chessboard&, Move& move){
 
         auto startFile = move.start_position_.file_get();
         auto startRank = move.start_position_.rank_get();
@@ -117,7 +82,7 @@ namespace board {
         return startFile + 1 == endFile && startRank + 2 == endRank;
     }
 
-    bool MoveLegalityChecker::is_move_legal_BISHOP(const Chessboard& b, Move& move) {
+    bool MoveLegalityChecker::is_move_legal_BISHOP(Chessboard& b, Move& move) {
         int Fi = 1;
         int Ri = 1;
         bool bo = true;
@@ -201,7 +166,7 @@ namespace board {
         return bo;
     }
 
-    bool MoveLegalityChecker::is_move_legal_PAWN(const Chessboard& b, Move& move) {
+    bool MoveLegalityChecker::is_move_legal_PAWN(Chessboard& b, Move& move) {
 
         //TODO: the position hold in b.en_passant_target_square_ (if any) should be a valid capture position, even if it is empty. In this case, the captured piece
         //is not on move.end_position_ so we will have to handle this case.
@@ -237,7 +202,7 @@ namespace board {
         return true;
     }
 
-    bool MoveLegalityChecker::is_move_legal_ROOK(const Chessboard& b, Move& move) {
+    bool MoveLegalityChecker::is_move_legal_ROOK(Chessboard& b, Move& move) {
         int Fi = 1;
         int Ri = 1;
 
@@ -303,7 +268,7 @@ namespace board {
         }
     }
 
-    bool MoveLegalityChecker::is_move_legal(const Chessboard& b, Move &move) {
+    bool MoveLegalityChecker::is_move_legal(Chessboard& b, Move &move) {
         switch (move.piece_) {
             case PieceType::PAWN:
                 return is_move_legal_PAWN(b, move);
