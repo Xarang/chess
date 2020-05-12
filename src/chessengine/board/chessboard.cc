@@ -34,6 +34,7 @@ namespace board {
             File rookFile;
             Rank rookRank;
             File endRookFile;
+            rookRank = whose_turn_is_it() == Color::WHITE ? Rank::ONE : Rank::EIGHT;
             if (move.is_queen_castling_) {
                 rookFile = File::A;
                 endRookFile = File::D;
@@ -41,8 +42,22 @@ namespace board {
                 rookFile = File::H;
                 endRookFile = File::F;
             }
-            rookRank = whose_turn_is_it() == Color::WHITE ? Rank::ONE : Rank::EIGHT;
-            move_piece((*this)[Position(rookFile, rookRank)].value(), Position(endRookFile, rookRank));
+            Position rook_position(rookFile, rookRank);
+            Position rook_destination(endRookFile, rookRank);
+
+            //mark used castling
+            std::pair<Position, bool&> l[] = {
+                { Position(File::A, Rank::ONE), did_white_queen_castling_ },
+                { Position(File::H, Rank::ONE), did_white_king_castling_ },
+                { Position(File::A, Rank::EIGHT), did_black_queen_castling_ },
+                { Position(File::H, Rank::EIGHT), did_black_king_castling_ },
+            };
+            for (auto association : l) {
+                if (association.first == rook_position) {
+                    association.second = true;
+                }
+            }
+            move_piece((*this)[rook_position].value(), rook_destination);
         }
 
         //if the board previously had a 'en passant target square', it is now consumed
@@ -52,7 +67,6 @@ namespace board {
             //mark the square that can be "prise en passant"'ed next turn
             int direction = whose_turn_is_it() == Color::WHITE ? +1 : -1;
             en_passant_target_square_ = std::make_optional<Position>(move.start_position_.file_get(), move.start_position_.rank_get() + direction);
-            //TODO: unsure about this, make sure it marks the good square as eligible en passant target for next move
         }
 
         if (move.promotion_.has_value())
