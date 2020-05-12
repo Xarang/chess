@@ -20,13 +20,6 @@ namespace board {
             moves.push_front(MoveBuilder::basic_capture(p, Position(p.position_.file_get() + 1, p.position_.rank_get() + direction)));
             moves.push_front(MoveBuilder::basic_capture(p, Position(p.position_.file_get() - 1, p.position_.rank_get() + direction)));
 
-            auto en_passant_left = MoveBuilder::basic_capture(p, Position(p.position_.file_get() + 1, p.position_.rank_get() + direction));
-            auto en_passant_right = MoveBuilder::basic_capture(p, Position(p.position_.file_get() - 1, p.position_.rank_get() + direction));
-            en_passant_left.is_en_passant_ = true;
-            en_passant_right.is_en_passant_ = true;
-            moves.push_front(en_passant_left);
-            moves.push_front(en_passant_right);
-            
             std::list<Move> promotion_moves;
             for (auto move : moves) {
                 if ((move.end_position_.rank_get() == Rank::ONE && p.color_ == Color::WHITE)

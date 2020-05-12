@@ -45,7 +45,6 @@ namespace board
 
         Move(PgnMove pgnmove);
 
-
         std::string to_string();
         std::string uci();
 
@@ -53,6 +52,5 @@ namespace board
         void set_double_pawn_push();
         void set_king_castling();
         void set_queen_castling();
-        void set_en_passant();
     };
 }

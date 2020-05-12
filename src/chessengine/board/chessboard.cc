@@ -78,6 +78,10 @@ namespace board {
             || move.end_position_.file_get() == File::OUTOFBOUNDS || move.end_position_.rank_get() == Rank::OUTOFBOUNDS) {
                 return false;
             }
+        if (en_passant_target_square_.has_value() && move.end_position_ == en_passant_target_square_.value() && move.is_capture_ && move.piece_ == PieceType::PAWN) {
+            //this is the place where en passant moves are flagged are so. no en passant moves should be created before this.
+            move.is_en_passant_ = true;
+        }
 
         //do not consider moves that move a piece that does not exist
         if (!(*this)[move.start_position_].has_value())
@@ -114,14 +118,13 @@ namespace board {
                 return false;
             }
         }
-    
+
         return true;
       }
 
-    std::list<Move> Chessboard::generateLegalMoves(bool check_self_check) {
+    std::list<Move> Chessboard::generate_legal_moves(bool check_self_check) {
         std::list<Move> allMoves;
  
-
         //build the list of all "potential" moves, not accounting for OOB and blocked paths
         for (auto piece : pieces_) {
             if (piece.color_ == whose_turn_is_it()) {
@@ -131,24 +134,7 @@ namespace board {
                 }
             }
         }
-
-        /*std::cout << "potential moves:\n";
-        for (auto move : allMoves) {
-            if (move.piece_ == PieceType::QUEEN)
-                std::cout << move.to_string();
-        }*/
-
-        allMoves.remove_if([this, check_self_check](Move m){return !this->is_move_legal(m, check_self_check); });
-        /*for (auto move : allMoves) {
-            if (move.piece_ == PieceType::QUEEN)
-                std::cout << move.to_string();
-        }*/
-        /*
-        std::cout << "removed all illegal moves; legal moves remaining: " << allMoves.size() << "\n";
-        for (auto move : allMoves) {
-            std::cout << move.to_string();
-        }
-        */
+        allMoves.remove_if([this, check_self_check](Move& m){return !this->is_move_legal(m, check_self_check); });
         return allMoves;
     }
 
@@ -163,7 +149,7 @@ namespace board {
         //std::cout << "is check ?" << "\n";
         //generate legal moves for opponent and check if one on them captures your king.
         change_turn();
-        std::list<Move> opponent_moves = generateLegalMoves(false); //this false means that this call to generateLegalMoves will not check for check itself (since the other player has initiative anyway)
+        std::list<Move> opponent_moves = generate_legal_moves(false); //this false means that this call to generate_legal_moves will not check for check itself (since the other player has initiative anyway)
         change_turn();
 
         File king_file = File::OUTOFBOUNDS;
@@ -196,7 +182,7 @@ namespace board {
             return false;
         }
 
-        std::list<Move> moves = generateLegalMoves();
+        std::list<Move> moves = generate_legal_moves();
         for (auto move : moves) {
             if (is_move_legal(move)) {
                 return false;
@@ -212,7 +198,7 @@ namespace board {
         //or
         //no pawn moved or piece captured in last 50 turns
 
-        std::list<Move> legal_moves = generateLegalMoves();
+        std::list<Move> legal_moves = generate_legal_moves();
         if (legal_moves.empty() && !is_check())
         {
             return true;

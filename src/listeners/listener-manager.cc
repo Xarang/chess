@@ -82,7 +82,7 @@ namespace listener {
                                 if (board_->is_check()) {
                                     register_check(board_->whose_turn_is_it());
                                 }
-                                if (board_->generateLegalMoves().size() == 0) {
+                                if (board_->generate_legal_moves().size() == 0) {
                                     register_pat(board_->whose_turn_is_it());
                                 }
                                 else if (board_->is_draw()) {
@@ -117,13 +117,14 @@ namespace listener {
             return 1;
         }
         unsigned long long sum = 0;
-        auto moves = b.generateLegalMoves();
+        auto moves = b.generate_legal_moves();
         for (auto move : moves) {
             if (depth == 1) {
                 std::ofstream output_file;
                 output_file.open("chessengine_perft_output.out", std::ios_base::app);
                 output_file << move.uci() << "\n";
                 output_file.close();
+                //std::cout << move.to_string();
             }
             auto projection = b.project(move);
             sum += perft(projection, depth - 1);
@@ -154,7 +155,7 @@ namespace listener {
             auto board = board::Chessboard(board_str);
 
             //ai get best move for board;
-            auto moves = board_->generateLegalMoves();
+            auto moves = board_->generate_legal_moves();
             auto best_move = moves.front().uci();
 
             //send move

@@ -38,26 +38,6 @@ namespace board
         }
     }
 
-    void Move::set_en_passant() {
-        if (piece_ == PieceType::PAWN && is_capture_
-            && (
-                (
-                    start_position_.rank_get() == Rank::FIVE
-                    && end_position_.rank_get() == Rank::SIX
-                    && (start_position_.file_get() + 1 == end_position_.file_get() || start_position_.file_get() - 1 == end_position_.file_get())
-                )
-                ||
-                (
-                    start_position_.rank_get() == Rank::FOUR
-                    && end_position_.rank_get() == Rank::THREE
-                    && (start_position_.file_get() + 1 == end_position_.file_get() || start_position_.file_get() - 1 == end_position_.file_get())
-                )
-            )) {
-                is_en_passant_ = true;
-            }
-    }
-
-
     //take the informations we want from pgnmove and re-reformate them in a handier way.
     Move::Move(PgnMove move)
         :   piece_(move.piece_get()),
@@ -73,7 +53,6 @@ namespace board
         set_double_pawn_push();
         set_king_castling();
         set_queen_castling();
-        set_en_passant();
     }
 
     std::string Move::to_string() {
