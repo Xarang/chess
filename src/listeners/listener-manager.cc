@@ -5,7 +5,7 @@
 
 #include "ai/uci.hh"
 #include "pgn/pgn-parser.hh"
-
+#include "ai/minimax.hh"
 #include "listener-manager.hh"
 
 namespace listener {
@@ -165,7 +165,9 @@ namespace listener {
         auto moves = board_->generate_legal_moves();
         for (auto move : moves) {
             //TODO: show ai score for this move
-            std::cout << move.uci() << "\n";
+            board_->project(move);
+            ai::AI myAI;
+            std::cout << move.uci() << " " << myAI.evaluate(board_.value()) << "\n";
         }
     }
 

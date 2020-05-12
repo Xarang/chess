@@ -4,7 +4,6 @@
 #include "chessengine/board/position.hh"
 #include "ai/minimax.hh"
 #include "chessengine/board/chessboard.hh"
-
 namespace ai {
     int AI::evaluate(board::Chessboard& myBoard) {
         int res = 0;
@@ -13,11 +12,15 @@ namespace ai {
         {
             if (color_ == piece.color_)
             {
+                //Individual piece value
                 res += material_values[piece.type_];
+                //Piece's positional value
+                res += *table_values[piece.type_][(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
             }
             else
             {
                 res -= material_values[piece.type_];
+                res -= *table_values[piece.type_][(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
             }
         }
         return res;
