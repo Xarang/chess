@@ -15,13 +15,12 @@ namespace ai {
                 //Individual piece value
                 res += material_values[piece.type_];
                 //Piece's positional value
-                //auto myRes = *table_values[piece.type_][(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
-                //res += myRes;
+                res += (*table_values[piece.type_])[(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
             }
             else
             {
                 res -= material_values[piece.type_];
-                //res -= *table_values[piece.type_][(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
+                res -= (*table_values[piece.type_])[(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
             }
         }
         return res;
