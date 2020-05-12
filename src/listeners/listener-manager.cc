@@ -17,13 +17,13 @@ namespace listener {
                 std::cerr << "could not open listener lib " << listener << " : " << dlerror();
                 throw std::runtime_error("could not open listener lib " + listener + " : " + dlerror());
             }
-            std::cout << "[LOAD] loaded listener lib: " << listener << "\n";
+            //std::cout << "[LOAD] loaded listener lib: " << listener << "\n";
             void *listenerFunc = dlsym(lib, "listener_create");
-            std::cout << "[LOAD] extracted 'listener_create' from lib: " << listenerFunc << "\n";
+            //std::cout << "[LOAD] extracted 'listener_create' from lib: " << listenerFunc << "\n";
             listener::Listener* lst = reinterpret_cast<listener::Listener*(*)()>(listenerFunc)();
             listeners_.push_back(lst);
             plugins_.push_back(lib);
-            std::cout << "[LOAD] plugin " << listener << " ready to go!" << "(" << plugins_.size() << "/" << plugins.size() << ")\n";
+            //std::cout << "[LOAD] plugin " << listener << " ready to go!" << "(" << plugins_.size() << "/" << plugins.size() << ")\n";
         }
     }
 

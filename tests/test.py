@@ -12,7 +12,7 @@ def test_pgn():
     fichiers = [f for f in listdir(path_pgn) if isfile(join(path_pgn, f))]
     for elt in fichiers:
         refWinner = findWinner(elt)
-        proc = subprocess.Popen(['../build/chessengine', '--listener', '../build/./liblistener-test-suit.so', '--pgn', 'pgn/' + elt], stdout=subprocess.PIPE)
+        proc = subprocess.Popen(['../build/chessengine', '--listener', '../build/liblistener-test-suite.so', '--pgn', 'pgn/' + elt], stdout=subprocess.PIPE)
         stdout_value = proc.communicate()[0]
         index = repr(stdout_value).find("[RESULT]")
         begin = repr(stdout_value).find(" ", index)
