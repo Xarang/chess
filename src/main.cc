@@ -72,9 +72,8 @@ int main(int argc, const char *argv[]) {
         listenerManager.run_perft(std::atoi(depth.c_str()));
     }
     else if (variables.count("evaluate")) {
-        std::ifstream ifs(variables["evaluate"].as<std::string>());
-        std::string content((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
-        auto board = board::Chessboard(content);
+        auto str = (variables.find("evaluate"))->second.as<std::string>();
+        auto board = board::Chessboard(str);
         listenerManager.register_board(board);
         listenerManager.evaluate_ai();
     }
