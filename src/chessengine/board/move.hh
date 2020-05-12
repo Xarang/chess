@@ -1,7 +1,7 @@
 #pragma once
 
 #include "position.hh"
-#include "../pgn/pgn-move.hh"
+#include "pgn/pgn-move.hh"
 
 namespace board
 {
@@ -45,13 +45,12 @@ namespace board
 
         Move(PgnMove pgnmove);
 
-
         std::string to_string();
+        std::string uci();
 
         private:
         void set_double_pawn_push();
         void set_king_castling();
         void set_queen_castling();
-        void set_en_passant();
     };
 }

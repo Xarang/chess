@@ -1,7 +1,9 @@
 #include <dlfcn.h>
 #include <iostream>
+#include <fstream>
 #include <string>
 
+#include "ai/uci.hh"
 #include "pgn/pgn-parser.hh"
 
 #include "listener-manager.hh"
@@ -80,7 +82,7 @@ namespace listener {
                                 if (board_->is_check()) {
                                     register_check(board_->whose_turn_is_it());
                                 }
-                                if (board_->generateLegalMoves().size() == 0) {
+                                if (board_->generate_legal_moves().size() == 0) {
                                     register_pat(board_->whose_turn_is_it());
                                 }
                                 else if (board_->is_draw()) {
@@ -110,23 +112,56 @@ namespace listener {
         }
     }
 
-    static unsigned long perft(board::Chessboard b, int depth) {
+    static unsigned long long perft(board::Chessboard b, int depth) {
         if (depth == 0) {
-            return 0;
+            return 1;
         }
-        unsigned long sum = 0;
-        auto moves = b.generateLegalMoves();
-        sum += moves.size();
+        unsigned long long sum = 0;
+        auto moves = b.generate_legal_moves();
         for (auto move : moves) {
+            if (depth == 1) {
+                std::ofstream output_file;
+                output_file.open("chessengine_perft_output.out", std::ios_base::app);
+                output_file << move.uci() << "\n";
+                output_file.close();
+                //std::cout << move.to_string();
+            }
             auto projection = b.project(move);
             sum += perft(projection, depth - 1);
-        }
+        }   
         return sum;
     }
 
     void ListenerManager::run_perft(int depth) {
+        std::ofstream output_file;
+        output_file.open("chessengine_perft_output.out", std::ios_base::out);
+        output_file << "";
+        output_file.close();
         auto n = perft(board_.value(), depth);
         std::cout << n << "\n";
+    }
+
+
+    //TODO: figure this out
+    void ListenerManager::run_ai() {
+        ai::init("Kasparov");
+
+        while (true) { //end when ?
+            std::string board_str = ai::get_board();
+
+            //this will not work; board_str is not always a fen string
+            //so we will have to create another Chessboard constructor for this
+            //but you get the idea
+            auto board = board::Chessboard(board_str);
+
+            //ai get best move for board;
+            auto moves = board_->generate_legal_moves();
+            auto best_move = moves.front().uci();
+
+            //send move
+            ai::play_move(best_move);
+        }
+        
     }
 
 

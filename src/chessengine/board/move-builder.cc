@@ -42,7 +42,7 @@ namespace board {
     }
 
     Move MoveBuilder::queen_castling(Piece p) {
-        auto m = basic_move(p, Position(File::B, p.position_.rank_get()));
+        auto m = basic_move(p, Position(File::C, p.position_.rank_get()));
         m.is_queen_castling_ = true;
         return m;
     }

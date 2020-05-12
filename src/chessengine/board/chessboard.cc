@@ -34,6 +34,7 @@ namespace board {
             File rookFile;
             Rank rookRank;
             File endRookFile;
+            rookRank = whose_turn_is_it() == Color::WHITE ? Rank::ONE : Rank::EIGHT;
             if (move.is_queen_castling_) {
                 rookFile = File::A;
                 endRookFile = File::D;
@@ -41,8 +42,22 @@ namespace board {
                 rookFile = File::H;
                 endRookFile = File::F;
             }
-            rookRank = whose_turn_is_it() == Color::WHITE ? Rank::ONE : Rank::EIGHT;
-            move_piece((*this)[Position(rookFile, rookRank)].value(), Position(endRookFile, rookRank));
+            Position rook_position(rookFile, rookRank);
+            Position rook_destination(endRookFile, rookRank);
+
+            //mark used castling
+            std::pair<Position, bool&> l[] = {
+                { Position(File::A, Rank::ONE), did_white_queen_castling_ },
+                { Position(File::H, Rank::ONE), did_white_king_castling_ },
+                { Position(File::A, Rank::EIGHT), did_black_queen_castling_ },
+                { Position(File::H, Rank::EIGHT), did_black_king_castling_ },
+            };
+            for (auto association : l) {
+                if (association.first == rook_position) {
+                    association.second = true;
+                }
+            }
+            move_piece((*this)[rook_position].value(), rook_destination);
         }
 
         //if the board previously had a 'en passant target square', it is now consumed
@@ -52,7 +67,6 @@ namespace board {
             //mark the square that can be "prise en passant"'ed next turn
             int direction = whose_turn_is_it() == Color::WHITE ? +1 : -1;
             en_passant_target_square_ = std::make_optional<Position>(move.start_position_.file_get(), move.start_position_.rank_get() + direction);
-            //TODO: unsure about this, make sure it marks the good square as eligible en passant target for next move
         }
 
         if (move.promotion_.has_value())
@@ -78,6 +92,10 @@ namespace board {
             || move.end_position_.file_get() == File::OUTOFBOUNDS || move.end_position_.rank_get() == Rank::OUTOFBOUNDS) {
                 return false;
             }
+        if (en_passant_target_square_.has_value() && move.end_position_ == en_passant_target_square_.value() && move.is_capture_ && move.piece_ == PieceType::PAWN) {
+            //this is the place where en passant moves are flagged are so. no en passant moves should be created before this.
+            move.is_en_passant_ = true;
+        }
 
         //do not consider moves that move a piece that does not exist
         if (!(*this)[move.start_position_].has_value())
@@ -103,25 +121,28 @@ namespace board {
             return false;
         }
 
+
         //now that we know the move is 'valid', we check if it is illegal due to " can not check yourself " clause
 
         //check if this move would make/leave the king vulnerable
         //if you are already checked, this is not an option
         if (check_self_check) {
+            if ((move.is_king_castling_ || move.is_queen_castling_) && is_check()) {
+                return false;
+            }
             auto projection = project(move);
             projection.is_white_turn_ = !projection.is_white_turn_;
             if (projection.is_check()) {
                 return false;
             }
         }
-    
+
         return true;
       }
 
-    std::list<Move> Chessboard::generateLegalMoves(bool check_self_check) {
+    std::list<Move> Chessboard::generate_legal_moves(bool check_self_check) {
         std::list<Move> allMoves;
  
-
         //build the list of all "potential" moves, not accounting for OOB and blocked paths
         for (auto piece : pieces_) {
             if (piece.color_ == whose_turn_is_it()) {
@@ -131,29 +152,12 @@ namespace board {
                 }
             }
         }
-
-        /*std::cout << "potential moves:\n";
-        for (auto move : allMoves) {
-            if (move.piece_ == PieceType::QUEEN)
-                std::cout << move.to_string();
-        }*/
-
-        allMoves.remove_if([this, check_self_check](Move m){return !this->is_move_legal(m, check_self_check); });
-        /*for (auto move : allMoves) {
-            if (move.piece_ == PieceType::QUEEN)
-                std::cout << move.to_string();
-        }*/
-        /*
-        std::cout << "removed all illegal moves; legal moves remaining: " << allMoves.size() << "\n";
-        for (auto move : allMoves) {
-            std::cout << move.to_string();
-        }
-        */
+        allMoves.remove_if([this, check_self_check](Move& m){return !this->is_move_legal(m, check_self_check); });
         return allMoves;
     }
 
     //copies the board and perform a move on it
-    Chessboard Chessboard::project(Move move) {
+    Chessboard Chessboard::project(Move move) const {
         auto copy = Chessboard(*this);
         copy.do_move(move);
         return copy;
@@ -163,7 +167,7 @@ namespace board {
         //std::cout << "is check ?" << "\n";
         //generate legal moves for opponent and check if one on them captures your king.
         change_turn();
-        std::list<Move> opponent_moves = generateLegalMoves(false); //this false means that this call to generateLegalMoves will not check for check itself (since the other player has initiative anyway)
+        std::list<Move> opponent_moves = generate_legal_moves(false); //this false means that this call to generate_legal_moves will not check for check itself (since the other player has initiative anyway)
         change_turn();
 
         File king_file = File::OUTOFBOUNDS;
@@ -196,7 +200,7 @@ namespace board {
             return false;
         }
 
-        std::list<Move> moves = generateLegalMoves();
+        std::list<Move> moves = generate_legal_moves();
         for (auto move : moves) {
             if (is_move_legal(move)) {
                 return false;
@@ -212,7 +216,7 @@ namespace board {
         //or
         //no pawn moved or piece captured in last 50 turns
 
-        std::list<Move> legal_moves = generateLegalMoves();
+        std::list<Move> legal_moves = generate_legal_moves();
         if (legal_moves.empty() && !is_check())
         {
             return true;
@@ -223,7 +227,6 @@ namespace board {
         }
 
         for (std::pair<std::string, int> pair : all_boards_since_start_) {
-            //std::cout << pair.first << " ----------> " << pair.second << "\n";
             if (pair.second >= 3) {
                 return true;
             }
@@ -240,7 +243,7 @@ namespace board {
     }
 
 
-    std::string Chessboard::to_string() {
+    std::string Chessboard::to_string() const {
         //TODO: output a FEN string representing the board (https://fr.wikipedia.org/wiki/Notation_Forsyth-Edwards)
         std::string res = "";
         board::Rank currRank = Rank::ONE;
@@ -253,8 +256,8 @@ namespace board {
                 Position myPos(currFile, currRank);
                 char symbol = ' ';
 
-                if ((*this)[myPos].has_value()) {
-                    auto myPiece = (*this)[myPos].value();
+                if (read(myPos).has_value()) {
+                    auto myPiece = read(myPos).value();
 
                     symbol = myPiece.piece_to_char_fen();
                     if (empty_counter != 0)
@@ -300,7 +303,7 @@ namespace board {
             int fileIndex = 0;
             for (auto it = rank.begin(); it != rank.end(); it++) {
                 if (isdigit(*it)) {
-                    fileIndex += '0' - (int)*it;
+                    fileIndex += (int)*it - '0';
                 }
                 else {
                     pieces_.push_back(Piece(Position((File)fileIndex, (Rank)rankIndex), islower(*it) ? Color::BLACK : Color::WHITE, char_to_piece(toupper(*it))));
@@ -314,16 +317,23 @@ namespace board {
         }
 
         //parse informations regarding the current state of the game
+        //whose turn is it
         is_white_turn_ = fields[1] == "w";
-        did_black_king_castling_ = fields[2].find("k") != fields[2].npos;
-        did_white_king_castling_ = fields[2].find("K") != fields[2].npos;
-        did_black_queen_castling_ = fields[2].find("q") != fields[2].npos;
-        did_white_queen_castling_ = fields[2].find("Q") != fields[2].npos;
+
+        //castling situation
+        did_black_king_castling_ = fields[2].find("k") == fields[2].npos;
+        did_white_king_castling_ = fields[2].find("K") == fields[2].npos;
+        did_black_queen_castling_ = fields[2].find("q") == fields[2].npos;
+        did_white_queen_castling_ = fields[2].find("Q") == fields[2].npos;
 
 
-        all_boards_since_start_.insert(std::pair<std::string, int>(to_string(), 1));
         //TODO: add potential en-passant spot
-
+        if (fields[3] != "-") {
+            File f = (File)(fields[3].at(0) - 'a');
+            Rank r = (Rank)(fields[3].at(1) - '0' - 1);
+            en_passant_target_square_ = std::make_optional<Position>(f, r);
+        }
+        all_boards_since_start_.insert(std::pair<std::string, int>(to_string(), 1));
     }
 
     //private methods used to factorise basic move operations
