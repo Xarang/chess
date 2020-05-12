@@ -103,7 +103,7 @@ class BestListener2022 : public listener::Listener {
         ** @param color: The color of the player concerned by the castling.
         */
         void on_kingside_castling(const board::Color color) {
-            std::cout << "[CASTLING] " + board::color_to_string(color) + " kingside castling" << "\n"; 
+            std::cout << "[CASTLING] " + board::color_to_string(color) + " kingside castling" << "\n";
         }
 
         /**
@@ -114,7 +114,7 @@ class BestListener2022 : public listener::Listener {
         ** @param color: The color of the player concerned by the castling
         */
         void on_queenside_castling(const board::Color color) {
-            std::cout << "[CASTLING] " + board::color_to_string(color) + " queenside castling" << "\n"; 
+            std::cout << "[CASTLING] " + board::color_to_string(color) + " queenside castling" << "\n";
         }
 
         /**

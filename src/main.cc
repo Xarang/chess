@@ -20,11 +20,11 @@ int main(int argc, const char *argv[]) {
     
     namespace po = boost::program_options;
     auto options = po::options_description("Usage");
-
     options.add_options()
         ("help,h", "displays helpful message")
         ("pgn", po::value<std::string>(), "runs provided PGN on our chessengine")
         ("listeners,l", po::value<std::vector<std::string>>()->multitoken(), "plugs in provided listeners")
+        ("test-suit", po::value<std::vector<std::string>>()->multitoken(), "plugs in provided listeners")
         ("perft", po::value<std::string>(), "runs provided Perft on our chessengine and output the amount of moves we were able to generate.")
         ;
     
@@ -39,6 +39,10 @@ int main(int argc, const char *argv[]) {
 
     auto listenerManager = listener::ListenerManager();
     if (variables.count("listeners")) {
+        listenerManager.load_plugins(variables["listeners"].as<std::vector<std::string>>());
+    }
+    if (variables.count("test-suit"))
+    {
         listenerManager.load_plugins(variables["listeners"].as<std::vector<std::string>>());
     }
 
