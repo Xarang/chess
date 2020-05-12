@@ -22,11 +22,11 @@ int main(int argc, const char *argv[]) {
     
     namespace po = boost::program_options;
     auto options = po::options_description("Usage");
-
     options.add_options()
         ("help,h", "displays helpful message")
         ("pgn", po::value<std::string>(), "runs provided PGN on our chessengine")
         ("listeners,l", po::value<std::vector<std::string>>()->multitoken(), "plugs in provided listeners")
+        ("evaluate", po::value<std::string>(), "evaluates moves for given fen-represented board.")
         ("perft", po::value<std::string>(), "runs provided Perft on our chessengine and output the amount of moves we were able to generate.")
         ;
     
@@ -70,6 +70,13 @@ int main(int argc, const char *argv[]) {
         auto board = board::Chessboard(content);
         listenerManager.register_board(board);
         listenerManager.run_perft(std::atoi(depth.c_str()));
+    }
+    else if (variables.count("evaluate")) {
+        std::ifstream ifs(variables["evaluate"].as<std::string>());
+        std::string content((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+        auto board = board::Chessboard(content);
+        listenerManager.register_board(board);
+        listenerManager.evaluate_ai();
     }
     else {
         listenerManager.run_ai();

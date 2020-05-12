@@ -1,2 +1,8 @@
 build/
 .vscode/
+venv/
+env/
+*.out
+*.idea
+*.pgn
+__pycache__/

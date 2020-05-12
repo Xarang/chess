@@ -120,7 +120,7 @@ namespace board {
         //main methods
         void do_move(Move);
         bool is_move_legal(Move&, bool check_self_check = true);
-        std::list<Move> generateLegalMoves(bool check_self_check = true);
+        std::list<Move> generate_legal_moves(bool check_self_check = true);
         bool is_check();
         bool is_checkmate();
         bool is_draw();
@@ -133,27 +133,27 @@ namespace board {
         }
 
         //utils
-        std::string to_string();
-        Color whose_turn_is_it() { return is_white_turn_ ? Color::WHITE : Color::BLACK; }
+        std::string to_string() const;
+        Color whose_turn_is_it() const { return is_white_turn_ ? Color::WHITE : Color::BLACK; }
         const std::optional<Piece> read(Position p) const; //same as operator[], but read-only
 
-        void change_turn() { is_white_turn_ = !is_white_turn_; }
+        void change_turn(){ is_white_turn_ = !is_white_turn_; }
         friend class MoveLegalityChecker;
 
         //make a copy of the board with the move passed as argument executed
-        Chessboard project(Move move);
+        Chessboard project(Move move) const;
 
     };
 
     class MoveLegalityChecker {
         public:
-        static bool is_move_legal_QUEEN(const Chessboard& b, Move& move);
-        static bool is_move_legal_KING(const Chessboard& b, Move& move);
-        static bool is_move_legal_ROOK(const Chessboard& b, Move& move);
-        static bool is_move_legal_KNIGHT(const Chessboard& b, Move& move);
-        static bool is_move_legal_BISHOP(const Chessboard& b, Move& move);
-        static bool is_move_legal_PAWN(const Chessboard& b, Move& move);
-        static bool is_move_legal(const Chessboard& b, Move& move);
+        static bool is_move_legal_QUEEN(Chessboard& b, Move& move);
+        static bool is_move_legal_KING(Chessboard& b, Move& move);
+        static bool is_move_legal_ROOK(Chessboard& b, Move& move);
+        static bool is_move_legal_KNIGHT(Chessboard& b, Move& move);
+        static bool is_move_legal_BISHOP(Chessboard& b, Move& move);
+        static bool is_move_legal_PAWN(Chessboard& b, Move& move);
+        static bool is_move_legal(Chessboard& b, Move& move);
     };
 
     //extern Chessboard myBoard;

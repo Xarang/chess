@@ -17,13 +17,13 @@ namespace listener {
                 std::cerr << "could not open listener lib " << listener << " : " << dlerror();
                 throw std::runtime_error("could not open listener lib " + listener + " : " + dlerror());
             }
-            std::cout << "[LOAD] loaded listener lib: " << listener << "\n";
+            //std::cout << "[LOAD] loaded listener lib: " << listener << "\n";
             void *listenerFunc = dlsym(lib, "listener_create");
-            std::cout << "[LOAD] extracted 'listener_create' from lib: " << listenerFunc << "\n";
+            //std::cout << "[LOAD] extracted 'listener_create' from lib: " << listenerFunc << "\n";
             listener::Listener* lst = reinterpret_cast<listener::Listener*(*)()>(listenerFunc)();
             listeners_.push_back(lst);
             plugins_.push_back(lib);
-            std::cout << "[LOAD] plugin " << listener << " ready to go!" << "(" << plugins_.size() << "/" << plugins.size() << ")\n";
+            //std::cout << "[LOAD] plugin " << listener << " ready to go!" << "(" << plugins_.size() << "/" << plugins.size() << ")\n";
         }
     }
 
@@ -82,7 +82,7 @@ namespace listener {
                                 if (board_->is_check()) {
                                     register_check(board_->whose_turn_is_it());
                                 }
-                                if (board_->generateLegalMoves().size() == 0) {
+                                if (board_->generate_legal_moves().size() == 0) {
                                     register_pat(board_->whose_turn_is_it());
                                 }
                                 else if (board_->is_draw()) {
@@ -117,13 +117,21 @@ namespace listener {
             return 1;
         }
         unsigned long long sum = 0;
+<<<<<<< HEAD
         auto moves = b.generateLegalMoves();
+=======
+        auto moves = b.generate_legal_moves();
+>>>>>>> 58ca4bba6e743abfdc4f3fb021117b462e90d838
         for (auto move : moves) {
             if (depth == 1) {
                 std::ofstream output_file;
                 output_file.open("chessengine_perft_output.out", std::ios_base::app);
                 output_file << move.uci() << "\n";
                 output_file.close();
+<<<<<<< HEAD
+=======
+                //std::cout << move.to_string();
+>>>>>>> 58ca4bba6e743abfdc4f3fb021117b462e90d838
             }
             auto projection = b.project(move);
             sum += perft(projection, depth - 1);
@@ -152,13 +160,21 @@ namespace listener {
             auto board = board::Chessboard::parse_uci(board_str);
 
             //ai get best move for board;
-            auto moves = board_->generateLegalMoves();
+            auto moves = board_->generate_legal_moves();
             auto best_move = moves.front().uci();
 
             //send move
             ai::play_move(best_move);
         }
         
+    }
+
+    void ListenerManager::evaluate_ai() {
+        auto moves = board_->generate_legal_moves();
+        for (auto move : moves) {
+            //TODO: show ai score for this move
+            std::cout << move.uci() << "\n";
+        }
     }
 
 

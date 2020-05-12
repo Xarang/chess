@@ -11,7 +11,6 @@ std::string BestListener2022::board_string_representation() {
         //std::string vertical =   "| | | | | | | | |\n";
         std::string res = "";
 
-        
         board::Rank currRank = board::Rank::EIGHT; 
         std::string background = "";
 
