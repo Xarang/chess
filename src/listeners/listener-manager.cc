@@ -165,9 +165,9 @@ namespace listener {
         auto moves = board_->generate_legal_moves();
         for (auto move : moves) {
             //TODO: show ai score for this move
-            board_->project(move);
+            auto new_board = board_->project(move);
             ai::AI myAI;
-            std::cout << move.uci() << " " << myAI.evaluate(board_.value()) << "\n";
+            std::cout << move.uci() << " " << myAI.evaluate(new_board) << "\n";
         }
     }
 
