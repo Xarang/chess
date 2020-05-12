@@ -326,12 +326,10 @@ namespace board {
         //TODO: add potential en-passant spot
         if (fields[3] != "-") {
             File f = (File)(fields[3].at(0) - 'a');
-            Rank r = (Rank)(fields[3].at(1) - '0');
-            en_passant_target_square_ = Position(f, r);
+            Rank r = (Rank)(fields[3].at(1) - '0' - 1);
+            en_passant_target_square_ = std::make_optional<Position>(f, r);
         }
-
         all_boards_since_start_.insert(std::pair<std::string, int>(to_string(), 1));
-
     }
 
     //private methods used to factorise basic move operations
