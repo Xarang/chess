@@ -15,7 +15,8 @@ namespace ai {
                 //Individual piece value
                 res += material_values[piece.type_];
                 //Piece's positional value
-                res += *table_values[piece.type_][(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
+                auto myRes = *table_values[piece.type_][(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
+                res += myRes;
             }
             else
             {
