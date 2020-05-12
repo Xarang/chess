@@ -24,7 +24,7 @@ int main(int argc, const char *argv[]) {
         ("help,h", "displays helpful message")
         ("pgn", po::value<std::string>(), "runs provided PGN on our chessengine")
         ("listeners,l", po::value<std::vector<std::string>>()->multitoken(), "plugs in provided listeners")
-        ("test-suit", po::value<std::vector<std::string>>()->multitoken(), "plugs in provided listeners")
+        ("evaluate", po::value<std::string>(), "evaluates moves for given fen-represented board.")
         ("perft", po::value<std::string>(), "runs provided Perft on our chessengine and output the amount of moves we were able to generate.")
         ;
     
@@ -39,10 +39,6 @@ int main(int argc, const char *argv[]) {
 
     auto listenerManager = listener::ListenerManager();
     if (variables.count("listeners")) {
-        listenerManager.load_plugins(variables["listeners"].as<std::vector<std::string>>());
-    }
-    if (variables.count("test-suit"))
-    {
         listenerManager.load_plugins(variables["listeners"].as<std::vector<std::string>>());
     }
 
@@ -72,6 +68,16 @@ int main(int argc, const char *argv[]) {
         auto board = board::Chessboard(content);
         listenerManager.register_board(board);
         listenerManager.run_perft(std::atoi(depth.c_str()));
+    }
+    else if (variables.count("evaluate")) {
+        std::ifstream ifs(variables["evaluate"].as<std::string>());
+        std::string content((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+        auto board = board::Chessboard(content);
+        auto moves = board.generate_legal_moves();
+        for (auto move : moves) {
+            //TODO: show ai score for this move
+            std::cout << move.uci() << "\n";
+        }
     }
     else {
         listenerManager.run_ai();
