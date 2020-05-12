@@ -3,4 +3,5 @@ build/
 venv/
 env/
 *.out
+*.idea
 __pycache__/
