@@ -164,6 +164,14 @@ namespace listener {
         
     }
 
+    void ListenerManager::evaluate_ai() {
+        auto moves = board_->generate_legal_moves();
+        for (auto move : moves) {
+            //TODO: show ai score for this move
+            std::cout << move.uci() << "\n";
+        }
+    }
+
 
     //listener calls
     void ListenerManager::register_move(board::Color color, board::Move move, std::optional<board::Piece> captured_piece) {

@@ -73,11 +73,8 @@ int main(int argc, const char *argv[]) {
         std::ifstream ifs(variables["evaluate"].as<std::string>());
         std::string content((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
         auto board = board::Chessboard(content);
-        auto moves = board.generate_legal_moves();
-        for (auto move : moves) {
-            //TODO: show ai score for this move
-            std::cout << move.uci() << "\n";
-        }
+        listenerManager.register_board(board);
+        listenerManager.evaluate_ai();
     }
     else {
         listenerManager.run_ai();
