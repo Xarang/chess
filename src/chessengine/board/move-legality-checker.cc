@@ -21,7 +21,7 @@ namespace board {
                 return false;
             if (chessboard.is_white_turn_) {
                 auto rook = chessboard.board_((int) File::A, (int) Rank::ONE);
-                if (!rook.has_value() || rook.value().has_already_moved_)
+                if (!rook.has_value() || rook.value().has_already_moved_ || chessboard.did_white_queen_castling_)
                     return false;
 
                 if (chessboard.board_((int) File::B, (int) Rank::ONE).has_value() ||
@@ -29,7 +29,7 @@ namespace board {
                     return false;
             } else {
                 auto rook = chessboard.board_((int) File::A, (int) Rank::EIGHT);
-                if (!rook.has_value() || rook.value().has_already_moved_)
+                if (!rook.has_value() || rook.value().has_already_moved_ || chessboard.did_black_queen_castling_)
                     return false;
 
                 if (chessboard.board_((int) File::B, (int) Rank::EIGHT).has_value() ||
@@ -46,7 +46,7 @@ namespace board {
             if (chessboard.is_white_turn_)
             {
                auto rook = chessboard.board_((int)File::H, (int)Rank::ONE);
-               if (!rook.has_value() || rook.value().has_already_moved_)
+               if (!rook.has_value() || rook.value().has_already_moved_ || chessboard.did_white_king_castling_)
                    return false;
 
                if (chessboard.board_((int)File::F, (int)Rank::ONE).has_value() || chessboard.board_((int)File::G, (int)Rank::ONE).has_value())
@@ -54,7 +54,7 @@ namespace board {
             } else
             {
                 auto rook = chessboard.board_((int)File::H, (int)Rank::EIGHT);
-                if (!rook.has_value() || rook.value().has_already_moved_)
+                if (!rook.has_value() || rook.value().has_already_moved_ || chessboard.did_black_king_castling_)
                     return false;
 
                 if (chessboard.board_((int)File::F, (int)Rank::EIGHT).has_value() || chessboard.board_((int)File::G, (int)Rank::EIGHT).has_value())

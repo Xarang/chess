@@ -317,10 +317,10 @@ namespace board {
         is_white_turn_ = fields[1] == "w";
 
         //castling situation
-        did_black_king_castling_ = fields[2].find("k") != fields[2].npos;
-        did_white_king_castling_ = fields[2].find("K") != fields[2].npos;
-        did_black_queen_castling_ = fields[2].find("q") != fields[2].npos;
-        did_white_queen_castling_ = fields[2].find("Q") != fields[2].npos;
+        did_black_king_castling_ = fields[2].find("k") == fields[2].npos;
+        did_white_king_castling_ = fields[2].find("K") == fields[2].npos;
+        did_black_queen_castling_ = fields[2].find("q") == fields[2].npos;
+        did_white_queen_castling_ = fields[2].find("Q") == fields[2].npos;
 
 
         //TODO: add potential en-passant spot
