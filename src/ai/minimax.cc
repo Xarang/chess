@@ -11,7 +11,7 @@ namespace ai {
         auto pieces = myBoard.get_pieces();
         for (auto piece : pieces)
         {
-            if (color_ = piece.color_)
+            if (color_ == piece.color_)
             {
                 res += material_values[piece.type_];
             }
@@ -69,7 +69,7 @@ namespace ai {
 
         color_ = myBoard.whose_turn_is_it();
 
-        auto moves = myBoard.generateLegalMoves();
+        auto moves = myBoard.generate_legal_moves();
         for (auto move : moves) {
             auto proj = myBoard.project(move);
             proj.change_turn();

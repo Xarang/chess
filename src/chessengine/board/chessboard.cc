@@ -363,6 +363,7 @@ namespace board {
                     Rank rank_from = (Rank)(move.at(1) - '0');
                     File file_to = (File)(move.at(2) - 'a');
                     Rank rank_to = (Rank)(move.at(3) - '0');
+                    board.change_turn();
                     board.move_piece(board[Position(file_from, rank_from)].value(), Position(file_to, rank_to));
                 }
             }

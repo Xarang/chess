@@ -117,21 +117,13 @@ namespace listener {
             return 1;
         }
         unsigned long long sum = 0;
-<<<<<<< HEAD
-        auto moves = b.generateLegalMoves();
-=======
         auto moves = b.generate_legal_moves();
->>>>>>> 58ca4bba6e743abfdc4f3fb021117b462e90d838
         for (auto move : moves) {
             if (depth == 1) {
                 std::ofstream output_file;
                 output_file.open("chessengine_perft_output.out", std::ios_base::app);
                 output_file << move.uci() << "\n";
                 output_file.close();
-<<<<<<< HEAD
-=======
-                //std::cout << move.to_string();
->>>>>>> 58ca4bba6e743abfdc4f3fb021117b462e90d838
             }
             auto projection = b.project(move);
             sum += perft(projection, depth - 1);
