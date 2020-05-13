@@ -9,6 +9,7 @@ namespace ai {
         friend board::Chessboard;
         board::Color color_ = board::Color::WHITE;
 
+        //Piece Material Values
         std::map<board::PieceType, int> material_values = {
                 {board::PieceType::QUEEN,  900},
                 {board::PieceType::ROOK,   500},
@@ -18,6 +19,7 @@ namespace ai {
                 {board::PieceType::KING,   20000}
         };
 
+        //Piece Square Values
         std::map<board::PieceType, int (*)[8][8]> table_values = {
                 {board::PieceType::QUEEN,  &queenTable},
                 {board::PieceType::ROOK,   &rookTable},
@@ -103,6 +105,10 @@ namespace ai {
                 {-50,-30,-30,-30,-30,-30,-30,-50}
         };
 
+        // Best Openings
+        std::list<std::string> openingWhite = {"c4", "Nc3", "Nf3", "g3", "Bg2", "O-O"};
+        std::list<std::string> openingBlack = { "d5", "c6", "Nf6", "e6", "Nbd7"};
+
 
         /*
          * For mobility values, we might need a specific class in order to take into account multiple paramters:
@@ -111,6 +117,8 @@ namespace ai {
          */
         int evaluate(board::Chessboard& board);
         float minimax(board::Position myPos, int depth, bool is_black, board::Chessboard& board);
+        board::Move openingWhitesBuilder(std::string str, board::Chessboard myBoard);
+        board::Move openingBlacksBuilder(std::string str, board::Chessboard myBoard);
         board::Move searchMove(board::Chessboard& board);
     };
 }
