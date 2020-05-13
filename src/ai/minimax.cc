@@ -71,60 +71,60 @@ namespace ai {
     board::Move AI::openingWhitesBuilder(std::string str, board::Chessboard myBoard) {
         if (str == "c4") {
             board::Position pos(board::File::C, board::Rank::TWO);
-            board::Piece p = myBoard.getPiece(pos).value();
+            board::Piece p = myBoard[pos].value();
             return board::MoveBuilder::basic_move(p, board::Position(board::File::C, board::Rank::FOUR));
         }
         if (str == "Nc3") {
             board::Position pos(board::File::B, board::Rank::ONE);
-            board::Piece p = myBoard.getPiece(pos).value();
+            board::Piece p = myBoard[pos].value();
             return board::MoveBuilder::basic_move(p, board::Position(board::File::C, board::Rank::THREE));
         }
         if (str == "Nf3") {
             board::Position pos(board::File::G, board::Rank::ONE);
-            board::Piece p = myBoard.getPiece(pos).value();
+            board::Piece p = myBoard[pos].value();
             return board::MoveBuilder::basic_move(p, board::Position(board::File::F, board::Rank::THREE));
         }
         if (str == "g3") {
             board::Position pos(board::File::G, board::Rank::TWO);
-            board::Piece p = myBoard.getPiece(pos).value();
+            board::Piece p = myBoard[pos].value();
             return board::MoveBuilder::basic_move(p, board::Position(board::File::G, board::Rank::THREE));
         }
         if (str == "Bg2") {
             board::Position pos(board::File::F, board::Rank::ONE);
-            board::Piece p = myBoard.getPiece(pos).value();
+            board::Piece p = myBoard[pos].value();
             return board::MoveBuilder::basic_move(p, board::Position(board::File::G, board::Rank::TWO));
         }
         else {
             board::Position pos(board::File::E, board::Rank::ONE);
-            board::Piece p = myBoard.getPiece(pos).value();
+            board::Piece p = myBoard[pos].value();
             return board::MoveBuilder::king_castling(p);
         }
     }
 
-    board::Move openingBlacksBuilder(std::string str, board::Chessboard myBoard) {
+    board::Move AI::openingBlacksBuilder(std::string str, board::Chessboard myBoard) {
         if (str == "d5") {
             board::Position pos(board::File::D, board::Rank::SEVEN);
-            board::Piece p = myBoard.getPiece(pos).value();
+            board::Piece p = myBoard[pos].value();
             return board::MoveBuilder::basic_move(p, board::Position(board::File::D, board::Rank::FIVE));
         }
         if (str == "c6") {
             board::Position pos(board::File::C, board::Rank::SEVEN);
-            board::Piece p = myBoard.getPiece(pos).value();
+            board::Piece p = myBoard[pos].value();
             return board::MoveBuilder::basic_move(p, board::Position(board::File::C, board::Rank::SIX));
         }
         if (str == "Nf6") {
             board::Position pos(board::File::G, board::Rank::EIGHT);
-            board::Piece p = myBoard.getPiece(pos).value();
+            board::Piece p = myBoard[pos].value();
             return board::MoveBuilder::basic_move(p, board::Position(board::File::F, board::Rank::SIX));
         }
         if (str == "e6") {
             board::Position pos(board::File::E, board::Rank::SEVEN);
-            board::Piece p = myBoard.getPiece(pos).value();
+            board::Piece p = myBoard[pos].value();
             return board::MoveBuilder::basic_move(p, board::Position(board::File::E, board::Rank::SIX));
         }
         else {
             board::Position pos(board::File::B, board::Rank::EIGHT);
-            board::Piece p = myBoard.getPiece(pos).value();
+            board::Piece p = myBoard[pos].value();
             return board::MoveBuilder::basic_move(p, board::Position(board::File::D, board::Rank::SEVEN));
         }
     }

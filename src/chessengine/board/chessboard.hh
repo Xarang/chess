@@ -131,8 +131,6 @@ namespace board {
         std::vector<Piece> get_pieces() {
             return pieces_;
         }
-        std::optional<Piece> getPiece(Position myPos);
-
 
             //utils
         std::string to_string() const;

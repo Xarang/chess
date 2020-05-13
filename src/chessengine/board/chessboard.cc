@@ -423,12 +423,4 @@ namespace board {
         assert((*this)[p.position_]->type_ == new_type && "promotion did not take effect in piece list");
         assert(*std::find(pieces_.begin(), pieces_.end(), p) == (*this)[p.position_].value());
     }
-
-    std::optional<Piece> Chessboard::getPiece(Position myPos) {
-        for (auto piece : pieces_) {
-            if (piece.position_ == myPos)
-                return std::make_optional(piece);
-        }
-        return std::nullopt;
-    }
 }
