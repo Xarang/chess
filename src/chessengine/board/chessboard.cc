@@ -13,6 +13,7 @@ namespace board {
 
         //handle capture (+ special behaviour for en-passant)
         if (move.is_capture_) {
+            last_piece_capture = (*this)[move.end_position_].value();
             if (!move.is_en_passant_) {
                 remove_piece((*this)[move.end_position_].value());
             } else {
