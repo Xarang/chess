@@ -132,7 +132,7 @@ namespace board {
             return pieces_;
         }
 
-        //utils
+            //utils
         std::string to_string() const;
         Color whose_turn_is_it() const { return is_white_turn_ ? Color::WHITE : Color::BLACK; }
         const std::optional<Piece> read(Position p) const; //same as operator[], but read-only
