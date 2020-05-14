@@ -41,9 +41,6 @@ def run_perft_file(path_chessengine, path_listener, path_perft):
         if a != b:
             print(path_perft + ": python and engine did not find the same amount of moves. Python got " + str(a) + " whereas engine got " + str(b))
 
-            python_boards_moves = {}
-            chessengine_board_moves = {}
-
             def results_to_dict(results) -> dict:
                 dict = {}
                 for entry in results:
@@ -52,16 +49,24 @@ def run_perft_file(path_chessengine, path_listener, path_perft):
                     moves = dict.get(board)
                     if moves:
                         moves.append(move)
-                        dict[move] = moves
+                        dict[board] = moves
+                    else:
+                        dict[board] = [move]
                 return dict
 
             python_boards_moves = results_to_dict(python_move_log)
-            chessengine_board_moves = results_to_dict(chessengine_move_log)
+            chessengine_boards_moves = results_to_dict(chessengine_move_log)
+
+            #print("python", python_boards_moves)
+            #print("engine", chessengine_boards_moves)
+
+            #print("python keys", python_boards_moves.keys())
+            #print("engine keys", chessengine_boards_moves.keys())
 
             for board in python_boards_moves.keys():
-                if chessengine_boards_moves[board]:
+                if chessengine_boards_moves.get(board):
                     python_moves = python_boards_moves.get(board)
-                    chessengine_moves = chessengine_board_moves.get(board)
+                    chessengine_moves = chessengine_boards_moves.get(board)
                     for move in python_moves:
                         if move not in chessengine_moves:
                             print(board + " python got move: " + move + " whereas engine did not")

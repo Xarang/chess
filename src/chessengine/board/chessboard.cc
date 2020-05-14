@@ -271,7 +271,9 @@ namespace board {
             }
             if (empty_counter != 0)
                 res += std::to_string(empty_counter);
-            res += "/";
+            if (i != 7) {
+                res += "/";
+            }
             currRank = currRank - 1;
         }
         //std::cout << res << "\n";
