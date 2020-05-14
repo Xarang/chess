@@ -47,6 +47,7 @@ namespace board {
         unsigned int turns_since_last_piece_taken_or_pawn_moved_ = 0;
 
         std::optional<Position> en_passant_target_square_ = std::nullopt;
+        std::optional<Position> old_en_passant_target_square_ = std::nullopt;
         
         //map containing hashed representations of all boards since start (to_string'ed)
         //if a key has 3 values it means the '3 fold' rule applies and the game is a draw

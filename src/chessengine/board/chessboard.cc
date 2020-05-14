@@ -62,6 +62,7 @@ namespace board {
         }
 
         //if the board previously had a 'en passant target square', it is now consumed
+        old_en_passant_target_square_ = en_passant_target_square_;
         en_passant_target_square_ = std::nullopt;
 
         if (move.is_double_pawn_push_) {
@@ -429,14 +430,10 @@ namespace board {
         current_turn_--;
         turns_since_last_piece_taken_or_pawn_moved_--;
 
-        //handle movement (+ special behaviour for en-passant)
-        if (!move.is_en_passant_)
-        {
-            undo_move_piece((*this)[move.end_position_].value(), move.start_position_);
-        } else {
-            undo_move_piece((*this)[move.start_position_].value(), en_passant_target_square_.value());
-        }
+        //undo the move
+        undo_move_piece((*this)[move.end_position_].value(), move.start_position_);
 
+        //undo the castling
         if (move.is_king_castling_ || move.is_queen_castling_)
         {
             File rookFile;
@@ -453,43 +450,45 @@ namespace board {
             Position rook_position(rookFile, rookRank);
             Position rook_destination(endRookFile, rookRank);
 
-            //mark used castling
+            //unmark used castling
             std::pair<Position, bool&> l[] = {
-                    { Position(File::A, Rank::ONE), did_white_queen_castling_ },
-                    { Position(File::H, Rank::ONE), did_white_king_castling_ },
-                    { Position(File::A, Rank::EIGHT), did_black_queen_castling_ },
-                    { Position(File::H, Rank::EIGHT), did_black_king_castling_ },
+                    { Position(File::D, Rank::ONE), did_white_queen_castling_ },
+                    { Position(File::F, Rank::ONE), did_white_king_castling_ },
+                    { Position(File::D, Rank::EIGHT), did_black_queen_castling_ },
+                    { Position(File::F, Rank::EIGHT), did_black_king_castling_ },
             };
             for (auto association : l) {
                 if (association.first == rook_position) {
-                    association.second = true;
+                    association.second = false;
                 }
             }
             undo_move_piece((*this)[rook_position].value(), rook_destination);
         }
 
-        //Undo en passant
-        int direction = whose_turn_is_it() == Color::WHITE ? +1 : -1;
+        //Undo en passant (not sure about this)
+        en_passant_target_square_ = old_en_passant_target_square_;
+        /*int direction = whose_turn_is_it() == Color::WHITE ? +1 : -1;
         en_passant_target_square_ = std::make_optional<Position>(move.start_position_.file_get(), move.start_position_.rank_get() + direction);
 
         if (move.is_double_pawn_push_) {
             en_passant_target_square_ = std::nullopt;
-        }
+        }*/
 
-        if (move.undo_promotion_.has_value())
+        if (move.promotion_.has_value())
         {
-            //Check undo_promotion
-            undo_promote_piece((*this)[move.start_position_].value(), move.undo_promotion_.value());
+            //Check undo_promotion use start_position because this move is undo
+            undo_promote_piece((*this)[move.start_position_].value(), move.piece_);
         }
 
         if (move.is_capture_) {
-            if (!move.is_en_passant_) {
+            //if (!move.is_en_passant_) {
                 add_piece(last_piece_capture);
+                (*this)[move.end_position_] = last_piece_capture;
                 /*} else {
                     direction = whose_turn_is_it() == Color::WHITE ? 1 : -1;
                     remove_piece((*this)[Position(en_passant_target_square_->file_get(), en_passant_target_square_->rank_get() - direction)].value());
                 }*/
-            }
+           //}
         }
 
         /*auto fen = to_string();
