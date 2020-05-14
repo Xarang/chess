@@ -52,11 +52,17 @@ namespace board {
         //if a key has 3 values it means the '3 fold' rule applies and the game is a draw
         std::unordered_map<std::string, int> all_boards_since_start_ = std::unordered_map<std::string, int>();
 
+        std::optional<Piece> last_piece_capture = std::nullopt;
 
         //these 3 methods are used by do_move
         void remove_piece(const Piece& p);
         void move_piece(const Piece& p, Position new_position);
         void promote_piece(const Piece& p, PieceType type);
+
+        //theses methods are used by undo_move
+        void add_piece(const std::optional<Piece> p);
+        void undo_move_piece(const Piece& p, Position old_position);
+        void undo_promote_piece(const Piece& p, PieceType type);
 
         public:
 
@@ -124,6 +130,7 @@ namespace board {
         bool is_check();
         bool is_checkmate();
         bool is_draw();
+        void undo_move(Move);
         std::optional<Piece>& operator[](Position p);
 
 

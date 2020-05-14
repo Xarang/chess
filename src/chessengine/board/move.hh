@@ -15,6 +15,7 @@ namespace board
 
         //a pawn is getting promotted to a new piecetype
         opt_piecetype_t promotion_;
+        opt_piecetype_t undo_promotion_;
 
         //the move is a capture
         bool is_capture_;
@@ -52,5 +53,6 @@ namespace board
         void set_double_pawn_push();
         void set_king_castling();
         void set_queen_castling();
+
     };
 }
