@@ -26,7 +26,7 @@ namespace listener {
 
             //tasks
             void run_pgn_file(std::string& filename);
-            void run_perft(int depth);
+            void run_perft(int depth, bool debug=false);
             void run_ai();
             void evaluate_ai();
 

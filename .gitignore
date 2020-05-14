@@ -3,6 +3,6 @@ build/
 venv/
 env/
 *.out
-*.idea
+idea/
 *.pgn
 __pycache__/

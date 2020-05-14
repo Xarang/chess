@@ -112,7 +112,7 @@ namespace listener {
         }
     }
 
-    static unsigned long long perft(board::Chessboard b, int depth) {
+    static unsigned long long perft(board::Chessboard b, int depth, bool debug) {
         if (depth == 0) {
             return 1;
         }
@@ -120,23 +120,18 @@ namespace listener {
         auto moves = b.generate_legal_moves();
         for (auto move : moves) {
             if (depth == 1) {
-                std::ofstream output_file;
-                output_file.open("chessengine_perft_output.out", std::ios_base::app);
-                output_file << move.uci() << "\n";
-                output_file.close();
+                if (debug) {
+                    std::cout << b.to_string() << " " << move.uci() << "\n";
+                }
             }
             auto projection = b.project(move);
-            sum += perft(projection, depth - 1);
+            sum += perft(projection, depth - 1, debug);
         }   
         return sum;
     }
 
-    void ListenerManager::run_perft(int depth) {
-        std::ofstream output_file;
-        output_file.open("chessengine_perft_output.out", std::ios_base::out);
-        output_file << "";
-        output_file.close();
-        auto n = perft(board_.value(), depth);
+    void ListenerManager::run_perft(int depth, bool debug) {
+        auto n = perft(board_.value(), depth, debug);
         std::cout << n << "\n";
     }
 

@@ -246,7 +246,7 @@ namespace board {
     std::string Chessboard::to_string() const {
         //TODO: output a FEN string representing the board (https://fr.wikipedia.org/wiki/Notation_Forsyth-Edwards)
         std::string res = "";
-        board::Rank currRank = Rank::ONE;
+        board::Rank currRank = Rank::EIGHT;
         for (size_t i = 0; i < 8; i++)
         {
             board::File currFile = File::A;
@@ -258,13 +258,11 @@ namespace board {
 
                 if (read(myPos).has_value()) {
                     auto myPiece = read(myPos).value();
-
                     symbol = myPiece.piece_to_char_fen();
                     if (empty_counter != 0)
                         res += std::to_string(empty_counter);
                     res += symbol;
                     empty_counter = 0;
-
                 }
                 else
                     empty_counter++;
@@ -274,7 +272,7 @@ namespace board {
             if (empty_counter != 0)
                 res += std::to_string(empty_counter);
             res += "/";
-            currRank = currRank + 1;
+            currRank = currRank - 1;
         }
         //std::cout << res << "\n";
         return res;

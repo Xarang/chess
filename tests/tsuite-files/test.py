@@ -1,6 +1,7 @@
 import argparse
 import sys
 from pgn import *
+from perft import run_perft_file
 from termcolor import colored, cprint
 
 
@@ -13,7 +14,6 @@ def main(argv):
     parser.add_argument("--perft", help="perft directory to process")
     args = parser.parse_args()
 
-
     result = 0
     cprint("-----------------------TEST SUITE START--------------------------\n", "red")
 
@@ -21,6 +21,7 @@ def main(argv):
         result = test_pgn(args.chessengine, "./liblistener-test-suite.so", args.pgn)
 
     if (args.perft != None):
+        result = run_perft_file(args.chessengine, "./liblistener-test-suite.so", args.perft)
         pass
 
     cprint("\n---------------------TEST SUITE FINISH----------------------", "red")
