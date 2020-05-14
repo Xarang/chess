@@ -44,8 +44,15 @@ namespace board {
             if (chessboard.whose_turn_is_it() == Color::BLACK && move.is_queen_castling_ && chessboard.did_black_queen_castling_) {
                 return false;
             }
+            if (move.is_king_castling_) {
+            return chessboard.read(Position(move.start_position_.file_get() + 1, move.start_position_.rank_get())).has_value() == false
+                && chessboard.read(Position(move.start_position_.file_get() + 2, move.start_position_.rank_get())).has_value() == false;
+            }
+            else // (move.is_queen_castling_) {
+                return chessboard.read(Position(move.start_position_.file_get() - 1, move.start_position_.rank_get())).has_value() == false
+                    && chessboard.read(Position(move.start_position_.file_get() - 2, move.start_position_.rank_get())).has_value() == false
+                    && chessboard.read(Position(move.start_position_.file_get() - 3, move.start_position_.rank_get())).has_value() == false;
             //check verification will be in the encapsulating function
-            return true;
         }
 
         auto start_file = move.start_position_.file_get();
@@ -53,6 +60,7 @@ namespace board {
         auto end_file = move.end_position_.file_get();
         auto end_rank = move.end_position_.rank_get();
 
+  
         return abs((int)start_file - (int)end_file) <= 1 && abs((int)start_rank - (int)end_rank) <= 1;
     }
 
