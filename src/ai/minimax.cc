@@ -49,7 +49,6 @@ namespace ai {
             float maxEval = -INFINITY;
             for (auto move : moves) {
                 auto proj = myBoard.project(move);
-                proj.change_turn();
                 auto eval = minimax(move.end_position_, depth - 1, !ai_turn, proj);
                 maxEval = std::max(maxEval, eval);
             }
@@ -60,7 +59,6 @@ namespace ai {
              float minEval = +INFINITY;
              for (auto move : moves) {
                  auto proj = myBoard.project(move);
-                 proj.change_turn();
                  auto eval = minimax(move.end_position_, depth - 1, !ai_turn, proj);
                  minEval = std::min(minEval, eval);
              }
@@ -150,7 +148,6 @@ namespace ai {
         auto moves = myBoard.generate_legal_moves();
         for (auto move : moves) {
             auto proj = myBoard.project(move);
-            proj.change_turn();
             auto value = minimax(move.start_position_, 3, false, proj);
             if (value > bestValue)
             {

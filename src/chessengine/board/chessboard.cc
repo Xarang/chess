@@ -340,6 +340,17 @@ namespace board {
         std::string s;
         uci_string_stream >> s;
 
+        if (s == "position")
+        {
+            uci_string_stream >> s;
+        }
+        else
+        {
+            throw std::runtime_error("position string does not start with position");
+        }
+
+        std::cout << s << "\n";
+
         if (s == "fen") {
             try {
                 std::string fen;

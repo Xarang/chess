@@ -138,22 +138,31 @@ namespace listener {
 
     //TODO: figure this out
     void ListenerManager::run_ai() {
-        ai::init("Kasparov");
+        ai::init("The best AI");
 
+        ai::AI chess_ai;
+
+        std::fstream f;
+        f.open("chess_debug", std::ios::out | std::ios::trunc);
+        f.close();
         while (true) { //end when ?
+            //open file at /.local/share/pychess/engines
+            f.open("chess_debug", std::ios::out | std::ios::app);
             std::string board_str = ai::get_board();
+            f << board_str << std::endl;
+            f.close();
 
             //TODO: not tested this function
             auto board = board::Chessboard::parse_uci(board_str);
 
             //ai get best move for board;
-            auto moves = board_->generate_legal_moves();
-            auto best_move = moves.front().uci();
+            //auto moves = board_->generate_legal_moves();
+            auto move = chess_ai.searchMove(board);
+            auto best_move = move.uci();
 
             //send move
             ai::play_move(best_move);
         }
-        
     }
 
     void ListenerManager::evaluate_ai() {
