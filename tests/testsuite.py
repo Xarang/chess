@@ -1,1 +1,1 @@
-test-suite/test.py
+tsuite-files/test.py

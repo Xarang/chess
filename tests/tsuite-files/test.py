@@ -9,7 +9,6 @@ def main(argv):
 
     parser = argparse.ArgumentParser()
     parser.add_argument("chessengine", help="binary to test")
-    parser.add_argument("--listener", help="listener to use")
     parser.add_argument("--pgn", help="pgn directory to process")
     parser.add_argument("--perft", help="perft directory to process")
     args = parser.parse_args()
@@ -19,7 +18,7 @@ def main(argv):
     cprint("-----------------------TEST SUITE START--------------------------\n", "red")
 
     if (args.pgn != None):
-        result = test_pgn(args.chessengine, args.listener, args.pgn)
+        result = test_pgn(args.chessengine, "./liblistener-test-suite.so", args.pgn)
 
     if (args.perft != None):
         pass
