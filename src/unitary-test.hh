@@ -71,8 +71,6 @@ namespace board {
             return false;
         }
         char brd[8][8];
-        /*std::string fenArray[] = {"1R6/PpP3Q1/4P3/K3bP1p/pp1Np2p/Bprq1PP1/bPP1pknn/1RN1rB2 w - - 0 1",
-                                  "6n1/n3rr1P/b1P1p1Q1/2Kp1pNp/kP2PP2/pp1q1pb1/NR2PpPP/2R1BB2 w - - 0 1",
-                                  "5Q2/PP2P2k/3pK2p/2BP1p1b/rRpp1NPp/2PrpnR1/1PP1BbNp/1n3q2 w - - 0 1"};*/
+        std::string fenArray[1] = {"Fen strings here"};
     };
 }

@@ -22,6 +22,22 @@ namespace board
                 }
             }
         }
+        for (auto fen : fenArray)
+        {
+            Chessboard board(fen);
+            auto legals_moves = board.generate_legal_moves(true);
+            for (auto moves : legals_moves)
+            {
+                Chessboard copyBoard(fen);
+                copyBoard.do_move(moves);
+                copyBoard.undo_move(moves);
+                if (!(board == copyBoard))
+                {
+                    std::cout << "\nFor the move " << moves.to_string() << " undo move failed " <<
+                              board.to_string() << " " << copyBoard.to_string() << " \n";
+                }
+            }
+        }
         return 0;
     }
 }
