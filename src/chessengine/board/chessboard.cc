@@ -221,10 +221,14 @@ namespace board {
     }
 
     std::optional<Piece>& Chessboard::operator[](Position pos) {
+        if (pos.file_get() == File::OUTOFBOUNDS || pos.rank_get() == Rank::OUTOFBOUNDS)
+            return (std::optional<Piece> &) std::nullopt;
         return board_((int)pos.file_get(), (int)pos.rank_get());
     }
 
     const std::optional<Piece> Chessboard::read(Position pos) const {
+        if (pos.file_get() == File::OUTOFBOUNDS || pos.rank_get() == Rank::OUTOFBOUNDS)
+            return std::nullopt;
         return board_((int)pos.file_get(), (int)pos.rank_get());
     }
 

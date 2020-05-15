@@ -152,6 +152,12 @@ namespace ai {
         std::list<std::string> openingWhite = {"c2c4", "g1f3", "b2b3"};
         std::list<std::string> openingBlack = { "d7d5"};
 
+        //BackwardPawnCheck
+        int backwardPawnCheck(board::Position myPos, board::Chessboard myboard);
+
+        //CandidatePawnCheck
+        int candidatePawnCheck(board::Position myPos, board::Chessboard myboard);
+
 
         /*
          * For mobility values, we might need a specific class in order to take into account multiple paramters:

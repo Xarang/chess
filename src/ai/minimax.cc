@@ -22,6 +22,11 @@ namespace ai {
                     res += (*table_valuesWhite[piece.type_])[(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
                 else
                     res += (*table_valuesBlack[piece.type_])[(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
+
+                if (piece.type_ == board::PieceType::PAWN) {
+                    res += backwardPawnCheck(piece.position_, myBoard);
+                    res += candidatePawnCheck(piece.position_, myBoard);
+                }
             }
             else
             {
@@ -30,6 +35,10 @@ namespace ai {
                     res -= (*table_valuesWhite[piece.type_])[(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
                 else
                     res -= (*table_valuesBlack[piece.type_])[(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
+                if (piece.type_ == board::PieceType::PAWN) {
+                    res -= backwardPawnCheck(piece.position_, myBoard);
+                    res -= candidatePawnCheck(piece.position_, myBoard);
+                }
             }
         }
         return res;
@@ -100,5 +109,53 @@ namespace ai {
             }
         }
         return bestMove;
+    }
+
+    int AI::backwardPawnCheck(board::Position myPos, board::Chessboard myboard) {
+        int res = 0;
+        if (color_ == board::Color::WHITE) {
+            auto backLeft = myboard[board::Position(myPos.file_get() - 1, myPos.rank_get() - 1)];
+            auto backRight = myboard[board::Position(myPos.file_get() + 1, myPos.rank_get() - 1)];
+            if (backLeft.has_value() && backLeft.value().type_ == board::PieceType::PAWN)
+                res += 30;
+            if (backRight.has_value() && backRight.value().type_ == board::PieceType::PAWN) {
+                if (res > 0)
+                    res -= 10;
+                res += 30;
+            }
+
+        } else {
+            auto backLeft = myboard[board::Position(myPos.file_get() - 1, myPos.rank_get() + 1)];
+            auto backRight = myboard[board::Position(myPos.file_get() + 1, myPos.rank_get() + 1)];
+            if (backLeft.has_value() && backLeft.value().type_ == board::PieceType::PAWN)
+                res += 10;
+            if (backRight.has_value() && backRight.value().type_ == board::PieceType::PAWN) {
+                if (res > 0)
+                    res -= 10;
+                res += 30;
+            }
+        }
+        return res;
+    }
+
+    //Candidate Pawn should not take into account special Pieces.
+    int AI::candidatePawnCheck(board::Position myPos, board::Chessboard myboard) {
+        int res = 0;
+        int i = 0;
+        if (color_ == board::Color::WHITE) {
+            while (!myboard[board::Position(myPos.file_get() + i, myPos.rank_get())].has_value()) {
+                i++;
+            }
+            if (myPos.file_get() - i == board::File::H)
+                res += 50;
+        }
+        else {
+            while (!myboard[board::Position(myPos.file_get() - i, myPos.rank_get())].has_value()) {
+                i++;
+            }
+            if (myPos.file_get() - i == board::File::A)
+                res += 50;
+        }
+        return res;
     }
 }
