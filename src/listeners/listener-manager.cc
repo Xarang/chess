@@ -67,7 +67,6 @@ namespace listener {
                             //check current game state for the player that did the move
                             board_->do_move(move); //player 1
 
-
                             //3 fold rule check
                             auto fen = board_->to_string();
                             if (all_boards_since_start_.find(fen) != all_boards_since_start_.end()) {
@@ -78,8 +77,7 @@ namespace listener {
                             }
                             for (std::pair<std::string, int> pair : all_boards_since_start_) {
                                 if (pair.second >= 3) {
-                                    register_game_draw();
-                                    return;
+                                    return register_game_draw();
                                 }
                             }
 
@@ -91,34 +89,33 @@ namespace listener {
                             //player 2
 
                             if (board_->is_checkmate()) {
-                                register_mat(board_->whose_turn_is_it());
+                                return register_mat(board_->whose_turn_is_it());
                             }
                             else {
                                 if (board_->is_check()) {
                                     register_check(board_->whose_turn_is_it());
                                 }
-                                if (board_->generate_legal_moves().size() == 0) {
-                                    register_pat(board_->whose_turn_is_it());
+                                if (board_->generate_legal_moves().empty()) {
+                                    return register_pat(board_->whose_turn_is_it());
                                 }
                                 else if (board_->is_draw()) {
-                                    register_game_draw();
+                                    return register_game_draw();
                                 }
                             }
                             //player 2
                         }
-                        catch (std::bad_alloc &e /*std::exception &e we dont want to catch for now */) {
+                        catch (std::exception &e) {
                             throw std::runtime_error("error happened while executing move: " + move.to_string() + " : " + e.what() + "\n");
                         }
                     }
                     else {
                         //std::cout << "[PGN RUNNER] move illegal: " + move.to_string();
-                        register_player_disqualification(board_->whose_turn_is_it());
-                        return;
+                        return register_player_disqualification(board_->whose_turn_is_it());
                     }
                 }
-                catch (std::bad_alloc &e /*we dont want to catch for now*/) {
+                catch (std::exception &e) {
                     std::cerr << "Error happened while assessing legality of move: " + move.to_string() + "  : " << e.what() << "\n";
-                    break;
+                    return;
                 }
             }
         }
