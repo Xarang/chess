@@ -7,7 +7,7 @@ namespace board {
 
     void Chessboard::do_move(Move move) {
         current_turn_++;
-        turns_since_last_piece_taken_or_pawn_moved_++;
+        turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size() - 1]++;
         //TODO: hash the current state of the board (string ?) and store it inside the all_boards_since_start_ multimap
 
 
@@ -224,7 +224,7 @@ namespace board {
         {
             return true;
         }
-        if (turns_since_last_piece_taken_or_pawn_moved_ >= 50)
+        if (turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size() - 1] >= 50)
         {
             return true;
         }
@@ -387,7 +387,7 @@ namespace board {
         auto piece_it = std::find(pieces_.begin(), pieces_.end(), p);
         pieces_.erase(piece_it);
         (*this)[p.position_] = std::nullopt;
-        turns_since_last_piece_taken_or_pawn_moved_ = 0;
+        turns_since_last_piece_taken_or_pawn_moved_.push_back(0);
 
         //make sure this did what we want
         assert(std::find(pieces_.begin(), pieces_.end(), p) == pieces_.end());
@@ -406,7 +406,7 @@ namespace board {
         assert((*this)[piece_it->position_].value() == *piece_it && "copy constructor of piece did not copy properly");
 
         if (p.type_ == PieceType::PAWN) {
-            turns_since_last_piece_taken_or_pawn_moved_ = 0;
+            turns_since_last_piece_taken_or_pawn_moved_.push_back(0);
         }
         
         //make sure this did what we want
@@ -428,10 +428,10 @@ namespace board {
     }
 
     void Chessboard::undo_move(Move move) {
-        if (current_turn_ > 0)
-             current_turn_--;
-        if(turns_since_last_piece_taken_or_pawn_moved_ > 0)
-            turns_since_last_piece_taken_or_pawn_moved_--;
+        current_turn_-=1;
+        if(turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size() - 1] > 0) {
+            turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size() - 1] -= 1;
+        }
 
         //undo the move
         undo_move_piece((*this)[move.end_position_].value(), move.start_position_);
@@ -524,7 +524,7 @@ namespace board {
         assert((*this)[piece_it->position_].value() == *piece_it && "copy constructor of piece did not copy properly");
 
         if (p.type_ == PieceType::PAWN) {
-            turns_since_last_piece_taken_or_pawn_moved_ = 1;
+            turns_since_last_piece_taken_or_pawn_moved_.pop_back();
         }
 
         //make sure this did what we want

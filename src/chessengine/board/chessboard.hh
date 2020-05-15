@@ -44,7 +44,7 @@ namespace board {
         unsigned int current_turn_ = 0;
 
         //turns elapsed since a piece was last taken or a pawn moved
-        unsigned int turns_since_last_piece_taken_or_pawn_moved_ = 0;
+        std::vector<int>turns_since_last_piece_taken_or_pawn_moved_ = {0};
 
         std::vector<std::optional<Position>> en_passant_target_square_ = {std::nullopt};
         //std::optional<Position> old_en_passant_target_square_ = std::nullopt;
@@ -110,10 +110,12 @@ namespace board {
                 std::cout << "current is different "  << current_turn_ << " vs " << b.current_turn_;
                 return false;
             }
-            if (turns_since_last_piece_taken_or_pawn_moved_ != b.turns_since_last_piece_taken_or_pawn_moved_)
+            if (turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size() - 1]
+            != b.turns_since_last_piece_taken_or_pawn_moved_[b.turns_since_last_piece_taken_or_pawn_moved_.size() - 1])
             {
-                std::cout << "turns_since_last_piece_taken_or_pawn_moved_ is different "  << turns_since_last_piece_taken_or_pawn_moved_ << " vs "
-                << b.turns_since_last_piece_taken_or_pawn_moved_;
+                std::cout << "turns_since_last_piece_taken_or_pawn_moved_ is different "
+                << turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size() - 1] << " vs "
+                << b.turns_since_last_piece_taken_or_pawn_moved_[b.turns_since_last_piece_taken_or_pawn_moved_.size() - 1];
                 return false;
             }
             return true;
