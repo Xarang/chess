@@ -342,6 +342,8 @@ namespace board {
                     if (word != "moves") {
                         fen += word + " "; 
                     }
+                    else
+                        break;
                 }
                 board = Chessboard(fen);
             }
