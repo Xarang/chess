@@ -17,13 +17,10 @@ namespace listener {
                 std::cerr << "could not open listener lib " << listener << " : " << dlerror();
                 throw std::runtime_error("could not open listener lib " + listener + " : " + dlerror());
             }
-            //std::cout << "[LOAD] loaded listener lib: " << listener << "\n";
             void *listenerFunc = dlsym(lib, "listener_create");
-            //std::cout << "[LOAD] extracted 'listener_create' from lib: " << listenerFunc << "\n";
             listener::Listener* lst = reinterpret_cast<listener::Listener*(*)()>(listenerFunc)();
             listeners_.push_back(lst);
             plugins_.push_back(lib);
-            //std::cout << "[LOAD] plugin " << listener << " ready to go!" << "(" << plugins_.size() << "/" << plugins.size() << ")\n";
         }
     }
 
@@ -138,22 +135,52 @@ namespace listener {
 
     //TODO: figure this out
     void ListenerManager::run_ai() {
-        ai::init("Kasparov");
+        ai::init("The best AI");
 
+        ai::AI chess_ai;
+
+        //open debug file at /.local/share/pychess/engine
+
+        //erase debug content from previous run
+        std::fstream f;
+        f.open("chess_debug", std::ios::out | std::ios::trunc);
+        f.close();
         while (true) { //end when ?
-            std::string board_str = ai::get_board();
 
-            //TODO: not tested this function
+            //outputs received position string to log file
+            std::string board_str = ai::get_board();
+            f.open("chess_debug", std::ios::out | std::ios::app);
+            f << "received board: " << board_str << std::endl;
+            f.close();
+
             auto board = board::Chessboard::parse_uci(board_str);
 
+            /*
+            f.open("chess_debug", std::ios::out | std::ios::app);
+            f << "playing : " << (board.whose_turn_is_it() == board::Color::WHITE ? "whites" : "blacks") << std::endl;
+            f.close();
+            */
             //ai get best move for board;
-            auto moves = board_->generate_legal_moves();
-            auto best_move = moves.front().uci();
+            //auto moves = board_->generate_legal_moves();
+
+            std::string move;
+
+            auto next_opening_move = chess_ai.get_next_opening_move(board.whose_turn_is_it());
+            if (!next_opening_move.empty()) {
+                move = next_opening_move;
+            }
+            else {
+                move = chess_ai.searchMove(board).uci();
+            }
+
+            //outputs best move to log file
+            f.open("chess_debug", std::ios::out | std::ios::app);
+            f << "best move: " << move << std::endl;
+            f.close();
 
             //send move
-            ai::play_move(best_move);
+            ai::play_move(move);
         }
-        
     }
 
     void ListenerManager::evaluate_ai() {

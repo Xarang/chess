@@ -1,16 +1,24 @@
 
 from chess import Board
 from chess import Move
+import json
+import os
+from os.path import isfile, join
 import subprocess
 import sys
-import json
+import time
+from termcolor import colored, cprint
 
+def run_perft(path_chessengine, path_listener, path_perft_directory):
+    files = [f for f in os.listdir(path_perft_directory) if isfile(join(path_perft_directory, f))]
+    for file in files:
+        run_perft_file(path_chessengine, path_listener, path_perft_directory + "/" + file)
 
 def run_perft_file(path_chessengine, path_listener, path_perft):
 
+    time_start = time.time()
     python_move_log = []
     chessengine_move_log = []
-
     def python_perft(depth, board) -> int:
         if depth == 1:
             for move in list(board.legal_moves):
@@ -73,8 +81,10 @@ def run_perft_file(path_chessengine, path_listener, path_perft):
                     for move in chessengine_moves:
                         if move not in python_moves:
                             print(board + " engine got move: " + move + " whereas python did not")
-
-
+            cprint(path_perft + " failure...", "orange")
+        else:
+            time_end = time.time()
+            cprint(path_perft + " python and chess engine got the same perft results. Hurray ! computation took: " + str(time_end - time_start) + " seconds", "green")
         #print("-- chessengine output", chessengine_move_log, "--")
         #print("-- python output", python_move_log, "--")
 

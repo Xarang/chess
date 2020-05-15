@@ -340,38 +340,55 @@ namespace board {
         std::string s;
         uci_string_stream >> s;
 
+        if (s == "position")
+        {
+            uci_string_stream >> s;
+        }
+        else
+        {
+            throw std::runtime_error("position string does not start with position");
+        }
+        auto board = Chessboard();
+
         if (s == "fen") {
             try {
                 std::string fen;
                 std::string word;
                 while (uci_string_stream >> word) {
-                    fen += word + " "; 
+                    if (word != "moves") {
+                        fen += word + " "; 
+                    }
                 }
-                return Chessboard(fen);
+                board = Chessboard(fen);
             }
             catch (std::exception &e) {
                 std::cerr << "error while recreating board position from uci fen string";
             }
-
         }
         else if (s == "startpos") {
-            try {
-                auto board = Chessboard();
-                std::string move;
-                while (uci_string_stream >> move) {
-                    File file_from = (File)(move.at(0) - 'a');
-                    Rank rank_from = (Rank)(move.at(1) - '0');
-                    File file_to = (File)(move.at(2) - 'a');
-                    Rank rank_to = (Rank)(move.at(3) - '0');
-                    board.change_turn();
-                    board.move_piece(board[Position(file_from, rank_from)].value(), Position(file_to, rank_to));
-                }
-            }
-            catch (std::exception &e) {
-               std::cerr << "error while recreating board position from uci move list";
-            }
+            std::string moves_keyword;
+            uci_string_stream >> moves_keyword;
         }
-        else throw std::runtime_error("unrecognised uci board position");
+        else {
+            throw std::runtime_error("unrecognised UCI position");
+        }
+    
+        try {
+            std::string move;
+            while (uci_string_stream >> move) {
+                File file_from = (File)(move.at(0) - 'a');
+                Rank rank_from = (Rank)(move.at(1) - '1');
+                File file_to = (File)(move.at(2) - 'a');
+                Rank rank_to = (Rank)(move.at(3) - '1');
+                board.change_turn();
+                board.move_piece(board[Position(file_from, rank_from)].value(), Position(file_to, rank_to));
+            }
+            return board;
+        }
+        catch (std::exception &e) {
+            std::cerr << "error while recreating board position from uci move list :" << e.what() << "\n";
+        }
+
         return Chessboard();
     }
 

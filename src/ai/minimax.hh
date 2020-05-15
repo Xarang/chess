@@ -106,8 +106,8 @@ namespace ai {
         };
 
         // Best Openings
-        std::list<std::string> openingWhite = {"c4", "Nc3", "Nf3", "g3", "Bg2", "O-O"};
-        std::list<std::string> openingBlack = { "d5", "c6", "Nf6", "e6", "Nbd7"};
+        std::list<std::string> openingWhite = {"c2c4", "g1f3", "b2b3"};
+        std::list<std::string> openingBlack = { "d7d5"};
 
 
         /*
@@ -117,8 +117,9 @@ namespace ai {
          */
         int evaluate(board::Chessboard& board);
         float minimax(board::Position myPos, int depth, bool is_black, board::Chessboard& board);
-        board::Move openingWhitesBuilder(std::string str, board::Chessboard myBoard);
-        board::Move openingBlacksBuilder(std::string str, board::Chessboard myBoard);
+        std::string get_next_opening_move(board::Color color);
+        //board::Move openingWhitesBuilder(std::string str, board::Chessboard myBoard);
+        //board::Move openingBlacksBuilder(std::string str, board::Chessboard myBoard);
         board::Move searchMove(board::Chessboard& board);
     };
 }

@@ -50,7 +50,9 @@ def test_pgn(path_chessengine, path_listener, path_pgn):
         run = chessengine_run_pgn(path_pgn + "/" + file)
         #cprint(path_pgn + "/" + file, "green" if run == True else "red")
         if run == False:
-            cprint(path_pgn + "/" + file, "red")
+            cprint("KO: " + path_pgn + "/" + file, "red")
+        else:
+            cprint("OK: " + path_pgn + "/" + file, "green")
 
 
     timers = np.array(timers)
