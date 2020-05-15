@@ -6,6 +6,7 @@
 #include "chessengine/board/chessboard.hh"
 #include "chessengine/board/color.hh"
 #include "chessengine/board/move-builder.hh"
+
 namespace ai {
     int AI::evaluate(board::Chessboard& myBoard) {
         int res = 0;
@@ -28,31 +29,22 @@ namespace ai {
         return res;
     }
 
-    static std::list<struct board::Move> getMovesFromPos(board::Position myPos, board::Chessboard& myBoard) {
-        auto pieces = myBoard.get_pieces();
-
-        for (auto piece : pieces) {
-            if (piece.position_ == myPos)
-                return piece.getAllPotentialMoves();
-        }
-        return std::list<struct board::Move>();
-    }
-
     float AI::minimax(board::Position myPos, int depth, bool ai_turn, board::Chessboard& myBoard) {
+        (void) myPos;
          if (depth == 0 || myBoard.is_checkmate())
              return evaluate(myBoard);
 
-         auto moves = getMovesFromPos(myPos, myBoard);
+         auto moves = myBoard.generate_legal_moves();
 
          // Black wants to minimize
          if (ai_turn) {
-            float maxEval = -INFINITY;
-            for (auto move : moves) {
-                auto proj = myBoard.project(move);
-                auto eval = minimax(move.end_position_, depth - 1, !ai_turn, proj);
-                maxEval = std::max(maxEval, eval);
-            }
-            return maxEval;
+             float maxEval = -INFINITY;
+             for (auto move : moves) {
+                 auto proj = myBoard.project(move);
+                 auto eval = minimax(move.end_position_, depth - 1, !ai_turn, proj);
+                 maxEval = std::max(maxEval, eval);
+             }
+             return maxEval;
          }
 
          else {
@@ -91,9 +83,10 @@ namespace ai {
         board::Move bestMove;
 
         auto moves = myBoard.generate_legal_moves();
+
         for (auto move : moves) {
             auto proj = myBoard.project(move);
-            auto value = minimax(move.start_position_, 3, false, proj);
+            auto value = minimax(move.end_position_, 2, false, proj);
             if (value > bestValue)
             {
                 bestValue = value;
