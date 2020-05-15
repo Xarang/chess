@@ -55,6 +55,9 @@ namespace board
         set_queen_castling();
     }
 
+    //take the informations we want from pgnmove and re-reformate them in a handier way.
+
+
     std::string Move::to_string() {
         std::string str = "[MOVE] ";
         str += piece_to_char(piece_);

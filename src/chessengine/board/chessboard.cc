@@ -362,12 +362,8 @@ namespace board {
         try {
             std::string move;
             while (uci_string_stream >> move) {
-                File file_from = (File)(move.at(0) - 'a');
-                Rank rank_from = (Rank)(move.at(1) - '1');
-                File file_to = (File)(move.at(2) - 'a');
-                Rank rank_to = (Rank)(move.at(3) - '1');
-                board.change_turn();
-                board.move_piece(board[Position(file_from, rank_from)].value(), Position(file_to, rank_to));
+                Move parsed_uci_move = board.parse_uci_move(move);
+                board.do_move(parsed_uci_move);
             }
             return board;
         }
@@ -381,6 +377,49 @@ namespace board {
     //private methods used to factorise basic move operations
 
     //heavily asserted for now, to make sure they do what we want them to do
+
+    //we assume parsed move is legal
+    Move Chessboard::parse_uci_move(std::string uci_move) {
+        Move move;
+
+        Position start_position((File)uci_move.at(0) - 'a', (Rank)uci_move.at(1) - '1');
+        Position end_position((File)uci_move.at(2) - 'a', (Rank)uci_move.at(3) - '1');
+
+        move.piece_ = (*this)[start_position]->type_;
+        auto color = (*this)[start_position]->color_;
+        move.start_position_ = start_position;
+        move.end_position_ = end_position;
+
+        if (move.piece_ == PieceType::PAWN) {
+
+            int direction = color == Color::BLACK ? -1 : 1;
+            if (start_position.rank_get() + direction * 2 == end_position.rank_get()) {
+                move.is_double_pawn_push_ = true;
+                return move;
+            }
+            else if (en_passant_target_square_.has_value() && en_passant_target_square_.value() == end_position && end_position.file_get() != start_position.file_get()) {
+                move.is_capture_ = true;
+                move.is_en_passant_ = true;
+                return move;
+            }
+        }
+        else if (move.piece_ == PieceType::KING) {
+            if (end_position.file_get() + 2 == start_position.file_get()) {
+                move.is_king_castling_ = true;
+                return move;
+            }
+            if (end_position.file_get() - 2 == start_position.file_get()) {
+                move.is_queen_castling_ = true;
+                return move;
+            }
+        }
+
+        if ((*this)[end_position].has_value()) {
+            move.is_capture_ = true;
+        }
+
+        return move;
+    }
 
     void Chessboard::remove_piece(const Piece& p) {
         assert(std::find(pieces_.begin(), pieces_.end(), p) != pieces_.end() && "queried piece not in piece list");

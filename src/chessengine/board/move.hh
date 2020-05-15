@@ -44,6 +44,7 @@ namespace board
                 }
 
         Move(PgnMove pgnmove);
+        static Move parse_uci(std::string uci);
 
         std::string to_string();
         std::string uci();

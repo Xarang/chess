@@ -109,6 +109,8 @@ namespace board {
         //FEN string based constructor
         Chessboard(std::string fen_string);
 
+
+        Move parse_uci_move(std::string uci_move);
         static Chessboard parse_uci(std::string uci_position);
 
         //main methods
