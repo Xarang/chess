@@ -12,7 +12,7 @@ namespace board
             auto legals_moves = board.generate_legal_moves(false);
             for (auto moves : legals_moves)
             {
-                Chessboard copyBoard = board;
+                Chessboard copyBoard(fen);
                 copyBoard.do_move(moves);
                 copyBoard.undo_move(moves);
                 if (!(board == copyBoard))

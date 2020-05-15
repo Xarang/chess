@@ -6,8 +6,10 @@
 namespace board {
 
     void Chessboard::do_move(Move move) {
-        current_turn_++;
-        turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size() - 1]++;
+        current_turn_+=1;
+        //turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size() - 1]+=1;
+        auto temp = turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size()-1] + 1;
+        turns_since_last_piece_taken_or_pawn_moved_.push_back(temp);
         //TODO: hash the current state of the board (string ?) and store it inside the all_boards_since_start_ multimap
 
 
@@ -429,9 +431,9 @@ namespace board {
 
     void Chessboard::undo_move(Move move) {
         current_turn_-=1;
-        if(turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size() - 1] > 0) {
-            turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size() - 1] -= 1;
-        }
+        /*if(turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size() - 1] > 0)
+            turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size() - 1] -= 1;*/
+        turns_since_last_piece_taken_or_pawn_moved_.pop_back();
 
         //undo the move
         undo_move_piece((*this)[move.end_position_].value(), move.start_position_);
@@ -509,6 +511,7 @@ namespace board {
     void Chessboard::add_piece(const std::optional<Piece> p) {
         assert(p.has_value() && "last_piece_capture has no value");
         pieces_.push_back(p.value());
+        turns_since_last_piece_taken_or_pawn_moved_.pop_back();
     }
 
     void Chessboard::undo_move_piece(const Piece &p, Position old_position) {
