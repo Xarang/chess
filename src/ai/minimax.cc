@@ -119,26 +119,41 @@ namespace ai {
 
     int AI::backwardPawnCheck(board::Position myPos, board::Chessboard myboard) {
         int res = 0;
+        board::File f = myPos.file_get();
+        board::Rank r = myPos.rank_get();
         if (color_ == board::Color::WHITE) {
-            auto backLeft = myboard[board::Position(myPos.file_get() - 1, myPos.rank_get() - 1)];
-            auto backRight = myboard[board::Position(myPos.file_get() + 1, myPos.rank_get() - 1)];
-            if (backLeft.has_value() && backLeft.value().type_ == board::PieceType::PAWN)
-                res += 30;
-            if (backRight.has_value() && backRight.value().type_ == board::PieceType::PAWN) {
-                if (res > 0)
-                    res -= 10;
-                res += 30;
+            if (f - 1 != board::File::OUTOFBOUNDS && r - 1 != board::Rank::OUTOFBOUNDS)
+            {
+                auto backLeft = myboard[board::Position(myPos.file_get() - 1, myPos.rank_get() - 1)];
+                if (backLeft.has_value() && backLeft.value().type_ == board::PieceType::PAWN)
+                    res += 30;
             }
 
+            if (f + 1 != board::File::OUTOFBOUNDS && r - 1 != board::Rank::OUTOFBOUNDS)
+            {
+                auto backRight = myboard[board::Position(myPos.file_get() + 1, myPos.rank_get() - 1)];
+                if (backRight.has_value() && backRight.value().type_ == board::PieceType::PAWN) {
+                    if (res > 0)
+                        res -= 10;
+                    res += 30;
+                }
+            }
         } else {
-            auto backLeft = myboard[board::Position(myPos.file_get() - 1, myPos.rank_get() + 1)];
-            auto backRight = myboard[board::Position(myPos.file_get() + 1, myPos.rank_get() + 1)];
-            if (backLeft.has_value() && backLeft.value().type_ == board::PieceType::PAWN)
-                res += 10;
-            if (backRight.has_value() && backRight.value().type_ == board::PieceType::PAWN) {
-                if (res > 0)
-                    res -= 10;
-                res += 30;
+            if (f - 1 != board::File::OUTOFBOUNDS && r + 1 != board::Rank::OUTOFBOUNDS)
+            {
+                auto backLeft = myboard[board::Position(myPos.file_get() - 1, myPos.rank_get() + 1)];
+                if (backLeft.has_value() && backLeft.value().type_ == board::PieceType::PAWN)
+                    res += 10;
+            }
+
+            if (f + 1 != board::File::OUTOFBOUNDS && r + 1 != board::Rank::OUTOFBOUNDS)
+            {
+                auto backRight = myboard[board::Position(myPos.file_get() + 1, myPos.rank_get() + 1)];
+                if (backRight.has_value() && backRight.value().type_ == board::PieceType::PAWN) {
+                    if (res > 0)
+                        res -= 10;
+                    res += 30;
+                }
             }
         }
         return res;
