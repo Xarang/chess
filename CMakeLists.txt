@@ -45,7 +45,7 @@ set(SRC
     src/chessengine/pgn/pgn-move.cc
     src/chessengine/pgn/pgn-parser.cc
     src/listeners/listener-manager.cc
-        src/unitaryTest.cc
+        src/unitary-test.cc
         )
 
 set (SRC_AI
