@@ -67,10 +67,7 @@ namespace listener {
                                 }
                             }
                             //check current game state for the player that did the move
-                            //auto temp = board_.value().get_pieces();
                             board_->do_move(move); //player 1
-                            /*board_->undo_move(move);
-                            assert(board_.value().get_pieces() == temp && "Failed");*/
                             //player 2
                             board_->change_turn();
                             //player 1

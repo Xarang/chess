@@ -13,12 +13,13 @@ namespace board {
 
         //handle capture (+ special behaviour for en-passant)
         if (move.is_capture_) {
-            last_piece_capture = (*this)[move.end_position_].value();
+            last_piece_capture.push_back((*this)[move.end_position_].value());
             if (!move.is_en_passant_) {
                 remove_piece((*this)[move.end_position_].value());
             } else {
                 int direction = whose_turn_is_it() == Color::WHITE ? 1 : -1;
-                remove_piece((*this)[Position(en_passant_target_square_->file_get(), en_passant_target_square_->rank_get() - direction)].value());
+                auto piece = en_passant_target_square_[en_passant_target_square_.size() - 1];
+                remove_piece((*this)[Position(piece->file_get(), piece->rank_get() - direction)].value());
             }
         }   
 
@@ -27,7 +28,7 @@ namespace board {
         {
             move_piece((*this)[move.start_position_].value(), move.end_position_);
         } else {
-            move_piece((*this)[move.start_position_].value(), en_passant_target_square_.value());
+            move_piece((*this)[move.start_position_].value(), en_passant_target_square_[en_passant_target_square_.size()].value());
         }
 
         if (move.is_king_castling_ || move.is_queen_castling_)
@@ -61,14 +62,13 @@ namespace board {
             move_piece((*this)[rook_position].value(), rook_destination);
         }
 
-        //if the board previously had a 'en passant target square', it is now consumed
-        old_en_passant_target_square_ = en_passant_target_square_;
-        en_passant_target_square_ = std::nullopt;
+        //if the board previously had a 'en passant target square', it is now consume
+        en_passant_target_square_.push_back(std::nullopt);
 
         if (move.is_double_pawn_push_) {
             //mark the square that can be "prise en passant"'ed next turn
             int direction = whose_turn_is_it() == Color::WHITE ? +1 : -1;
-            en_passant_target_square_ = std::make_optional<Position>(move.start_position_.file_get(), move.start_position_.rank_get() + direction);
+            en_passant_target_square_.push_back(std::make_optional<Position>(move.start_position_.file_get(), move.start_position_.rank_get() + direction));
         }
 
         if (move.promotion_.has_value())
@@ -94,7 +94,8 @@ namespace board {
             || move.end_position_.file_get() == File::OUTOFBOUNDS || move.end_position_.rank_get() == Rank::OUTOFBOUNDS) {
                 return false;
             }
-        if (en_passant_target_square_.has_value() && move.end_position_ == en_passant_target_square_.value() && move.is_capture_ && move.piece_ == PieceType::PAWN) {
+        if (en_passant_target_square_[en_passant_target_square_.size() - 1].has_value() && move.end_position_ == en_passant_target_square_[en_passant_target_square_.size() - 1].value()
+        && move.is_capture_ && move.piece_ == PieceType::PAWN) {
             //this is the place where en passant moves are flagged are so. no en passant moves should be created before this.
             move.is_en_passant_ = true;
         }
@@ -332,7 +333,7 @@ namespace board {
         if (fields[3] != "-") {
             File f = (File)(fields[3].at(0) - 'a');
             Rank r = (Rank)(fields[3].at(1) - '0' - 1);
-            en_passant_target_square_ = std::make_optional<Position>(f, r);
+            en_passant_target_square_.push_back(std::make_optional<Position>(f, r));
         }
         all_boards_since_start_.insert(std::pair<std::string, int>(to_string(), 1));
     }
@@ -427,8 +428,10 @@ namespace board {
     }
 
     void Chessboard::undo_move(Move move) {
-        current_turn_--;
-        turns_since_last_piece_taken_or_pawn_moved_--;
+        if (current_turn_ > 0)
+             current_turn_--;
+        if(turns_since_last_piece_taken_or_pawn_moved_ > 0)
+            turns_since_last_piece_taken_or_pawn_moved_--;
 
         //undo the move
         undo_move_piece((*this)[move.end_position_].value(), move.start_position_);
@@ -466,7 +469,7 @@ namespace board {
         }
 
         //Undo en passant (not sure about this)
-        en_passant_target_square_ = old_en_passant_target_square_;
+        en_passant_target_square_.pop_back();
         /*int direction = whose_turn_is_it() == Color::WHITE ? +1 : -1;
         en_passant_target_square_ = std::make_optional<Position>(move.start_position_.file_get(), move.start_position_.rank_get() + direction);
 
@@ -482,8 +485,10 @@ namespace board {
 
         if (move.is_capture_) {
             //if (!move.is_en_passant_) {
-                add_piece(last_piece_capture);
-                (*this)[move.end_position_] = last_piece_capture;
+                auto piece = last_piece_capture[last_piece_capture.size() - 1];
+                last_piece_capture.pop_back();
+                add_piece(piece);
+                (*this)[move.end_position_] = piece;
                 /*} else {
                     direction = whose_turn_is_it() == Color::WHITE ? 1 : -1;
                     remove_piece((*this)[Position(en_passant_target_square_->file_get(), en_passant_target_square_->rank_get() - direction)].value());

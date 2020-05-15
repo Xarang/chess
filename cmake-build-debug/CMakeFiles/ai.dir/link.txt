@@ -1,0 +1,2 @@
+/usr/bin/ar qc libai.a  CMakeFiles/ai.dir/src/ai/uci.cc.o CMakeFiles/ai.dir/src/ai/minimax.cc.o
+/usr/bin/ranlib libai.a
