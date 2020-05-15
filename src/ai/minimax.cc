@@ -104,7 +104,7 @@ namespace ai {
 
         for (auto move : moves) {
             auto proj = myBoard.project(move);
-            auto value = minimax(move.end_position_, 2, false, proj);
+            auto value = minimax(move.end_position_, depth_, false, proj);
             if (value > bestValue)
             {
                 bestValue = value;
@@ -113,7 +113,9 @@ namespace ai {
         }
         duration = (clock() - start) / (double) CLOCKS_PER_SEC;
         std::cerr << "The turn took " << duration << "\n";
-        remaining_time -= duration;
+        remaining_time_ -= duration;
+        if (duration <= 500)
+            depth_ = 1;
         return bestMove;
     }
 

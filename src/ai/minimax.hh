@@ -8,7 +8,8 @@
 namespace ai {
     struct AI {
         friend board::Chessboard;
-        clock_t remaining_time = 5000;
+        clock_t remaining_time_ = 5000;
+        int depth_ = 2;
         board::Color color_ = board::Color::WHITE;
 
         //Piece Material Values
