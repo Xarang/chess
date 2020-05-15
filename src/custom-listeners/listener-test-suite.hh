@@ -30,7 +30,7 @@ public:
     ** It is always the last method called.
     */
     void on_game_finished() {
-
+        
     }
 
     /**
@@ -108,9 +108,9 @@ public:
     **
     ** @param color: The color of the player whose King is checkmate
     */
-    void on_player_mat(const board::Color color) {
+    void on_player_mat(const board::Color) {
 
-        std::cout << "[RESULT] " + board::color_to_string((board::Color)(!(bool)color)) + " won\n";
+        //std::cout << "[RESULT] " + board::color_to_string((board::Color)(!(bool)color)) + " won\n";
     }
 
     /**
@@ -130,15 +130,16 @@ public:
     **
     ** @param color: The color of the player who is disqualified.
     */
-    void on_player_disqualified(const board::Color color) {
-        std::cout << "[RESULT] " << "Illegal move by " << board::color_to_string(color) << ", disqualified." << "\n";
+    void on_player_disqualified(const board::Color) {
+        std::cout << "illegal move\n";
+        //std::cout << "[RESULT] " << "Illegal move by " << board::color_to_string(color) << ", disqualified." << "\n";
     }
 
     /**
     ** \brief Event when there is a draw game.
     */
     void on_draw() {
-        std::cout << "[RESULT] Draw" << "\n";
+        //std::cout << "[RESULT] Draw" << "\n";
     }
 };
 

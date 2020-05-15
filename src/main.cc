@@ -29,7 +29,8 @@ int main(int argc, const char *argv[]) {
         ("listeners,l", po::value<std::vector<std::string>>()->multitoken(), "plugs in provided listeners")
         ("evaluate", po::value<std::string>(), "evaluates moves for given fen-represented board.")
         ("perft", po::value<std::string>(), "runs provided Perft on our chessengine and output the amount of moves we were able to generate.")
-        ("unitary-undo-move","run unitary-test undo move")
+        ("unit-test","run unitary-test undo move")
+        ("debug", "activates debugging/testing output for some features")
         ;
     
     po::variables_map variables;
@@ -40,7 +41,7 @@ int main(int argc, const char *argv[]) {
         std::cout << options << "\n";
         return 1;
     }
-    if (variables.count("unitary-undo-move"))
+    if (variables.count("unit-test"))
     {
         auto UT = board::UnitaryTest();
         return UT.Controller();
@@ -75,12 +76,12 @@ int main(int argc, const char *argv[]) {
 
         auto board = board::Chessboard(content);
         listenerManager.register_board(board);
-        listenerManager.run_perft(std::atoi(depth.c_str()));
+        listenerManager.run_perft(std::atoi(depth.c_str()), variables.count("debug"));
+        
     }
     else if (variables.count("evaluate")) {
-        std::ifstream ifs(variables["evaluate"].as<std::string>());
-        std::string content((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
-        auto board = board::Chessboard(content);
+        auto str = (variables.find("evaluate"))->second.as<std::string>();
+        auto board = board::Chessboard(str);
         listenerManager.register_board(board);
         listenerManager.evaluate_ai();
     }

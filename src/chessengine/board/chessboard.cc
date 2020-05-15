@@ -6,12 +6,12 @@
 namespace board {
 
     void Chessboard::do_move(Move move) {
+
         current_turn_+=1;
         //turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size() - 1]+=1;
         auto temp = turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size()-1] + 1;
         turns_since_last_piece_taken_or_pawn_moved_.push_back(temp);
         //TODO: hash the current state of the board (string ?) and store it inside the all_boards_since_start_ multimap
-
 
         //handle capture (+ special behaviour for en-passant)
         if (move.is_capture_) {
@@ -78,13 +78,7 @@ namespace board {
             promote_piece((*this)[move.end_position_].value(), move.promotion_.value());
         }
 
-        auto fen = to_string();
-        if (all_boards_since_start_.find(fen) != all_boards_since_start_.end()) {
-            all_boards_since_start_.insert_or_assign(fen, all_boards_since_start_.find(fen)->second + 1);
-            //std::cout << fen << " ---> " << all_boards_since_start_.find(fen)->second << "\n";
-        } else {
-            all_boards_since_start_.insert(std::pair<std::string, int>(fen, 1));
-        }
+
         is_white_turn_ = !is_white_turn_;
     }
 
@@ -229,12 +223,6 @@ namespace board {
         {
             return true;
         }
-
-        for (std::pair<std::string, int> pair : all_boards_since_start_) {
-            if (pair.second >= 3) {
-                return true;
-            }
-        }
         return false;
     }
 
@@ -250,7 +238,7 @@ namespace board {
     std::string Chessboard::to_string() const {
         //TODO: output a FEN string representing the board (https://fr.wikipedia.org/wiki/Notation_Forsyth-Edwards)
         std::string res = "";
-        board::Rank currRank = Rank::ONE;
+        board::Rank currRank = Rank::EIGHT;
         for (size_t i = 0; i < 8; i++)
         {
             board::File currFile = File::A;
@@ -262,13 +250,11 @@ namespace board {
 
                 if (read(myPos).has_value()) {
                     auto myPiece = read(myPos).value();
-
                     symbol = myPiece.piece_to_char_fen();
                     if (empty_counter != 0)
                         res += std::to_string(empty_counter);
                     res += symbol;
                     empty_counter = 0;
-
                 }
                 else
                     empty_counter++;
@@ -277,8 +263,10 @@ namespace board {
             }
             if (empty_counter != 0)
                 res += std::to_string(empty_counter);
-            res += "/";
-            currRank = currRank + 1;
+            if (i != 7) {
+                res += "/";
+            }
+            currRank = currRank - 1;
         }
         //std::cout << res << "\n";
         return res;
@@ -330,13 +318,12 @@ namespace board {
         did_black_queen_castling_ = fields[2].find("q") == fields[2].npos;
         did_white_queen_castling_ = fields[2].find("Q") == fields[2].npos;
 
-        //TODO: add potential en-passant spot
         if (fields[3] != "-") {
             File f = (File)(fields[3].at(0) - 'a');
-            Rank r = (Rank)(fields[3].at(1) - '0' - 1);
+
             en_passant_target_square_.push_back(std::make_optional<Position>(f, r));
+            Rank r = (Rank)(fields[3].at(1) - '1');
         }
-        all_boards_since_start_.insert(std::pair<std::string, int>(to_string(), 1));
     }
 
     Chessboard Chessboard::parse_uci(std::string uci_position) {
@@ -344,38 +331,57 @@ namespace board {
         std::string s;
         uci_string_stream >> s;
 
+        if (s == "position")
+        {
+            uci_string_stream >> s;
+        }
+        else
+        {
+            throw std::runtime_error("position string does not start with position");
+        }
+        auto board = Chessboard();
+
         if (s == "fen") {
             try {
                 std::string fen;
                 std::string word;
                 while (uci_string_stream >> word) {
-                    fen += word + " "; 
+                    if (word != "moves") {
+                        fen += word + " "; 
+                    }
+                    else
+                        break;
                 }
-                return Chessboard(fen);
+                board = Chessboard(fen);
             }
             catch (std::exception &e) {
                 std::cerr << "error while recreating board position from uci fen string";
             }
-
         }
         else if (s == "startpos") {
-            try {
-                auto board = Chessboard();
-                std::string move;
-                while (uci_string_stream >> move) {
-                    File file_from = (File)(move.at(0) - 'a');
-                    Rank rank_from = (Rank)(move.at(1) - '0');
-                    File file_to = (File)(move.at(2) - 'a');
-                    Rank rank_to = (Rank)(move.at(3) - '0');
-                    board.change_turn();
-                    board.move_piece(board[Position(file_from, rank_from)].value(), Position(file_to, rank_to));
-                }
-            }
-            catch (std::exception &e) {
-               std::cerr << "error while recreating board position from uci move list";
-            }
+            std::string moves_keyword;
+            uci_string_stream >> moves_keyword;
         }
-        else throw std::runtime_error("unrecognised uci board position");
+        else {
+            throw std::runtime_error("unrecognised UCI position");
+        }
+    
+        try {
+            std::string move;
+            while (uci_string_stream >> move) {
+                File file_from = (File)(move.at(0) - 'a');
+                Rank rank_from = (Rank)(move.at(1) - '1');
+                File file_to = (File)(move.at(2) - 'a');
+                Rank rank_to = (Rank)(move.at(3) - '1');
+                board.change_turn();
+                board.move_piece(board[Position(file_from, rank_from)].value(), Position(file_to, rank_to));
+            }
+            return board;
+        }
+        catch (std::exception &e) {
+            std::cerr << "error while recreating board position from uci move list :" << e.what() << "\n";
+        }
+
         return Chessboard();
     }
 

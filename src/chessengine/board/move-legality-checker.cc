@@ -1,4 +1,5 @@
 #include "chessboard.hh"
+#include "move-builder.hh"
 
 namespace board {
 
@@ -29,7 +30,7 @@ namespace board {
             if (!rook.has_value()) {
                 return false;
             }
-            if (king.value().has_already_moved_ || rook.value().has_already_moved_) {
+            if (king->has_already_moved_ || rook->has_already_moved_) {
                 return false;
             }
             if (chessboard.whose_turn_is_it() == Color::WHITE && move.is_king_castling_ && chessboard.did_white_king_castling_) {
@@ -44,8 +45,21 @@ namespace board {
             if (chessboard.whose_turn_is_it() == Color::BLACK && move.is_queen_castling_ && chessboard.did_black_queen_castling_) {
                 return false;
             }
-            //check verification will be in the encapsulating function
+            if (move.is_king_castling_) {
+                if (chessboard.read(Position(move.start_position_.file_get() + 1, move.start_position_.rank_get())).has_value()
+                    || chessboard.read(Position(move.start_position_.file_get() + 2, move.start_position_.rank_get())).has_value()) {
+                        return false;
+                    }
+            }
+            else { // (move.is_queen_castling_) {
+                if (chessboard.read(Position(move.start_position_.file_get() - 1, move.start_position_.rank_get())).has_value()
+                    || chessboard.read(Position(move.start_position_.file_get() - 2, move.start_position_.rank_get())).has_value()
+                    || chessboard.read(Position(move.start_position_.file_get() - 3, move.start_position_.rank_get())).has_value()) {
+                        return false;
+                    }
+            }
             return true;
+            //check verification will be in the encapsulating function
         }
 
         auto start_file = move.start_position_.file_get();
@@ -53,6 +67,7 @@ namespace board {
         auto end_file = move.end_position_.file_get();
         auto end_rank = move.end_position_.rank_get();
 
+  
         return abs((int)start_file - (int)end_file) <= 1 && abs((int)start_rank - (int)end_rank) <= 1;
     }
 

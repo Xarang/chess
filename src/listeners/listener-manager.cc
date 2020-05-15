@@ -5,7 +5,7 @@
 
 #include "ai/uci.hh"
 #include "pgn/pgn-parser.hh"
-
+#include "ai/minimax.hh"
 #include "listener-manager.hh"
 
 namespace listener {
@@ -17,18 +17,16 @@ namespace listener {
                 std::cerr << "could not open listener lib " << listener << " : " << dlerror();
                 throw std::runtime_error("could not open listener lib " + listener + " : " + dlerror());
             }
-            //std::cout << "[LOAD] loaded listener lib: " << listener << "\n";
             void *listenerFunc = dlsym(lib, "listener_create");
-            //std::cout << "[LOAD] extracted 'listener_create' from lib: " << listenerFunc << "\n";
             listener::Listener* lst = reinterpret_cast<listener::Listener*(*)()>(listenerFunc)();
             listeners_.push_back(lst);
             plugins_.push_back(lib);
-            //std::cout << "[LOAD] plugin " << listener << " ready to go!" << "(" << plugins_.size() << "/" << plugins.size() << ")\n";
         }
     }
 
     void ListenerManager::register_board(board::Chessboard& b) {
         board_ = std::make_optional<board::Chessboard>(b);
+        all_boards_since_start_.insert(std::pair<std::string, int>(board_->to_string(), 1));
         interface_ = std::make_optional<board::ChessboardInterfaceImpl>(board_.value());
         for (auto listener : listeners_) {
             listener->register_board(interface_.value());
@@ -68,6 +66,21 @@ namespace listener {
                             }
                             //check current game state for the player that did the move
                             board_->do_move(move); //player 1
+
+                            //3 fold rule check
+                            auto fen = board_->to_string();
+                            if (all_boards_since_start_.find(fen) != all_boards_since_start_.end()) {
+                                all_boards_since_start_.insert_or_assign(fen, all_boards_since_start_.find(fen)->second + 1);
+                                //std::cout << fen << " ---> " << all_boards_since_start_.find(fen)->second << "\n";
+                            } else {
+                                all_boards_since_start_.insert(std::pair<std::string, int>(fen, 1));
+                            }
+                            for (std::pair<std::string, int> pair : all_boards_since_start_) {
+                                if (pair.second >= 3) {
+                                    return register_game_draw();
+                                }
+                            }
+
                             //player 2
                             board_->change_turn();
                             //player 1
@@ -76,34 +89,33 @@ namespace listener {
                             //player 2
 
                             if (board_->is_checkmate()) {
-                                register_mat(board_->whose_turn_is_it());
+                                return register_mat(board_->whose_turn_is_it());
                             }
                             else {
                                 if (board_->is_check()) {
                                     register_check(board_->whose_turn_is_it());
                                 }
-                                if (board_->generate_legal_moves().size() == 0) {
-                                    register_pat(board_->whose_turn_is_it());
+                                if (board_->generate_legal_moves().empty()) {
+                                    return register_pat(board_->whose_turn_is_it());
                                 }
                                 else if (board_->is_draw()) {
-                                    register_game_draw();
+                                    return register_game_draw();
                                 }
                             }
                             //player 2
                         }
-                        catch (std::bad_alloc &e /*std::exception &e we dont want to catch for now */) {
+                        catch (std::exception &e) {
                             throw std::runtime_error("error happened while executing move: " + move.to_string() + " : " + e.what() + "\n");
                         }
                     }
                     else {
                         //std::cout << "[PGN RUNNER] move illegal: " + move.to_string();
-                        register_player_disqualification(board_->whose_turn_is_it());
-                        return;
+                        return register_player_disqualification(board_->whose_turn_is_it());
                     }
                 }
-                catch (std::bad_alloc &e /*we dont want to catch for now*/) {
+                catch (std::exception &e) {
                     std::cerr << "Error happened while assessing legality of move: " + move.to_string() + "  : " << e.what() << "\n";
-                    break;
+                    return;
                 }
             }
         }
@@ -112,7 +124,7 @@ namespace listener {
         }
     }
 
-    static unsigned long long perft(board::Chessboard b, int depth) {
+    static unsigned long long perft(board::Chessboard b, int depth, bool debug) {
         if (depth == 0) {
             return 1;
         }
@@ -120,52 +132,79 @@ namespace listener {
         auto moves = b.generate_legal_moves();
         for (auto move : moves) {
             if (depth == 1) {
-                std::ofstream output_file;
-                output_file.open("chessengine_perft_output.out", std::ios_base::app);
-                output_file << move.uci() << "\n";
-                output_file.close();
+                if (debug) {
+                    std::cout << b.to_string() << " " << move.uci() << "\n";
+                }
             }
             auto projection = b.project(move);
-            sum += perft(projection, depth - 1);
+            sum += perft(projection, depth - 1, debug);
         }   
         return sum;
     }
 
-    void ListenerManager::run_perft(int depth) {
-        std::ofstream output_file;
-        output_file.open("chessengine_perft_output.out", std::ios_base::out);
-        output_file << "";
-        output_file.close();
-        auto n = perft(board_.value(), depth);
+    void ListenerManager::run_perft(int depth, bool debug) {
+        auto n = perft(board_.value(), depth, debug);
         std::cout << n << "\n";
     }
 
 
     //TODO: figure this out
     void ListenerManager::run_ai() {
-        ai::init("Kasparov");
+        ai::init("The best AI");
 
+        ai::AI chess_ai;
+
+        //open debug file at /.local/share/pychess/engine
+
+        //erase debug content from previous run
+        std::fstream f;
+        f.open("chess_debug", std::ios::out | std::ios::trunc);
+        f.close();
         while (true) { //end when ?
-            std::string board_str = ai::get_board();
 
-            //TODO: not tested this function
+            //outputs received position string to log file
+            std::string board_str = ai::get_board();
+            f.open("chess_debug", std::ios::out | std::ios::app);
+            f << "received board: " << board_str << std::endl;
+            f.close();
+
             auto board = board::Chessboard::parse_uci(board_str);
 
+            f.open("chess_debug", std::ios::out | std::ios::app);
+            f << "playing : " << (board.whose_turn_is_it() == board::Color::WHITE ? "whites" : "blacks") << std::endl;
+            f.close();
             //ai get best move for board;
-            auto moves = board_->generate_legal_moves();
-            auto best_move = moves.front().uci();
+            //auto moves = board_->generate_legal_moves();
+
+            std::string move;
+
+            chess_ai.color_ = board.whose_turn_is_it();
+
+            auto next_opening_move = chess_ai.get_next_opening_move(board.whose_turn_is_it());
+            if (!next_opening_move.empty()) {
+                move = next_opening_move;
+            }
+            else {
+                move = chess_ai.searchMove(board).uci();
+            }
+
+            //outputs best move to log file
+            f.open("chess_debug", std::ios::out | std::ios::app);
+            f << "best move: " << move << std::endl;
+            f.close();
 
             //send move
-            ai::play_move(best_move);
+            ai::play_move(move);
         }
-        
     }
 
     void ListenerManager::evaluate_ai() {
         auto moves = board_->generate_legal_moves();
         for (auto move : moves) {
             //TODO: show ai score for this move
-            std::cout << move.uci() << "\n";
+            auto new_board = board_->project(move);
+            ai::AI myAI;
+            std::cout << move.uci() << " " << myAI.evaluate(new_board) << "\n";
         }
     }
 
