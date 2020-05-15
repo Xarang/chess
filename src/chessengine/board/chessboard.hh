@@ -44,17 +44,92 @@ namespace board {
         unsigned int current_turn_ = 0;
 
         //turns elapsed since a piece was last taken or a pawn moved
-        unsigned int turns_since_last_piece_taken_or_pawn_moved_ = 0;
+        std::vector<int>turns_since_last_piece_taken_or_pawn_moved_ = {0};
+        std::vector<std::optional<Position>> en_passant_target_square_ = {std::nullopt};
+        //std::optional<Position> old_en_passant_target_square_ = std::nullopt;
+        
+        //map containing hashed representations of all boards since start (to_string'ed)
+        //if a key has 3 values it means the '3 fold' rule applies and the game is a draw
+        std::unordered_map<std::string, int> all_boards_since_start_ = std::unordered_map<std::string, int>();
 
-        std::optional<Position> en_passant_target_square_ = std::nullopt;
+        std::vector<Piece> last_piece_capture;
+
 
         //these 3 methods are used by do_move
         void remove_piece(const Piece& p);
         void move_piece(const Piece& p, Position new_position);
         void promote_piece(const Piece& p, PieceType type);
 
+        //theses methods are used by undo_move
+        void add_piece(std::optional<Piece> p);
+        void undo_move_piece(const Piece& p, Position old_position);
+        void undo_promote_piece(const Piece& p, PieceType type);
+
         public:
 
+        bool operator==(Chessboard b) {
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                    if (!(board_(i, j) == b.board_(i, j))) {
+                        std::cout << "the elt at " << i << " " << j << " is different\n";
+                        return false;
+                    }
+                }
+            }
+            for (auto elt : pieces_) {
+                if (find(b.pieces_.begin(), b.pieces_.end(), elt) == b.pieces_.end()) {
+                    return false;
+                }
+            }
+            if (is_white_turn_ != b.is_white_turn_) {
+                std::cout << "Is_whit_turn is different " << is_white_turn_ << " vs " << b.is_white_turn_;
+                return false;
+            }
+            if (did_white_queen_castling_ != b.did_white_queen_castling_)
+            {
+                std::cout << "did_white_queen_castling is different " << did_white_queen_castling_ << " vs " << b.did_white_queen_castling_;
+                return false;
+            }
+            if (did_white_king_castling_ != b.did_white_king_castling_)
+            {
+                std::cout << "did_white_king_castling is different " << did_white_king_castling_ << " vs " << b.did_white_king_castling_;
+                return false;
+            }
+            if (did_black_queen_castling_ != b.did_black_queen_castling_)
+            {
+                std::cout << "did_black_queen_castling is different " << did_black_queen_castling_ << " vs " << b.did_black_queen_castling_;
+                return false;
+            }
+            if (did_black_king_castling_ != b.did_black_king_castling_)
+            {
+                std::cout << "did_black_king_castling is different " << did_black_king_castling_ << " vs " << b.did_black_king_castling_;
+                return false;
+            }
+            if (current_turn_ != b.current_turn_)
+            {
+                std::cout << "current is different "  << current_turn_ << " vs " << b.current_turn_;
+                return false;
+            }
+            if (turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size() - 1]
+            != b.turns_since_last_piece_taken_or_pawn_moved_[b.turns_since_last_piece_taken_or_pawn_moved_.size() - 1])
+            {
+                std::cout << "turns_since_last_piece_taken_or_pawn_moved_ is different "
+                << turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size() - 1] << " vs "
+                << b.turns_since_last_piece_taken_or_pawn_moved_[b.turns_since_last_piece_taken_or_pawn_moved_.size() - 1];
+                return false;
+            }
+            for (unsigned long i = 0; i < en_passant_target_square_.size(); i++)
+            {
+                if (en_passant_target_square_[i].has_value())
+                {
+                    if (en_passant_target_square_[i].value() != b.en_passant_target_square_[i].value())
+                    {
+                        std::cout << "en passant target suqare are different\n";
+                    }
+                }
+            }
+            return true;
+        }
 
         // constructors 
 
@@ -118,6 +193,7 @@ namespace board {
         bool is_check();
         bool is_checkmate();
         bool is_draw();
+        void undo_move(Move);
         std::optional<Piece>& operator[](Position p);
 
 
