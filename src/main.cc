@@ -12,7 +12,7 @@
 #include "listener.hh"
 #include "pgn/pgn-parser.hh"
 #include "pgn/pgn-exception.hh"
-#include "unitaryTest.hh"
+#include "unitary-test.hh"
 
 //board::Chessboard myBoard();
 
