@@ -22,8 +22,10 @@ namespace board
                 }
             }
         }
-        for (auto fen : fenArray)
+        for (auto fen : fen_array)
         {
+            if (fen == "Fen strings here")
+                break;
             Chessboard board(fen);
             auto legals_moves = board.generate_legal_moves(true);
             for (auto moves : legals_moves)

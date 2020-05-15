@@ -71,6 +71,6 @@ namespace board {
             return false;
         }
         char brd[8][8];
-        std::string fenArray[1] = {"Fen strings here"};
+        std::string fen_array[1] = {"Fen strings here"};
     };
 }
