@@ -12,6 +12,7 @@
 #include "listener.hh"
 #include "pgn/pgn-parser.hh"
 #include "pgn/pgn-exception.hh"
+#include "unitary-test.hh"
 
 //board::Chessboard myBoard();
 
@@ -28,6 +29,7 @@ int main(int argc, const char *argv[]) {
         ("listeners,l", po::value<std::vector<std::string>>()->multitoken(), "plugs in provided listeners")
         ("evaluate", po::value<std::string>(), "evaluates moves for given fen-represented board.")
         ("perft", po::value<std::string>(), "runs provided Perft on our chessengine and output the amount of moves we were able to generate.")
+        ("unit-test","run unitary-test undo move")
         ("debug", "activates debugging/testing output for some features")
         ;
     
@@ -39,7 +41,11 @@ int main(int argc, const char *argv[]) {
         std::cout << options << "\n";
         return 1;
     }
-
+    if (variables.count("unit-test"))
+    {
+        auto UT = board::UnitaryTest();
+        return UT.Controller();
+    }
     auto listenerManager = listener::ListenerManager();
     if (variables.count("listeners")) {
         listenerManager.load_plugins(variables["listeners"].as<std::vector<std::string>>());

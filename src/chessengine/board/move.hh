@@ -53,5 +53,6 @@ namespace board
         void set_double_pawn_push();
         void set_king_castling();
         void set_queen_castling();
+
     };
 }
