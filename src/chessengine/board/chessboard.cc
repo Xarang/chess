@@ -15,7 +15,6 @@ namespace board {
 
         //handle capture (+ special behaviour for en-passant)
         if (move.is_capture_) {
-            last_piece_capture.push_back((*this)[move.end_position_].value());
             if (!move.is_en_passant_) {
                 remove_piece((*this)[move.end_position_].value());
             } else {
@@ -388,6 +387,7 @@ namespace board {
         assert(std::find(pieces_.begin(), pieces_.end(), p) != pieces_.end() && "queried piece not in piece list");
         auto piece_it = std::find(pieces_.begin(), pieces_.end(), p);
         pieces_.erase(piece_it);
+        last_piece_capture.push_back((*this)[p.position_].value());
         (*this)[p.position_] = std::nullopt;
         turns_since_last_piece_taken_or_pawn_moved_.push_back(0);
 

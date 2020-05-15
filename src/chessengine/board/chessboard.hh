@@ -77,7 +77,7 @@ namespace board {
                 }
             }
             for (auto elt : pieces_) {
-                if (find(pieces_.begin(), pieces_.end(), elt) == pieces_.end()) {
+                if (find(b.pieces_.begin(), b.pieces_.end(), elt) == b.pieces_.end()) {
                     return false;
                 }
             }
@@ -117,6 +117,16 @@ namespace board {
                 << turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size() - 1] << " vs "
                 << b.turns_since_last_piece_taken_or_pawn_moved_[b.turns_since_last_piece_taken_or_pawn_moved_.size() - 1];
                 return false;
+            }
+            for (unsigned long i = 0; i < en_passant_target_square_.size(); i++)
+            {
+                if (en_passant_target_square_[i].has_value())
+                {
+                    if (en_passant_target_square_[i].value() != b.en_passant_target_square_[i].value())
+                    {
+                        std::cout << "en passant target suqare are different\n";
+                    }
+                }
             }
             return true;
         }
