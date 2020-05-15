@@ -47,11 +47,6 @@ namespace board {
         unsigned int turns_since_last_piece_taken_or_pawn_moved_ = 0;
 
         std::optional<Position> en_passant_target_square_ = std::nullopt;
-        
-        //map containing hashed representations of all boards since start (to_string'ed)
-        //if a key has 3 values it means the '3 fold' rule applies and the game is a draw
-        std::unordered_map<std::string, int> all_boards_since_start_ = std::unordered_map<std::string, int>();
-
 
         //these 3 methods are used by do_move
         void remove_piece(const Piece& p);
@@ -66,47 +61,46 @@ namespace board {
         //default constructor
         Chessboard() {
                 //White Pawns
-                pieces_.push_back(Piece(Position(File::A, Rank::TWO), Color::WHITE, PieceType::PAWN));
-                pieces_.push_back(Piece(Position(File::B, Rank::TWO), Color::WHITE, PieceType::PAWN));
-                pieces_.push_back(Piece(Position(File::C, Rank::TWO), Color::WHITE, PieceType::PAWN));
-                pieces_.push_back(Piece(Position(File::D, Rank::TWO), Color::WHITE, PieceType::PAWN));
-                pieces_.push_back(Piece(Position(File::E, Rank::TWO), Color::WHITE, PieceType::PAWN));
-                pieces_.push_back(Piece(Position(File::F, Rank::TWO), Color::WHITE, PieceType::PAWN));
-                pieces_.push_back(Piece(Position(File::G, Rank::TWO), Color::WHITE, PieceType::PAWN));
-                pieces_.push_back(Piece(Position(File::H, Rank::TWO), Color::WHITE, PieceType::PAWN));
+                pieces_.emplace_back(Piece(Position(File::A, Rank::TWO), Color::WHITE, PieceType::PAWN));
+                pieces_.emplace_back(Piece(Position(File::B, Rank::TWO), Color::WHITE, PieceType::PAWN));
+                pieces_.emplace_back(Piece(Position(File::C, Rank::TWO), Color::WHITE, PieceType::PAWN));
+                pieces_.emplace_back(Piece(Position(File::D, Rank::TWO), Color::WHITE, PieceType::PAWN));
+                pieces_.emplace_back(Piece(Position(File::E, Rank::TWO), Color::WHITE, PieceType::PAWN));
+                pieces_.emplace_back(Piece(Position(File::F, Rank::TWO), Color::WHITE, PieceType::PAWN));
+                pieces_.emplace_back(Piece(Position(File::G, Rank::TWO), Color::WHITE, PieceType::PAWN));
+                pieces_.emplace_back(Piece(Position(File::H, Rank::TWO), Color::WHITE, PieceType::PAWN));
                 //White Specials
-                pieces_.push_back(Piece(Position(File::A, Rank::ONE), Color::WHITE, PieceType::ROOK));
-                pieces_.push_back(Piece(Position(File::B, Rank::ONE), Color::WHITE, PieceType::KNIGHT));
-                pieces_.push_back(Piece(Position(File::C, Rank::ONE), Color::WHITE, PieceType::BISHOP));
-                pieces_.push_back(Piece(Position(File::D, Rank::ONE), Color::WHITE, PieceType::QUEEN));
-                pieces_.push_back(Piece(Position(File::E, Rank::ONE), Color::WHITE, PieceType::KING));
-                pieces_.push_back(Piece(Position(File::F, Rank::ONE), Color::WHITE, PieceType::BISHOP));
-                pieces_.push_back(Piece(Position(File::G, Rank::ONE), Color::WHITE, PieceType::KNIGHT));
-                pieces_.push_back(Piece(Position(File::H, Rank::ONE), Color::WHITE, PieceType::ROOK));
+                pieces_.emplace_back(Piece(Position(File::A, Rank::ONE), Color::WHITE, PieceType::ROOK));
+                pieces_.emplace_back(Piece(Position(File::B, Rank::ONE), Color::WHITE, PieceType::KNIGHT));
+                pieces_.emplace_back(Piece(Position(File::C, Rank::ONE), Color::WHITE, PieceType::BISHOP));
+                pieces_.emplace_back(Piece(Position(File::D, Rank::ONE), Color::WHITE, PieceType::QUEEN));
+                pieces_.emplace_back(Piece(Position(File::E, Rank::ONE), Color::WHITE, PieceType::KING));
+                pieces_.emplace_back(Piece(Position(File::F, Rank::ONE), Color::WHITE, PieceType::BISHOP));
+                pieces_.emplace_back(Piece(Position(File::G, Rank::ONE), Color::WHITE, PieceType::KNIGHT));
+                pieces_.emplace_back(Piece(Position(File::H, Rank::ONE), Color::WHITE, PieceType::ROOK));
                 //Black Pawns
-                pieces_.push_back(Piece(Position(File::A, Rank::SEVEN), Color::BLACK, PieceType::PAWN));
-                pieces_.push_back(Piece(Position(File::B, Rank::SEVEN), Color::BLACK, PieceType::PAWN));
-                pieces_.push_back(Piece(Position(File::C, Rank::SEVEN), Color::BLACK, PieceType::PAWN));
-                pieces_.push_back(Piece(Position(File::D, Rank::SEVEN), Color::BLACK, PieceType::PAWN));
-                pieces_.push_back(Piece(Position(File::E, Rank::SEVEN), Color::BLACK, PieceType::PAWN));
-                pieces_.push_back(Piece(Position(File::F, Rank::SEVEN), Color::BLACK, PieceType::PAWN));
-                pieces_.push_back(Piece(Position(File::G, Rank::SEVEN), Color::BLACK, PieceType::PAWN));
-                pieces_.push_back(Piece(Position(File::H, Rank::SEVEN), Color::BLACK, PieceType::PAWN));
+                pieces_.emplace_back(Piece(Position(File::A, Rank::SEVEN), Color::BLACK, PieceType::PAWN));
+                pieces_.emplace_back(Piece(Position(File::B, Rank::SEVEN), Color::BLACK, PieceType::PAWN));
+                pieces_.emplace_back(Piece(Position(File::C, Rank::SEVEN), Color::BLACK, PieceType::PAWN));
+                pieces_.emplace_back(Piece(Position(File::D, Rank::SEVEN), Color::BLACK, PieceType::PAWN));
+                pieces_.emplace_back(Piece(Position(File::E, Rank::SEVEN), Color::BLACK, PieceType::PAWN));
+                pieces_.emplace_back(Piece(Position(File::F, Rank::SEVEN), Color::BLACK, PieceType::PAWN));
+                pieces_.emplace_back(Piece(Position(File::G, Rank::SEVEN), Color::BLACK, PieceType::PAWN));
+                pieces_.emplace_back(Piece(Position(File::H, Rank::SEVEN), Color::BLACK, PieceType::PAWN));
                 //Black Specials
-                pieces_.push_back(Piece(Position(File::A, Rank::EIGHT), Color::BLACK, PieceType::ROOK));
-                pieces_.push_back(Piece(Position(File::B, Rank::EIGHT), Color::BLACK, PieceType::KNIGHT));
-                pieces_.push_back(Piece(Position(File::C, Rank::EIGHT), Color::BLACK, PieceType::BISHOP));
-                pieces_.push_back(Piece(Position(File::D, Rank::EIGHT), Color::BLACK, PieceType::QUEEN));
-                pieces_.push_back(Piece(Position(File::E, Rank::EIGHT), Color::BLACK, PieceType::KING));
-                pieces_.push_back(Piece(Position(File::F, Rank::EIGHT), Color::BLACK, PieceType::BISHOP));
-                pieces_.push_back(Piece(Position(File::G, Rank::EIGHT), Color::BLACK, PieceType::KNIGHT));
-                pieces_.push_back(Piece(Position(File::H, Rank::EIGHT), Color::BLACK, PieceType::ROOK));
+                pieces_.emplace_back(Piece(Position(File::A, Rank::EIGHT), Color::BLACK, PieceType::ROOK));
+                pieces_.emplace_back(Piece(Position(File::B, Rank::EIGHT), Color::BLACK, PieceType::KNIGHT));
+                pieces_.emplace_back(Piece(Position(File::C, Rank::EIGHT), Color::BLACK, PieceType::BISHOP));
+                pieces_.emplace_back(Piece(Position(File::D, Rank::EIGHT), Color::BLACK, PieceType::QUEEN));
+                pieces_.emplace_back(Piece(Position(File::E, Rank::EIGHT), Color::BLACK, PieceType::KING));
+                pieces_.emplace_back(Piece(Position(File::F, Rank::EIGHT), Color::BLACK, PieceType::BISHOP));
+                pieces_.emplace_back(Piece(Position(File::G, Rank::EIGHT), Color::BLACK, PieceType::KNIGHT));
+                pieces_.emplace_back(Piece(Position(File::H, Rank::EIGHT), Color::BLACK, PieceType::ROOK));
 
                 //fill the initial matrix
                 for (Piece piece : pieces_) {
                     (*this)[Position(piece.position_.file_get(), piece.position_.rank_get())] = piece;
                 }
-                all_boards_since_start_.insert(std::pair<std::string, int>(to_string(), 1));
         }
 
         //copy constructor (overloaded for assertions)

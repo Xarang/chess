@@ -18,6 +18,8 @@ namespace listener {
             std::optional<board::Chessboard> board_;
             std::optional<board::ChessboardInterfaceImpl> interface_;
 
+            std::unordered_map<std::string, int> all_boards_since_start_ = std::unordered_map<std::string, int>();
+
         public:
             void close_listeners();
             void load_plugins(std::vector<std::string> plugins);

@@ -8,8 +8,6 @@ namespace board {
     void Chessboard::do_move(Move move) {
         current_turn_++;
         turns_since_last_piece_taken_or_pawn_moved_++;
-        //TODO: hash the current state of the board (string ?) and store it inside the all_boards_since_start_ multimap
-
 
         //handle capture (+ special behaviour for en-passant)
         if (move.is_capture_) {
@@ -75,13 +73,7 @@ namespace board {
             promote_piece((*this)[move.end_position_].value(), move.promotion_.value());
         }
 
-        auto fen = to_string();
-        if (all_boards_since_start_.find(fen) != all_boards_since_start_.end()) {
-            all_boards_since_start_.insert_or_assign(fen, all_boards_since_start_.find(fen)->second + 1);
-            //std::cout << fen << " ---> " << all_boards_since_start_.find(fen)->second << "\n";
-        } else {
-            all_boards_since_start_.insert(std::pair<std::string, int>(fen, 1));
-        }
+
         is_white_turn_ = !is_white_turn_;
     }
 
@@ -225,12 +217,6 @@ namespace board {
         {
             return true;
         }
-
-        for (std::pair<std::string, int> pair : all_boards_since_start_) {
-            if (pair.second >= 3) {
-                return true;
-            }
-        }
         return false;
     }
 
@@ -326,13 +312,11 @@ namespace board {
         did_black_queen_castling_ = fields[2].find("q") == fields[2].npos;
         did_white_queen_castling_ = fields[2].find("Q") == fields[2].npos;
 
-        //TODO: add potential en-passant spot
         if (fields[3] != "-") {
             File f = (File)(fields[3].at(0) - 'a');
-            Rank r = (Rank)(fields[3].at(1) - '0' - 1);
+            Rank r = (Rank)(fields[3].at(1) - '1');
             en_passant_target_square_ = std::make_optional<Position>(f, r);
         }
-        all_boards_since_start_.insert(std::pair<std::string, int>(to_string(), 1));
     }
 
     Chessboard Chessboard::parse_uci(std::string uci_position) {

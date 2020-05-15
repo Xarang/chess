@@ -26,6 +26,7 @@ namespace listener {
 
     void ListenerManager::register_board(board::Chessboard& b) {
         board_ = std::make_optional<board::Chessboard>(b);
+        all_boards_since_start_.insert(std::pair<std::string, int>(board_->to_string(), 1));
         interface_ = std::make_optional<board::ChessboardInterfaceImpl>(board_.value());
         for (auto listener : listeners_) {
             listener->register_board(interface_.value());
@@ -65,6 +66,23 @@ namespace listener {
                             }
                             //check current game state for the player that did the move
                             board_->do_move(move); //player 1
+
+
+                            //3 fold rule check
+                            auto fen = board_->to_string();
+                            if (all_boards_since_start_.find(fen) != all_boards_since_start_.end()) {
+                                all_boards_since_start_.insert_or_assign(fen, all_boards_since_start_.find(fen)->second + 1);
+                                //std::cout << fen << " ---> " << all_boards_since_start_.find(fen)->second << "\n";
+                            } else {
+                                all_boards_since_start_.insert(std::pair<std::string, int>(fen, 1));
+                            }
+                            for (std::pair<std::string, int> pair : all_boards_since_start_) {
+                                if (pair.second >= 3) {
+                                    register_game_draw();
+                                    return;
+                                }
+                            }
+
                             //player 2
                             board_->change_turn();
                             //player 1
