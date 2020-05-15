@@ -9,9 +9,8 @@ namespace board {
 
         current_turn_+=1;
         //turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size() - 1]+=1;
-        auto temp = turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size()-1] + 1;
+        auto temp = turns_since_last_piece_taken_or_pawn_moved_.back() + 1;
         turns_since_last_piece_taken_or_pawn_moved_.push_back(temp);
-        //TODO: hash the current state of the board (string ?) and store it inside the all_boards_since_start_ multimap
 
         //handle capture (+ special behaviour for en-passant)
         if (move.is_capture_) {
@@ -19,8 +18,8 @@ namespace board {
                 remove_piece((*this)[move.end_position_].value());
             } else {
                 int direction = whose_turn_is_it() == Color::WHITE ? 1 : -1;
-                auto piece = en_passant_target_square_[en_passant_target_square_.size() - 1];
-                remove_piece((*this)[Position(piece->file_get(), piece->rank_get() - direction)].value());
+                auto target = en_passant_target_square_.back().value();
+                remove_piece((*this)[Position(target.file_get(), target.rank_get() - direction)].value());
             }
         }   
 
@@ -29,7 +28,7 @@ namespace board {
         {
             move_piece((*this)[move.start_position_].value(), move.end_position_);
         } else {
-            move_piece((*this)[move.start_position_].value(), en_passant_target_square_[en_passant_target_square_.size()].value());
+            move_piece((*this)[move.start_position_].value(), en_passant_target_square_.back().value());
         }
 
         if (move.is_king_castling_ || move.is_queen_castling_)
@@ -89,8 +88,8 @@ namespace board {
             || move.end_position_.file_get() == File::OUTOFBOUNDS || move.end_position_.rank_get() == Rank::OUTOFBOUNDS) {
                 return false;
             }
-        if (en_passant_target_square_[en_passant_target_square_.size() - 1].has_value() && move.end_position_ == en_passant_target_square_[en_passant_target_square_.size() - 1].value()
-        && move.is_capture_ && move.piece_ == PieceType::PAWN) {
+        if (en_passant_target_square_.back().has_value() && move.end_position_ == en_passant_target_square_.back().value()
+            && move.is_capture_ && move.piece_ == PieceType::PAWN) {
             //this is the place where en passant moves are flagged are so. no en passant moves should be created before this.
             move.is_en_passant_ = true;
         }
@@ -219,7 +218,7 @@ namespace board {
         {
             return true;
         }
-        if (turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size() - 1] >= 50)
+        if (turns_since_last_piece_taken_or_pawn_moved_.back() >= 50)
         {
             return true;
         }
@@ -320,9 +319,8 @@ namespace board {
 
         if (fields[3] != "-") {
             File f = (File)(fields[3].at(0) - 'a');
-
-            en_passant_target_square_.push_back(std::make_optional<Position>(f, r));
             Rank r = (Rank)(fields[3].at(1) - '1');
+            en_passant_target_square_.push_back(std::make_optional<Position>(f, r));
         }
     }
 
@@ -404,7 +402,7 @@ namespace board {
                 move.is_double_pawn_push_ = true;
                 return move;
             }
-            else if (en_passant_target_square_.has_value() && en_passant_target_square_.value() == end_position && end_position.file_get() != start_position.file_get()) {
+            else if (en_passant_target_square_.back().has_value() && en_passant_target_square_.back().value() == end_position && end_position.file_get() != start_position.file_get()) {
                 move.is_capture_ = true;
                 move.is_en_passant_ = true;
                 return move;
@@ -517,6 +515,7 @@ namespace board {
 
         //Undo en passant (not sure about this)
         en_passant_target_square_.pop_back();
+
         /*int direction = whose_turn_is_it() == Color::WHITE ? +1 : -1;
         en_passant_target_square_ = std::make_optional<Position>(move.start_position_.file_get(), move.start_position_.rank_get() + direction);
 
@@ -532,7 +531,7 @@ namespace board {
 
         if (move.is_capture_) {
             //if (!move.is_en_passant_) {
-                auto piece = last_piece_capture[last_piece_capture.size() - 1];
+                auto piece = last_piece_capture.back();
                 last_piece_capture.pop_back();
                 add_piece(piece);
                 (*this)[move.end_position_] = piece;
@@ -556,6 +555,7 @@ namespace board {
     void Chessboard::add_piece(const std::optional<Piece> p) {
         assert(p.has_value() && "last_piece_capture has no value");
         pieces_.push_back(p.value());
+        (*this)[p->position_] = p;
         turns_since_last_piece_taken_or_pawn_moved_.pop_back();
     }
 
