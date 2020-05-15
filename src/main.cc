@@ -3,7 +3,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
-
+#include <time.h>
 #include <boost/program_options.hpp>
 
 #include "chessengine/board/chessboard.hh"
@@ -34,6 +34,7 @@ int main(int argc, const char *argv[]) {
     po::variables_map variables;
     po::store(po::parse_command_line(argc, argv, options), variables);
     po::notify(variables);
+
 
     if (variables.count("help")) {
         std::cout << options << "\n";
@@ -80,6 +81,7 @@ int main(int argc, const char *argv[]) {
         listenerManager.evaluate_ai();
     }
     else {
+
         listenerManager.run_ai();
     }
 

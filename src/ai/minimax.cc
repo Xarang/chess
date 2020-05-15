@@ -1,6 +1,7 @@
 #include <cmath>
 #include <algorithm>
 #include <limits>
+#include <ctime>
 #include "chessengine/board/position.hh"
 #include "ai/minimax.hh"
 #include "chessengine/board/chessboard.hh"
@@ -93,6 +94,8 @@ namespace ai {
     }
 
     board::Move AI::searchMove(board::Chessboard& myBoard) {
+        double duration;
+        clock_t start = clock();
 
         float bestValue = -INFINITY;
         board::Move bestMove;
@@ -108,6 +111,9 @@ namespace ai {
                 bestMove = move;
             }
         }
+        duration = (clock() - start) / (double) CLOCKS_PER_SEC;
+        std::cerr << "The turn took " << duration << "\n";
+        remaining_time -= duration;
         return bestMove;
     }
 
@@ -158,4 +164,8 @@ namespace ai {
         }
         return res;
     }
+
+    //King Safety Stockfish
+    //int AI::KingSafety
+
 }
