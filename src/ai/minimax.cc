@@ -18,12 +18,18 @@ namespace ai {
                 //Individual piece value
                 res += material_values[piece.type_];
                 //Piece's positional value
-                res += (*table_values[piece.type_])[(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
+                if (color_ == board::Color::WHITE)
+                    res += (*table_valuesWhite[piece.type_])[(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
+                else
+                    res += (*table_valuesBlack[piece.type_])[(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
             }
             else
             {
                 res -= material_values[piece.type_];
-                res -= (*table_values[piece.type_])[(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
+                if (color_ == board::Color::WHITE)
+                    res -= (*table_valuesWhite[piece.type_])[(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
+                else
+                    res -= (*table_valuesBlack[piece.type_])[(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
             }
         }
         return res;
