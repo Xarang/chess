@@ -81,7 +81,7 @@ def run_perft_file(path_chessengine, path_listener, path_perft):
                     for move in chessengine_moves:
                         if move not in python_moves:
                             print(board + " engine got move: " + move + " whereas python did not")
-            cprint(path_perft + " failure...", "orange")
+            cprint(path_perft + " failure...", "red")
         else:
             time_end = time.time()
             cprint(path_perft + " python and chess engine got the same perft results. Hurray ! computation took: " + str(time_end - time_start) + " seconds", "green")

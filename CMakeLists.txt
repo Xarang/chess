@@ -35,6 +35,9 @@ set(LIBRARIES Boost::system Boost::program_options ${CMAKE_DL_LIBS})
 set(SRC
     src/chessengine/board/chessboard-interface-impl.cc
     src/chessengine/board/chessboard.cc
+    src/chessengine/board/chessboard-uci.cc
+    src/chessengine/board/chessboard-do.cc
+    src/chessengine/board/chessboard-undo.cc
     src/chessengine/board/color.cc
     src/chessengine/board/move-builder.cc
     src/chessengine/board/move-legality-checker.cc
@@ -48,7 +51,7 @@ set(SRC
     src/unitary-test.cc
     src/ai/uci.cc
     src/ai/minimax.cc
-      )
+         )
 
 include_directories(
     src/

@@ -6,3 +6,4 @@ env/
 idea/
 *.pgn
 __pycache__/
+cmake-build-debug/

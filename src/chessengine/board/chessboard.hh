@@ -67,70 +67,6 @@ namespace board {
 
         public:
 
-        bool operator==(Chessboard b) {
-            for (int i = 0; i < 8; i++) {
-                for (int j = 0; j < 8; j++) {
-                    if (!(board_(i, j) == b.board_(i, j))) {
-                        std::cout << "the elt at " << i << " " << j << " is different\n";
-                        return false;
-                    }
-                }
-            }
-            for (auto elt : pieces_) {
-                if (find(b.pieces_.begin(), b.pieces_.end(), elt) == b.pieces_.end()) {
-                    return false;
-                }
-            }
-            if (is_white_turn_ != b.is_white_turn_) {
-                std::cout << "Is_whit_turn is different " << is_white_turn_ << " vs " << b.is_white_turn_;
-                return false;
-            }
-            if (did_white_queen_castling_ != b.did_white_queen_castling_)
-            {
-                std::cout << "did_white_queen_castling is different " << did_white_queen_castling_ << " vs " << b.did_white_queen_castling_;
-                return false;
-            }
-            if (did_white_king_castling_ != b.did_white_king_castling_)
-            {
-                std::cout << "did_white_king_castling is different " << did_white_king_castling_ << " vs " << b.did_white_king_castling_;
-                return false;
-            }
-            if (did_black_queen_castling_ != b.did_black_queen_castling_)
-            {
-                std::cout << "did_black_queen_castling is different " << did_black_queen_castling_ << " vs " << b.did_black_queen_castling_;
-                return false;
-            }
-            if (did_black_king_castling_ != b.did_black_king_castling_)
-            {
-                std::cout << "did_black_king_castling is different " << did_black_king_castling_ << " vs " << b.did_black_king_castling_;
-                return false;
-            }
-            if (current_turn_ != b.current_turn_)
-            {
-                std::cout << "current is different "  << current_turn_ << " vs " << b.current_turn_;
-                return false;
-            }
-            if (turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size() - 1]
-            != b.turns_since_last_piece_taken_or_pawn_moved_[b.turns_since_last_piece_taken_or_pawn_moved_.size() - 1])
-            {
-                std::cout << "turns_since_last_piece_taken_or_pawn_moved_ is different "
-                << turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size() - 1] << " vs "
-                << b.turns_since_last_piece_taken_or_pawn_moved_[b.turns_since_last_piece_taken_or_pawn_moved_.size() - 1];
-                return false;
-            }
-            for (unsigned long i = 0; i < en_passant_target_square_.size(); i++)
-            {
-                if (en_passant_target_square_[i].has_value())
-                {
-                    if (en_passant_target_square_[i].value() != b.en_passant_target_square_[i].value())
-                    {
-                        std::cout << "en passant target suqare are different\n";
-                    }
-                }
-            }
-            return true;
-        }
-
         // constructors 
 
         //default constructor
@@ -183,7 +119,7 @@ namespace board {
 
         //FEN string based constructor
         Chessboard(std::string fen_string);
-
+        bool operator==(Chessboard b);
 
         Move parse_uci_move(std::string uci_move);
         static Chessboard parse_uci(std::string uci_position);
