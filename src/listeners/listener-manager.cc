@@ -170,15 +170,15 @@ namespace listener {
 
             auto board = board::Chessboard::parse_uci(board_str);
 
-            /*
             f.open("chess_debug", std::ios::out | std::ios::app);
             f << "playing : " << (board.whose_turn_is_it() == board::Color::WHITE ? "whites" : "blacks") << std::endl;
             f.close();
-            */
             //ai get best move for board;
             //auto moves = board_->generate_legal_moves();
 
             std::string move;
+
+            chess_ai.color_ = board.whose_turn_is_it();
 
             auto next_opening_move = chess_ai.get_next_opening_move(board.whose_turn_is_it());
             if (!next_opening_move.empty()) {
