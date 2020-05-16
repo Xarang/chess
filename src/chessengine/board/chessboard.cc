@@ -148,11 +148,14 @@ namespace board {
         std::list<Move> allMoves;
  
         //build the list of all "potential" moves, not accounting for OOB and blocked paths
-        for (auto piece : pieces_) {
-            if (piece.color_ == whose_turn_is_it()) {
-                std::list<Move> pieceMoves = piece.getAllPotentialMoves();
-                for (auto move : pieceMoves) {
-                    allMoves.push_front(move);
+        for (auto vector : pieces_) {
+            if (vector.first.first == whose_turn_is_it()) {
+                for (auto piece : vector.second)
+                {
+                    std::list<Move> pieceMoves = piece.getAllPotentialMoves();
+                    for (auto move : pieceMoves) {
+                        allMoves.push_front(move);
+                }
                 }
             }
         }
@@ -176,15 +179,11 @@ namespace board {
 
         File king_file = File::OUTOFBOUNDS;
         Rank king_rank = Rank::OUTOFBOUNDS;
-        for (auto piece : pieces_)
-        {
-            if (piece.type_ == PieceType::KING && piece.color_ == whose_turn_is_it())
-            {
-                king_file = piece.position_.file_get();
-                king_rank = piece.position_.rank_get();
-                break;
-            }
-        }
+        auto king = pieces_.find(std::make_pair(whose_turn_is_it(), PieceType::KING));
+        assert(king != pieces_.end() && "No king in the map");
+        assert(king->second.size() != 0 && "No king in the map");
+        king_file = king->second[0].position_.file_get();
+        king_rank = king->second[0].position_.rank_get();
 
         for (auto move : opponent_moves)
         {
@@ -310,14 +309,25 @@ namespace board {
                     fileIndex += (int)*it - '0';
                 }
                 else {
-                    pieces_.push_back(Piece(Position((File)fileIndex, (Rank)rankIndex), islower(*it) ? Color::BLACK : Color::WHITE, char_to_piece(toupper(*it))));
+                    auto p = Piece(Position((File)fileIndex, (Rank)rankIndex), islower(*it) ? Color::BLACK : Color::WHITE, char_to_piece(toupper(*it)));
+                    auto pair = std::make_pair(p.color_, p.type_);
+                    auto temp = pieces_.find(pair);
+                    if (temp == pieces_.end())
+                    {
+                        pieces_.insert({pair, {p}});
+                    } else {
+                        temp->second.push_back(p);
+                        pieces_[pair] = temp->second;
+                    }
                     fileIndex++;
                 }
             }
             rankIndex--;
         }
-        for (auto piece : pieces_) {
-            (*this)[piece.position_] = piece;
+        for (auto vector : pieces_) {
+            for (auto piece : vector.second) {
+                (*this)[piece.position_] = piece;
+            }
         }
 
         //parse informations regarding the current state of the game
@@ -384,21 +394,27 @@ namespace board {
     //heavily asserted for now, to make sure they do what we want them to do
 
     void Chessboard::remove_piece(const Piece& p) {
-        assert(std::find(pieces_.begin(), pieces_.end(), p) != pieces_.end() && "queried piece not in piece list");
-        auto piece_it = std::find(pieces_.begin(), pieces_.end(), p);
-        pieces_.erase(piece_it);
+        auto temp = pieces_.find(std::make_pair(p.color_, p.type_));
+        assert(temp != pieces_.end());
+        auto pieces = temp->second;
+        assert(std::find(pieces.begin(), pieces.end(), p) != pieces.end() && "queried piece not in piece list");
+        auto piece_it = std::find(pieces.begin(), pieces.end(), p);
+        pieces.erase(piece_it);
         last_piece_capture.push_back((*this)[p.position_].value());
         (*this)[p.position_] = std::nullopt;
         turns_since_last_piece_taken_or_pawn_moved_.push_back(0);
-
+        pieces_[std::make_pair(p.color_, p.type_)] = pieces;
         //make sure this did what we want
         assert(std::find(pieces_.begin(), pieces_.end(), p) == pieces_.end());
     }
 
     void Chessboard::move_piece(const Piece& p, Position new_position) {
-        assert(std::find(pieces_.begin(), pieces_.end(), p) != pieces_.end() && "queried piece not in piece list");
+        auto temp = pieces_.find(std::make_pair(p.color_, p.type_));
+        assert(temp != pieces_.end());
+        auto pieces = temp->second;
+        assert(std::find(pieces.begin(), pieces.end(), p) != pieces.end() && "queried piece not in piece list");
         //std::cout << "move piece from position " << p.position_.to_string() << " to position " << new_position.to_string() << "\n";
-        auto piece_it = std::find(pieces_.begin(), pieces_.end(), p);
+        auto piece_it = std::find(pieces.begin(), pieces.end(), p);
         assert(*piece_it == p && "fetched piece is not equal to the queried piece");
         piece_it->has_already_moved_ = true;
         piece_it->position_ = new_position;
@@ -410,23 +426,27 @@ namespace board {
         if (p.type_ == PieceType::PAWN) {
             turns_since_last_piece_taken_or_pawn_moved_.push_back(0);
         }
-        
+        pieces_[std::make_pair(p.color_, p.type_)] = pieces;
         //make sure this did what we want
         assert((*this)[new_position] == *piece_it);
         assert((*this)[new_position]->type_ == p.type_);
         assert((*this)[new_position]->position_ != p.position_);
         assert((*this)[new_position]->color_ == p.color_);
+
     }
 
     void Chessboard::promote_piece(const Piece& p, PieceType new_type) {
-        assert(std::find(pieces_.begin(), pieces_.end(), p) != pieces_.end() && "queried piece not in piece list");
-        auto piece_it = std::find(pieces_.begin(), pieces_.end(), p);
+        auto temp = pieces_.find(std::make_pair(p.color_, p.type_));
+        assert(temp != pieces_.end());
+        auto pieces = temp->second;
+        assert(std::find(pieces.begin(), pieces.end(), p) != pieces.end() && "queried piece not in piece list");
+        auto piece_it = std::find(pieces.begin(), pieces.end(), p);
         piece_it->type_ = new_type;
         (*this)[piece_it->position_] = std::make_optional<Piece>(*piece_it);
-        
-        assert(std::find(pieces_.begin(), pieces_.end(), p)->type_ == new_type && "promotion did not take effect in piece list");
+        pieces_[std::make_pair(p.color_, p.type_)] = pieces;
+        assert(std::find(pieces.begin(), pieces.end(), p)->type_ == new_type && "promotion did not take effect in piece list");
         assert((*this)[p.position_]->type_ == new_type && "promotion did not take effect in piece list");
-        assert(*std::find(pieces_.begin(), pieces_.end(), p) == (*this)[p.position_].value());
+        assert(*std::find(pieces.begin(), pieces.end(), p) == (*this)[p.position_].value());
     }
 
     void Chessboard::undo_move(Move move) {
@@ -508,16 +528,24 @@ namespace board {
         is_white_turn_ = !is_white_turn_;
     }
 
-    void Chessboard::add_piece(const std::optional<Piece> p) {
-        assert(p.has_value() && "last_piece_capture has no value");
-        pieces_.push_back(p.value());
+    void Chessboard::add_piece(const std::optional<Piece> pi) {
+        assert(pi.has_value() && "last_piece_capture has no value");
+        auto p = pi.value();
+        auto temp = pieces_.find(std::make_pair(p.color_, p.type_));
+        assert(temp != pieces_.end());
+        auto pieces = temp->second;
+        pieces.push_back(p);
+        pieces_[std::make_pair(p.color_, p.type_)] = pieces;
         turns_since_last_piece_taken_or_pawn_moved_.pop_back();
     }
 
     void Chessboard::undo_move_piece(const Piece &p, Position old_position) {
-        assert(std::find(pieces_.begin(), pieces_.end(), p) != pieces_.end() && "queried piece not in piece list");
+        auto temp = pieces_.find(std::make_pair(p.color_, p.type_));
+        assert(temp != pieces_.end());
+        auto pieces = temp->second;
+        assert(std::find(pieces.begin(), pieces.end(), p) != pieces.end() && "queried piece not in piece list");
         //std::cout << "move piece from position " << p.position_.to_string() << " to position " << new_position.to_string() << "\n";
-        auto piece_it = std::find(pieces_.begin(), pieces_.end(), p);
+        auto piece_it = std::find(pieces.begin(), pieces.end(), p);
         assert(*piece_it == p && "fetched piece is not equal to the queried piece");
         piece_it->has_already_moved_ = false;
         piece_it->position_ = old_position;
@@ -529,22 +557,28 @@ namespace board {
         if (p.type_ == PieceType::PAWN) {
             turns_since_last_piece_taken_or_pawn_moved_.pop_back();
         }
-
+        pieces_[std::make_pair(p.color_, p.type_)] = pieces;
         //make sure this did what we want
         assert((*this)[old_position] == *piece_it);
         assert((*this)[old_position]->type_ == p.type_);
         assert((*this)[old_position]->position_ != p.position_);
         assert((*this)[old_position]->color_ == p.color_);
+
     }
 
     void Chessboard::undo_promote_piece(const Piece& p, PieceType new_type) {
-        assert(std::find(pieces_.begin(), pieces_.end(), p) != pieces_.end() && "queried piece not in piece list");
-        auto piece_it = std::find(pieces_.begin(), pieces_.end(), p);
+        auto temp = pieces_.find(std::make_pair(p.color_, p.type_));
+        assert(temp != pieces_.end());
+        auto pieces = temp->second;
+        assert(std::find(pieces.begin(), pieces.end(), p) != pieces.end() && "queried piece not in piece list");
+        auto piece_it = std::find(pieces.begin(), pieces.end(), p);
         piece_it->type_ = new_type;
         (*this)[piece_it->position_] = std::make_optional<Piece>(*piece_it);
 
-        assert(std::find(pieces_.begin(), pieces_.end(), p)->type_ == new_type && "promotion did not take effect in piece list");
+        pieces_[std::make_pair(p.color_, p.type_)] = pieces;
+        assert(std::find(pieces.begin(), pieces.end(), p)->type_ == new_type && "promotion did not take effect in piece list");
         assert((*this)[p.position_]->type_ == new_type && "promotion did not take effect in piece list");
-        assert(*std::find(pieces_.begin(), pieces_.end(), p) == (*this)[p.position_].value());
+        assert(*std::find(pieces.begin(), pieces.end(), p) == (*this)[p.position_].value());
+
     }
 }
