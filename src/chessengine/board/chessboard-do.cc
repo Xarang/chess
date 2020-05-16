@@ -89,18 +89,12 @@ namespace board {
         is_white_turn_ = !is_white_turn_;
     }
 
-    //used in undo operations only
-    void Chessboard::add_piece(const std::optional<Piece> p) {
-        assert(p.has_value() && "last_pieces_captured_ has no value");
-        pieces_.push_back(p.value());
-        (*this)[p->position_] = p;
-    }
+
 
     void Chessboard::move_piece(const Piece &p, Position new_position) {
-        assert(std::find(pieces_.begin(), pieces_.end(), p) != pieces_.end() && "queried piece not in piece list");
-        //std::cout << "move piece from position " << p.position_.to_string() << " to position " << new_position.to_string() << "\n";
-        auto piece_it = std::find(pieces_.begin(), pieces_.end(), p);
-        assert(*piece_it == p && "fetched piece is not equal to the queried piece");
+        std::vector<Piece>& piece_set = pieces_[{p.type_, p.color_}];
+        auto piece_it = std::find(piece_set.begin(), piece_set.end(), p);
+        assert(piece_it != piece_set.end() && "queried piece not in piece list");
         piece_it->has_already_moved_ = true;
         piece_it->position_ = new_position;
 
@@ -117,27 +111,29 @@ namespace board {
     }
 
     void Chessboard::promote_piece(const Piece &p, PieceType new_type) {
-        assert(std::find(pieces_.begin(), pieces_.end(), p) != pieces_.end() && "queried piece not in piece list");
-        auto piece_it = std::find(pieces_.begin(), pieces_.end(), p);
+        std::vector<Piece>& piece_set = pieces_[{p.type_, p.color_}];
+        auto piece_it = std::find(piece_set.begin(), piece_set.end(), p);
+        assert(piece_it != piece_set.end() && "queried piece not in piece list");
         piece_it->type_ = new_type;
         (*this)[piece_it->position_] = std::make_optional<Piece>(*piece_it);
 
-        assert(std::find(pieces_.begin(), pieces_.end(), p)->type_ == new_type &&
+        assert(std::find(piece_set.begin(), piece_set.end(), p)->type_ == new_type &&
                "promotion did not take effect in piece list");
         assert((*this)[p.position_]->type_ == new_type && "promotion did not take effect in piece list");
-        assert(*std::find(pieces_.begin(), pieces_.end(), p) == (*this)[p.position_].value());
+        assert(*std::find(piece_set.begin(), piece_set.end(), p) == (*this)[p.position_].value());
     }
 
     void Chessboard::remove_piece(const Piece &p) {
-        assert(std::find(pieces_.begin(), pieces_.end(), p) != pieces_.end() && "queried piece not in piece list");
-        auto piece_it = std::find(pieces_.begin(), pieces_.end(), p);
-        pieces_.erase(piece_it);
+        std::vector<Piece>& piece_set = pieces_[{p.type_, p.color_}];
+        auto piece_it = std::find(piece_set.begin(), piece_set.end(), p);
+        assert(piece_it != piece_set.end() && "queried piece not in piece list");
+        piece_set.erase(piece_it);
         last_pieces_captured_.push_back((*this)[p.position_].value());
         (*this)[p.position_] = std::nullopt;
 
 
         //make sure this did what we want
-        assert(std::find(pieces_.begin(), pieces_.end(), p) == pieces_.end());
+        assert(std::find(piece_set.begin(), piece_set.end(), p) == piece_set.end());
     }
 
 }

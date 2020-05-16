@@ -7,8 +7,8 @@
 namespace board {
 
     void Chessboard::undo_move(Move move) {
-        assert(past_moves_halfmove_clocks_.size() >= 1);
-        assert(past_moves_en_passant_target_squares_.size() >= 1);
+        assert(!past_moves_halfmove_clocks_.empty());
+        assert(!past_moves_en_passant_target_squares_.empty());
 
         current_turn_ -= 1;
 
@@ -60,17 +60,23 @@ namespace board {
             //if (!move.is_en_passant_) {
             auto piece = last_pieces_captured_.back();
             last_pieces_captured_.pop_back();
-            add_piece(piece);
+            undo_remove_piece(piece);
             (*this)[move.end_position_] = piece;
         }
 
         is_white_turn_ = !is_white_turn_;
     }
 
+    void Chessboard::undo_remove_piece(std::optional<Piece> p) {
+        assert(p.has_value() && "last_pieces_captured_ has no value");
+        pieces_[{p->type_, p->color_}].push_back(p.value());
+        (*this)[p->position_] = p;
+    }
+
     void Chessboard::undo_move_piece(const Piece &p, Position old_position) {
-        assert(std::find(pieces_.begin(), pieces_.end(), p) != pieces_.end() && "queried piece not in piece list");
-        //std::cout << "move piece from position " << p.position_.to_string() << " to position " << new_position.to_string() << "\n";
-        auto piece_it = std::find(pieces_.begin(), pieces_.end(), p);
+        std::vector<Piece>& piece_set = pieces_[{p.type_, p.color_}];
+        auto piece_it = std::find(piece_set.begin(), piece_set.end(), p);
+        assert(piece_it != piece_set.end() && "queried piece not in piece list");
         assert(*piece_it == p && "fetched piece is not equal to the queried piece");
         auto fen = p.to_char_fen();
         piece_it->has_already_moved_ = std::find(initial_positions[fen].begin(), initial_positions[fen].end(), old_position) == initial_positions[fen].end();
@@ -88,15 +94,16 @@ namespace board {
     }
 
     void Chessboard::undo_promote_piece(const Piece &p, PieceType new_type) {
-        assert(std::find(pieces_.begin(), pieces_.end(), p) != pieces_.end() && "queried piece not in piece list");
-        auto piece_it = std::find(pieces_.begin(), pieces_.end(), p);
+        std::vector<Piece>& piece_set = pieces_[{p.type_, p.color_}];
+        auto piece_it = std::find(piece_set.begin(), piece_set.end(), p);
+        assert(piece_it != piece_set.end() && "queried piece not in piece list");
         piece_it->type_ = new_type;
         (*this)[piece_it->position_] = std::make_optional<Piece>(*piece_it);
 
-        assert(std::find(pieces_.begin(), pieces_.end(), p)->type_ == new_type &&
+        assert(std::find(piece_set.begin(), piece_set.end(), p)->type_ == new_type &&
                "promotion did not take effect in piece list");
         assert((*this)[p.position_]->type_ == new_type && "promotion did not take effect in piece list");
-        assert(*std::find(pieces_.begin(), pieces_.end(), p) == (*this)[p.position_].value());
+        assert(*std::find(piece_set.begin(), piece_set.end(), p) == (*this)[p.position_].value());
     }
 
 }

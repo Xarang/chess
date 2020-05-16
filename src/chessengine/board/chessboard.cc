@@ -65,14 +65,17 @@ namespace board {
         std::list<Move> allMoves;
 
         //build the list of all "potential" moves, not accounting for OOB and blocked paths
-        for (auto piece : pieces_) {
-            if (piece.color_ == whose_turn_is_it()) {
-                std::list<Move> pieceMoves = piece.getAllPotentialMoves();
-                for (auto move : pieceMoves) {
-                    allMoves.push_front(move);
+        for (auto piece_set : pieces_) {
+            for (auto piece : piece_set.second) {
+                if (piece.color_ == whose_turn_is_it()) {
+                    std::list<Move> pieceMoves = piece.getAllPotentialMoves();
+                    for (auto move : pieceMoves) {
+                        allMoves.push_front(move);
+                    }
                 }
             }
         }
+
         allMoves.remove_if([this, check_self_check](Move &m) { return !this->is_move_legal(m, check_self_check); });
         return allMoves;
     }
@@ -92,19 +95,11 @@ namespace board {
                 false); //this false means that this call to generate_legal_moves will not check for check itself (since the other player has initiative anyway)
         change_turn();
 
-        File king_file = File::OUTOFBOUNDS;
-        Rank king_rank = Rank::OUTOFBOUNDS;
-        for (auto piece : pieces_) {
-            if (piece.type_ == PieceType::KING && piece.color_ == whose_turn_is_it()) {
-                king_file = piece.position_.file_get();
-                king_rank = piece.position_.rank_get();
-                break;
-            }
-        }
+        auto king = pieces_[{PieceType::KING, whose_turn_is_it()}].front();
 
         for (auto move : opponent_moves) {
-            if (move.end_position_.file_get() == king_file &&
-                move.end_position_.rank_get() == king_rank) {
+            if (move.end_position_.file_get() == king.position_.file_get() &&
+                move.end_position_.rank_get() == king.position_.rank_get()) {
                 return true;
             }
         }
@@ -222,15 +217,18 @@ namespace board {
                         initial_positions[*it].end()) {
                         piece.has_already_moved_ = true;
                     }
-                    pieces_.emplace_back(piece);
+                    pieces_[{piece.type_,piece.color_}].emplace_back(piece);
                     fileIndex++;
                 }
             }
             rankIndex--;
         }
-        for (auto piece : pieces_) {
-            (*this)[piece.position_] = piece;
+        for (auto piece_set : pieces_) {
+            for (auto piece : piece_set.second) {
+                (*this)[piece.position_] = piece;
+            }
         }
+
 
         //parse informations regarding the current state of the game
         //whose turn is it
@@ -266,20 +264,15 @@ namespace board {
                 }
             }
         }
-        /*if (pieces_ != b.pieces_) {
-            std::cout << "piece list different\n";
-            std::cout << "size: " << pieces_.size() << "\n";
-            std::cout << "other: " << b.pieces_.size() << "\n";*/
-            for (unsigned i = 0; i < pieces_.size(); i++) {
-               /* if (!(pieces_.at(i) == b.pieces_.at(i))) {
-                    std::cout << "pieces #" << i << " is different: got: " << pieces_.at(i).to_string()
-                              << "; expected: " << b.pieces_.at(i).to_string() << "\n";
-                }*/
-                if (find(b.pieces_.begin(), b.pieces_.end(), pieces_.at(i)) == b.pieces_.end()) {
-                    std::cout << "could not find piece #" << i << ":  " << pieces_.at(i).to_string() << "in other board\n";
+        for (auto piece_set : pieces_) {
+            auto equivalent_piece_set = b.pieces_[piece_set.first];
+            for (auto piece : piece_set.second) {
+                if (std::find (equivalent_piece_set.begin(), equivalent_piece_set.end(), piece) == equivalent_piece_set.end()) {
+                    std::cout << "could not find piece: " << piece.to_string() << " in other piece map\n";
+                    return false;
                 }
             }
-        /*}*/
+        }
 
         if (is_white_turn_ != b.is_white_turn_) {
             std::cout << "Is_whit_turn is different " << is_white_turn_ << " vs " << b.is_white_turn_;
