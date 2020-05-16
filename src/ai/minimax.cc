@@ -12,33 +12,36 @@ namespace ai {
     int AI::evaluate(board::Chessboard& myBoard) {
         int res = 0;
         auto pieces = myBoard.get_pieces();
-        for (auto piece : pieces)
+        for (auto piece_pair : pieces)
         {
-            if (color_ == piece.color_)
+            for (auto piece : piece_pair.second)
             {
-                //Individual piece value
-                res += material_values[piece.type_];
-                //Piece's positional value
-                if (color_ == board::Color::WHITE)
-                    res += (*table_valuesWhite[piece.type_])[(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
-                else
-                    res += (*table_valuesBlack[piece.type_])[(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
+                if (color_ == piece.color_)
+                {
+                    //Individual piece value
+                    res += material_values[piece.type_];
+                    //Piece's positional value
+                    if (color_ == board::Color::WHITE)
+                        res += (*table_valuesWhite[piece.type_])[(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
+                    else
+                        res += (*table_valuesBlack[piece.type_])[(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
 
-                if (piece.type_ == board::PieceType::PAWN) {
-                    res += backwardPawnCheck(piece.position_, myBoard);
-                    res += candidatePawnCheck(piece.position_, myBoard);
+                    if (piece.type_ == board::PieceType::PAWN) {
+                        res += backwardPawnCheck(piece.position_, myBoard);
+                        res += candidatePawnCheck(piece.position_, myBoard);
+                    }
                 }
-            }
-            else
-            {
-                res -= material_values[piece.type_];
-                if (color_ == board::Color::WHITE)
-                    res -= (*table_valuesWhite[piece.type_])[(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
                 else
-                    res -= (*table_valuesBlack[piece.type_])[(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
-                if (piece.type_ == board::PieceType::PAWN) {
-                    res -= backwardPawnCheck(piece.position_, myBoard);
-                    res -= candidatePawnCheck(piece.position_, myBoard);
+                {
+                    res -= material_values[piece.type_];
+                    if (color_ == board::Color::WHITE)
+                        res -= (*table_valuesWhite[piece.type_])[(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
+                    else
+                        res -= (*table_valuesBlack[piece.type_])[(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
+                    if (piece.type_ == board::PieceType::PAWN) {
+                        res -= backwardPawnCheck(piece.position_, myBoard);
+                        res -= candidatePawnCheck(piece.position_, myBoard);
+                    }
                 }
             }
         }
