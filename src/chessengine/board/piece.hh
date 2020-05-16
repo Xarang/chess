@@ -30,7 +30,7 @@ namespace board
         static std::pair<PieceType, Color> piecetype_and_color_from_fen(char fen);
 
 
-        std::string to_string();
+        std::string to_string() const;
     };
 
     class PieceMoveGenerator {

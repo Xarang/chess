@@ -93,17 +93,23 @@ namespace board {
         assert((*this)[old_position]->color_ == p.color_);
     }
 
-    void Chessboard::undo_promote_piece(const Piece &p, PieceType new_type) {
+    void Chessboard::undo_promote_piece(const Piece &p, PieceType old_type) {
         std::vector<Piece>& piece_set = pieces_[{p.type_, p.color_}];
         auto piece_it = std::find(piece_set.begin(), piece_set.end(), p);
         assert(piece_it != piece_set.end() && "queried piece not in piece list");
-        piece_it->type_ = new_type;
-        (*this)[piece_it->position_] = std::make_optional<Piece>(*piece_it);
 
-        assert(std::find(piece_set.begin(), piece_set.end(), p)->type_ == new_type &&
-               "promotion did not take effect in piece list");
-        assert((*this)[p.position_]->type_ == new_type && "promotion did not take effect in piece list");
-        assert(*std::find(piece_set.begin(), piece_set.end(), p) == (*this)[p.position_].value());
+        Piece demoted(*piece_it); //copy
+        piece_set.erase(piece_it);
+
+        demoted.type_ = old_type;
+        std::vector<Piece>& destination_set = pieces_[{old_type, p.color_}];
+        destination_set.emplace_back(demoted);
+        (*this)[demoted.position_] = std::make_optional<Piece>(demoted);
+
+        assert(std::find(piece_set.begin(), piece_set.end(), p) == piece_set.end() &&
+               "demotion did not remove piece from its original piece set");
+        assert(std::find(destination_set.begin(), destination_set.end(), demoted) != destination_set.end() &&
+               "demotion did not add promoted piece to the proper set");
     }
 
 }

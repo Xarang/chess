@@ -114,18 +114,28 @@ namespace board {
         std::vector<Piece>& piece_set = pieces_[{p.type_, p.color_}];
         auto piece_it = std::find(piece_set.begin(), piece_set.end(), p);
         assert(piece_it != piece_set.end() && "queried piece not in piece list");
-        piece_it->type_ = new_type;
-        (*this)[piece_it->position_] = std::make_optional<Piece>(*piece_it);
 
-        assert(std::find(piece_set.begin(), piece_set.end(), p)->type_ == new_type &&
-               "promotion did not take effect in piece list");
-        assert((*this)[p.position_]->type_ == new_type && "promotion did not take effect in piece list");
-        assert(*std::find(piece_set.begin(), piece_set.end(), p) == (*this)[p.position_].value());
+        Piece promoted(*piece_it); //copy
+        piece_set.erase(piece_it);
+
+        promoted.type_ = new_type;
+        std::vector<Piece>& destination_set = pieces_[{new_type, p.color_}];
+        destination_set.emplace_back(promoted);
+        (*this)[promoted.position_] = std::make_optional<Piece>(promoted);
+
+        assert(std::find(piece_set.begin(), piece_set.end(), p) == piece_set.end() &&
+               "promotion did not remove piece from its original piece set");
+        assert(std::find(destination_set.begin(), destination_set.end(), promoted) != destination_set.end() &&
+                "promotion did not add promoted piece to the proper set");
     }
 
     void Chessboard::remove_piece(const Piece &p) {
+        //std::cerr << "remove piece: " << p.to_string() << "\n";
         std::vector<Piece>& piece_set = pieces_[{p.type_, p.color_}];
         auto piece_it = std::find(piece_set.begin(), piece_set.end(), p);
+        if (piece_it == piece_set.end()) {
+            std::cerr << p.to_string() << "\n";
+        }
         assert(piece_it != piece_set.end() && "queried piece not in piece list");
         piece_set.erase(piece_it);
         last_pieces_captured_.push_back((*this)[p.position_].value());

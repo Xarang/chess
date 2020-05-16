@@ -95,7 +95,7 @@ namespace board {
 
     }
 
-    std::string Piece::to_string() {
+    std::string Piece::to_string() const {
        return "[PIECE " + std::string(color_ == Color::WHITE ? "white" : "black") + "  " + std::string(1, to_char_fen()) + " at " + position_.to_string() + " (already moved ? " + (has_already_moved_ ? "yes" : "no") + ")]";
     }
 }
