@@ -16,7 +16,15 @@
 
 namespace board {
 
-
+    struct hash_pair {
+        template <class T1, class T2>
+        size_t operator()(const std::pair<T1, T2>& p) const
+        {
+            auto hash1 = std::hash<T1>{}(p.first);
+            auto hash2 = std::hash<T2>{}(p.second);
+            return hash1 ^ hash2;
+        }
+    };
 
 
     /*
@@ -31,7 +39,18 @@ namespace board {
         boost::numeric::ublas::matrix<std::optional<Piece>> board_ = boost::numeric::ublas::matrix<std::optional<Piece>>(
                 8, 8);
         //all our pieces
-        std::vector<Piece> pieces_ = std::vector<Piece>();
+        std::unordered_map<std::pair<PieceType, Color>, std::vector<Piece>, hash_pair> pieces_ = {
+                { { PieceType::PAWN, Color::BLACK }, std::vector<Piece>() },
+                { { PieceType::KNIGHT, Color::BLACK }, std::vector<Piece>() },
+                { { PieceType::BISHOP, Color::BLACK }, std::vector<Piece>() },
+                { { PieceType::QUEEN, Color::BLACK }, std::vector<Piece>() },
+                { { PieceType::KING, Color::BLACK }, std::vector<Piece>() },
+                { { PieceType::PAWN, Color::WHITE }, std::vector<Piece>() },
+                { { PieceType::KNIGHT, Color::WHITE }, std::vector<Piece>() },
+                { { PieceType::BISHOP, Color::WHITE }, std::vector<Piece>() },
+                { { PieceType::QUEEN, Color::WHITE }, std::vector<Piece>() },
+                { { PieceType::KING, Color::WHITE }, std::vector<Piece>() },
+        };
 
         //whose turn is it ?
         bool is_white_turn_ = true;
@@ -52,68 +71,34 @@ namespace board {
 
         //these 3 methods are used by do_move
         void remove_piece(const Piece &p);
-
         void move_piece(const Piece &p, Position new_position);
-
         void promote_piece(const Piece &p, PieceType type);
 
         //theses methods are used by undo_move
-        void add_piece(std::optional<Piece> p);
-
+        void undo_remove_piece(std::optional<Piece> p);
         void undo_move_piece(const Piece &p, Position old_position);
-
         void undo_promote_piece(const Piece &p, PieceType type);
 
     public:
 
         // constructors 
 
-        //default constructor
+        //default constructor (much shorted now huh)
         Chessboard() {
-            //White Pawns
-            pieces_.emplace_back(Piece(Position(File::A, Rank::TWO), Color::WHITE, PieceType::PAWN));
-            pieces_.emplace_back(Piece(Position(File::B, Rank::TWO), Color::WHITE, PieceType::PAWN));
-            pieces_.emplace_back(Piece(Position(File::C, Rank::TWO), Color::WHITE, PieceType::PAWN));
-            pieces_.emplace_back(Piece(Position(File::D, Rank::TWO), Color::WHITE, PieceType::PAWN));
-            pieces_.emplace_back(Piece(Position(File::E, Rank::TWO), Color::WHITE, PieceType::PAWN));
-            pieces_.emplace_back(Piece(Position(File::F, Rank::TWO), Color::WHITE, PieceType::PAWN));
-            pieces_.emplace_back(Piece(Position(File::G, Rank::TWO), Color::WHITE, PieceType::PAWN));
-            pieces_.emplace_back(Piece(Position(File::H, Rank::TWO), Color::WHITE, PieceType::PAWN));
-            //White Specials
-            pieces_.emplace_back(Piece(Position(File::A, Rank::ONE), Color::WHITE, PieceType::ROOK));
-            pieces_.emplace_back(Piece(Position(File::B, Rank::ONE), Color::WHITE, PieceType::KNIGHT));
-            pieces_.emplace_back(Piece(Position(File::C, Rank::ONE), Color::WHITE, PieceType::BISHOP));
-            pieces_.emplace_back(Piece(Position(File::D, Rank::ONE), Color::WHITE, PieceType::QUEEN));
-            pieces_.emplace_back(Piece(Position(File::E, Rank::ONE), Color::WHITE, PieceType::KING));
-            pieces_.emplace_back(Piece(Position(File::F, Rank::ONE), Color::WHITE, PieceType::BISHOP));
-            pieces_.emplace_back(Piece(Position(File::G, Rank::ONE), Color::WHITE, PieceType::KNIGHT));
-            pieces_.emplace_back(Piece(Position(File::H, Rank::ONE), Color::WHITE, PieceType::ROOK));
-            //Black Pawns
-            pieces_.emplace_back(Piece(Position(File::A, Rank::SEVEN), Color::BLACK, PieceType::PAWN));
-            pieces_.emplace_back(Piece(Position(File::B, Rank::SEVEN), Color::BLACK, PieceType::PAWN));
-            pieces_.emplace_back(Piece(Position(File::C, Rank::SEVEN), Color::BLACK, PieceType::PAWN));
-            pieces_.emplace_back(Piece(Position(File::D, Rank::SEVEN), Color::BLACK, PieceType::PAWN));
-            pieces_.emplace_back(Piece(Position(File::E, Rank::SEVEN), Color::BLACK, PieceType::PAWN));
-            pieces_.emplace_back(Piece(Position(File::F, Rank::SEVEN), Color::BLACK, PieceType::PAWN));
-            pieces_.emplace_back(Piece(Position(File::G, Rank::SEVEN), Color::BLACK, PieceType::PAWN));
-            pieces_.emplace_back(Piece(Position(File::H, Rank::SEVEN), Color::BLACK, PieceType::PAWN));
-            //Black Specials
-            pieces_.emplace_back(Piece(Position(File::A, Rank::EIGHT), Color::BLACK, PieceType::ROOK));
-            pieces_.emplace_back(Piece(Position(File::B, Rank::EIGHT), Color::BLACK, PieceType::KNIGHT));
-            pieces_.emplace_back(Piece(Position(File::C, Rank::EIGHT), Color::BLACK, PieceType::BISHOP));
-            pieces_.emplace_back(Piece(Position(File::D, Rank::EIGHT), Color::BLACK, PieceType::QUEEN));
-            pieces_.emplace_back(Piece(Position(File::E, Rank::EIGHT), Color::BLACK, PieceType::KING));
-            pieces_.emplace_back(Piece(Position(File::F, Rank::EIGHT), Color::BLACK, PieceType::BISHOP));
-            pieces_.emplace_back(Piece(Position(File::G, Rank::EIGHT), Color::BLACK, PieceType::KNIGHT));
-            pieces_.emplace_back(Piece(Position(File::H, Rank::EIGHT), Color::BLACK, PieceType::ROOK));
-
+            for (auto position_per_fen_char : Chessboard::initial_positions) {
+                auto attributes = Piece::piecetype_and_color_from_fen(position_per_fen_char.first);
+                for (auto position : position_per_fen_char.second) {
+                    pieces_[{attributes.first, attributes.second}].push_back(Piece(position, attributes.second, attributes.first));
+                }
+            }
             //fill the initial matrix
-            for (Piece piece : pieces_) {
-                (*this)[Position(piece.position_.file_get(), piece.position_.rank_get())] = piece;
+            for (auto piece_set : pieces_) {
+                for (auto piece : piece_set.second) {
+                    (*this)[Position(piece.position_.file_get(), piece.position_.rank_get())] = piece;
+                }
             }
         }
 
-        //copy constructor (overloaded for assertions)
         Chessboard(const Chessboard &other) = default;
 
         //FEN string based constructor
@@ -144,7 +129,7 @@ namespace board {
 
 
         //Getters
-        std::vector<Piece> get_pieces() {
+        std::unordered_map<std::pair<PieceType, Color>, std::vector<Piece>, hash_pair> get_pieces() {
             return pieces_;
         }
 
