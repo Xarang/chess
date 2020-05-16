@@ -57,25 +57,6 @@ namespace ai {
              return minEval;
          }
     }
-    std::string AI::get_next_opening_move(board::Color color) {
-        if (color == board::Color::BLACK) {
-            if (openingBlack.empty()) {
-                return "";
-            }
-            auto move = openingBlack.front();
-            openingBlack.pop_front();
-            return move;
-        }
-        if (color == board::Color::WHITE) {
-            if (openingBlack.empty()) {
-                return "";
-            }
-            auto move = openingWhite.front();
-            openingWhite.pop_front();
-            return move;
-        }
-        return "";
-    }
 
     board::Move AI::searchMove(board::Chessboard& myBoard) {
 
