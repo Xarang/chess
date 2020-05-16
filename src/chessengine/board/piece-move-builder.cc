@@ -1,4 +1,4 @@
-#include "move-builder.hh"
+#include "piece-move-builder.hh"
 
 namespace board {
  //some quick constructors for most moves
@@ -22,7 +22,7 @@ namespace board {
 
     Move MoveBuilder::with_promotion(Move m, PieceType type) {
         auto promoted = Move(m);
-        m.promotion_ = opt_piecetype_t(type);
+        promoted.promotion_ = opt_piecetype_t(type);
         return promoted;
     }
 

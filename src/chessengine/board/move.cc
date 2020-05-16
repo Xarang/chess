@@ -1,4 +1,5 @@
 #include <list>
+#include <iostream>
 #include "move.hh"
 
 namespace board
@@ -55,7 +56,10 @@ namespace board
         set_queen_castling();
     }
 
-    std::string Move::to_string() {
+    //take the informations we want from pgnmove and re-reformate them in a handier way.
+
+
+    std::string Move::to_string() const {
         std::string str = "[MOVE] ";
         str += piece_to_char(piece_);
         str += "  ";
@@ -74,14 +78,26 @@ namespace board
         if (is_en_passant_) {
             tags.push_front("en passant");
         }
+        if (promotion_.has_value()) {
+            tags.push_front("promoting to -> " + std::string(1, piece_to_char(promotion_.value())));
+        }
 
         for (auto tag : tags) {
             str += " [ " + tag + " ] ";
         }
-        return str + "\n";
+        return str;
     }
 
-    std::string Move::uci() {
-        return start_position_.to_string() + end_position_.to_string();
+    std::string Move::uci() const {
+        std::string promotion = "";
+        if (promotion_.has_value()) {
+            promotion = std::string(1, tolower(piece_to_char(promotion_.value())));
+            //std::cerr << "promotion: " << promotion << "\n";
+        }
+        return start_position_.to_string() + end_position_.to_string() + promotion;
+    }
+
+    bool Move::is_halfmove_clock_resetter() const {
+        return is_capture_ || piece_ == PieceType::PAWN;
     }
 }

@@ -1,5 +1,5 @@
 #include "chessboard.hh"
-#include "move-builder.hh"
+#include "piece-move-builder.hh"
 
 namespace board {
 
@@ -183,7 +183,7 @@ namespace board {
 
     bool MoveLegalityChecker::is_move_legal_PAWN(Chessboard& b, Move& move) {
 
-        //TODO: the position hold in b.en_passant_target_square_ (if any) should be a valid capture position, even if it is empty. In this case, the captured piece
+        //TODO: the position hold in b.past_moves_en_passant_target_squares_ (if any) should be a valid capture position, even if it is empty. In this case, the captured piece
         //is not on move.end_position_ so we will have to handle this case.
 
         //std::cout << "checking legality of pawn move: " + move.to_string() << "\n";
@@ -200,7 +200,16 @@ namespace board {
             return (move.start_position_.rank_get() + rank_direction * 2 == move.end_position_.rank_get() &&
                     move.start_position_.file_get() == move.end_position_.file_get());
         }
-        else if (move.is_capture_) {
+
+        if (move.piece_ == PieceType::PAWN && ((b.whose_turn_is_it() == Color::WHITE && move.end_position_.rank_get() == Rank::EIGHT)
+           || (b.whose_turn_is_it() == Color::BLACK && move.end_position_.rank_get() == Rank::ONE))) {
+            if (!move.promotion_.has_value()) {
+                //promotion is actually obligatory
+                return false;
+            }
+        }
+
+        if (move.is_capture_) {
             if (move.start_position_.rank_get() + rank_direction != move.end_position_.rank_get()) {
                 return false;
             }

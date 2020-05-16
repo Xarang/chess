@@ -183,9 +183,6 @@ namespace ai {
          */
         int evaluate(board::Chessboard& board);
         float minimax(board::Position myPos, int depth, bool is_black, board::Chessboard& board);
-        std::string get_next_opening_move(board::Color color);
-        //board::Move openingWhitesBuilder(std::string str, board::Chessboard myBoard);
-        //board::Move openingBlacksBuilder(std::string str, board::Chessboard myBoard);
         board::Move searchMove(board::Chessboard& board);
     };
 }

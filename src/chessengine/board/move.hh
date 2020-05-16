@@ -44,13 +44,17 @@ namespace board
                 }
 
         Move(PgnMove pgnmove);
+        static Move parse_uci(std::string uci);
 
-        std::string to_string();
-        std::string uci();
+        std::string to_string() const;
+        std::string uci() const;
+        bool is_halfmove_clock_resetter() const;
+
 
         private:
         void set_double_pawn_push();
         void set_king_castling();
         void set_queen_castling();
+
     };
 }

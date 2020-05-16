@@ -154,44 +154,21 @@ namespace listener {
 
         ai::AI chess_ai;
 
-        //open debug file at /.local/share/pychess/engine
-
-        //erase debug content from previous run
-        std::fstream f;
-        f.open("chess_debug", std::ios::out | std::ios::trunc);
-        f.close();
         while (true) { //end when ?
 
             //outputs received position string to log file
             std::string board_str = ai::get_board();
-            f.open("chess_debug", std::ios::out | std::ios::app);
-            f << "received board: " << board_str << std::endl;
-            f.close();
+            std::cerr << "got position: " << board_str << std::endl;
 
             auto board = board::Chessboard::parse_uci(board_str);
-
-            f.open("chess_debug", std::ios::out | std::ios::app);
-            f << "playing : " << (board.whose_turn_is_it() == board::Color::WHITE ? "whites" : "blacks") << std::endl;
-            f.close();
+            std::cerr << "position parsed into chessboard: " << board.to_string() << "\n";
             //ai get best move for board;
             //auto moves = board_->generate_legal_moves();
 
-            std::string move;
-
-            chess_ai.color_ = board.whose_turn_is_it();
-
-            auto next_opening_move = chess_ai.get_next_opening_move(board.whose_turn_is_it());
-            if (!next_opening_move.empty()) {
-                move = next_opening_move;
-            }
-            else {
-                move = chess_ai.searchMove(board).uci();
-            }
+            auto move = chess_ai.searchMove(board).uci();
 
             //outputs best move to log file
-            f.open("chess_debug", std::ios::out | std::ios::app);
-            f << "best move: " << move << std::endl;
-            f.close();
+            std::cerr << "best move: " << move << std::endl;
 
             //send move
             ai::play_move(move);
