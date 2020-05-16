@@ -59,7 +59,7 @@ namespace board
     //take the informations we want from pgnmove and re-reformate them in a handier way.
 
 
-    std::string Move::to_string() {
+    std::string Move::to_string() const {
         std::string str = "[MOVE] ";
         str += piece_to_char(piece_);
         str += "  ";
@@ -88,12 +88,16 @@ namespace board
         return str;
     }
 
-    std::string Move::uci() {
+    std::string Move::uci() const {
         std::string promotion = "";
         if (promotion_.has_value()) {
             promotion = std::string(1, tolower(piece_to_char(promotion_.value())));
             //std::cerr << "promotion: " << promotion << "\n";
         }
         return start_position_.to_string() + end_position_.to_string() + promotion;
+    }
+
+    bool Move::is_halfmove_clock_resetter() const {
+        return is_capture_ || piece_ == PieceType::PAWN;
     }
 }

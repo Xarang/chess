@@ -7,10 +7,14 @@
 namespace board {
 
     void Chessboard::undo_move(Move move) {
+        assert(past_moves_halfmove_clocks_.size() >= 1);
+        assert(past_moves_en_passant_target_squares_.size() >= 1);
+
         current_turn_ -= 1;
-        /*if(past_moves_halfmove_clocks_[past_moves_halfmove_clocks_.size() - 1] > 0)
-            past_moves_halfmove_clocks_[past_moves_halfmove_clocks_.size() - 1] -= 1;*/
+
+        //pop back last entry in all turn-by-turn registers
         past_moves_halfmove_clocks_.pop_back();
+        past_moves_en_passant_target_squares_.pop_back();
 
         //undo the move
         undo_move_piece((*this)[move.end_position_].value(), move.start_position_);
@@ -46,15 +50,6 @@ namespace board {
             undo_move_piece((*this)[rook_position].value(), rook_destination);
         }
 
-        //Undo en passant (not sure about this)
-        past_moves_en_passant_target_squares_.pop_back();
-
-        /*int direction = whose_turn_is_it() == Color::WHITE ? +1 : -1;
-        past_moves_en_passant_target_squares_ = std::make_optional<Position>(move.start_position_.file_get(), move.start_position_.rank_get() + direction);
-
-        if (move.is_double_pawn_push_) {
-            past_moves_en_passant_target_squares_ = std::nullopt;
-        }*/
 
         if (move.promotion_.has_value()) {
             //Check undo_promotion use start_position because this move is undo
@@ -67,20 +62,8 @@ namespace board {
             last_pieces_captured_.pop_back();
             add_piece(piece);
             (*this)[move.end_position_] = piece;
-            /*} else {
-                direction = whose_turn_is_it() == Color::WHITE ? 1 : -1;
-                remove_piece((*this)[Position(past_moves_en_passant_target_squares_->file_get(), past_moves_en_passant_target_squares_->rank_get() - direction)].value());
-            }*/
-            //}
         }
 
-        /*auto fen = to_string();
-        if (all_boards_since_start_.find(fen) != all_boards_since_start_.end()) {
-            all_boards_since_start_.insert_or_assign(fen, all_boards_since_start_.find(fen)->second + 1);
-            //std::cout << fen << " ---> " << all_boards_since_start_.find(fen)->second << "\n";
-        } else {
-            all_boards_since_start_.insert(std::pair<std::string, int>(fen, 1));
-        }*/
         is_white_turn_ = !is_white_turn_;
     }
 
@@ -96,10 +79,6 @@ namespace board {
         (*this)[p.position_] = std::nullopt;
         (*this)[piece_it->position_] = std::make_optional<Piece>(*piece_it);
         assert((*this)[piece_it->position_].value() == *piece_it && "copy constructor of piece did not copy properly");
-
-        if (p.type_ == PieceType::PAWN) {
-            past_moves_halfmove_clocks_.pop_back();
-        }
 
         //make sure this did what we want
         assert((*this)[old_position] == *piece_it);

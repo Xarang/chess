@@ -11,8 +11,14 @@ namespace board {
 
         current_turn_ += 1;
         //past_moves_halfmove_clocks_[past_moves_halfmove_clocks_.size() - 1]+=1;
-        auto temp = past_moves_halfmove_clocks_.back() + 1;
-        past_moves_halfmove_clocks_.push_back(temp);
+        if (move.is_halfmove_clock_resetter()) {
+            past_moves_halfmove_clocks_.push_back(0);
+        }
+        else {
+            auto temp = past_moves_halfmove_clocks_.back() + 1;
+            past_moves_halfmove_clocks_.push_back(temp);
+        }
+
 
         //handle capture (+ special behaviour for en-passant)
         if (move.is_capture_) {
@@ -62,15 +68,16 @@ namespace board {
             move_piece((*this)[rook_position].value(), rook_destination);
         }
 
-        //if the board previously had a 'en passant target square', it is now consume
-        past_moves_en_passant_target_squares_.push_back(std::nullopt);
 
         if (move.is_double_pawn_push_) {
             //mark the square that can be "prise en passant"'ed next turn
             int direction = whose_turn_is_it() == Color::WHITE ? +1 : -1;
-            past_moves_en_passant_target_squares_.push_back(std::make_optional<Position>(move.start_position_.file_get(),
+            past_moves_en_passant_target_squares_.emplace_back(std::make_optional<Position>(move.start_position_.file_get(),
                                                                              move.start_position_.rank_get() +
                                                                              direction));
+        }
+        else {
+            past_moves_en_passant_target_squares_.emplace_back(std::nullopt);
         }
 
         if (move.promotion_.has_value()) {
@@ -82,12 +89,11 @@ namespace board {
         is_white_turn_ = !is_white_turn_;
     }
 
-
+    //used in undo operations only
     void Chessboard::add_piece(const std::optional<Piece> p) {
         assert(p.has_value() && "last_pieces_captured_ has no value");
         pieces_.push_back(p.value());
         (*this)[p->position_] = p;
-        past_moves_halfmove_clocks_.pop_back();
     }
 
     void Chessboard::move_piece(const Piece &p, Position new_position) {
@@ -102,9 +108,6 @@ namespace board {
         (*this)[piece_it->position_] = std::make_optional<Piece>(*piece_it);
         assert((*this)[piece_it->position_].value() == *piece_it && "copy constructor of piece did not copy properly");
 
-        if (p.type_ == PieceType::PAWN) {
-            past_moves_halfmove_clocks_.push_back(0);
-        }
 
         //make sure this did what we want
         assert((*this)[new_position] == *piece_it);
@@ -131,7 +134,7 @@ namespace board {
         pieces_.erase(piece_it);
         last_pieces_captured_.push_back((*this)[p.position_].value());
         (*this)[p.position_] = std::nullopt;
-        past_moves_halfmove_clocks_.push_back(0);
+
 
         //make sure this did what we want
         assert(std::find(pieces_.begin(), pieces_.end(), p) == pieces_.end());
