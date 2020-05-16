@@ -9,35 +9,30 @@ namespace ai {
     int AI::evaluate(board::Chessboard& myBoard) {
         int res = 0;
         auto pieces = myBoard.get_pieces();
-        for (auto piece : pieces)
+        for (auto piece_list : pieces)
         {
-            if (color_ == piece.color_)
+            for (auto piece : piece_list.second)
             {
-                res += material_values[piece.type_];
-            }
-            else
-            {
-                res -= material_values[piece.type_];
+                if (color_ == piece.color_)
+                {
+                    res += material_values[piece.type_];
+                }
+                else
+                {
+                    res -= material_values[piece.type_];
+                }
             }
         }
         return res;
     }
 
-    static std::list<struct board::Move> getMovesFromPos(board::Position myPos, board::Chessboard& myBoard) {
-        auto pieces = myBoard.get_pieces();
-
-        for (auto piece : pieces) {
-            if (piece.position_ == myPos)
-                return piece.getAllPotentialMoves();
-        }
-        return std::list<struct board::Move>();
-    }
-
     float AI::minimax(board::Position myPos, int depth, bool ai_turn, board::Chessboard& myBoard) {
-         if (depth == 0 || myBoard.is_checkmate())
-             return evaluate(myBoard);
+        (void) myPos;
+        if (depth == 0 || myBoard.is_checkmate())
+            return evaluate(myBoard);
 
-         auto moves = getMovesFromPos(myPos, myBoard);
+
+         auto moves = myBoard.generate_legal_moves();
 
          // Black wants to minimize
          if (ai_turn) {
