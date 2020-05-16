@@ -265,20 +265,20 @@ namespace board {
                 }
             }
         }
-        if (pieces_ != b.pieces_) {
+        /*if (pieces_ != b.pieces_) {
             std::cout << "piece list different\n";
             std::cout << "size: " << pieces_.size() << "\n";
-            std::cout << "other: " << b.pieces_.size() << "\n";
+            std::cout << "other: " << b.pieces_.size() << "\n";*/
             for (unsigned i = 0; i < pieces_.size(); i++) {
-                if (!(pieces_.at(i) == b.pieces_.at(i))) {
+               /* if (!(pieces_.at(i) == b.pieces_.at(i))) {
                     std::cout << "pieces #" << i << " is different: got: " << pieces_.at(i).to_string()
                               << "; expected: " << b.pieces_.at(i).to_string() << "\n";
-                }
+                }*/
                 if (find(b.pieces_.begin(), b.pieces_.end(), pieces_.at(i)) == b.pieces_.end()) {
-                    std::cout << "could not find piece #" << i << " in other board\n";
+                    std::cout << "could not find piece #" << i << ":  " << pieces_.at(i).to_string() << "in other board\n";
                 }
             }
-        }
+        /*}*/
 
         if (is_white_turn_ != b.is_white_turn_) {
             std::cout << "Is_whit_turn is different " << is_white_turn_ << " vs " << b.is_white_turn_;
