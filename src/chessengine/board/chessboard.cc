@@ -165,7 +165,7 @@ namespace board {
 
                 if (read(myPos).has_value()) {
                     auto myPiece = read(myPos).value();
-                    symbol = myPiece.piece_to_char_fen();
+                    symbol = myPiece.to_char_fen();
                     if (empty_counter != 0)
                         res += std::to_string(empty_counter);
                     res += symbol;

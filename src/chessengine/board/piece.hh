@@ -26,7 +26,7 @@ namespace board
             return position_ == other.position_ && color_ == other.color_ && type_ == other.type_ && has_already_moved_ == other.has_already_moved_;
         }
 
-        char piece_to_char_fen();
+        char to_char_fen() const;
 
         std::string to_string();
     };

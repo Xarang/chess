@@ -24,7 +24,7 @@ namespace board {
         }
     }
 
-    char Piece::piece_to_char_fen() {
+    char Piece::to_char_fen() const {
         if (this->color_ == Color::WHITE) {
             switch (this->type_) {
                 case PieceType::PAWN:
@@ -64,6 +64,6 @@ namespace board {
     }
 
     std::string Piece::to_string() {
-       return "[PIECE " + std::string(color_ == Color::WHITE ? "white" : "black") + "  " + std::string(1, piece_to_char_fen()) + " at " + position_.to_string() + " (already moved ? " + (has_already_moved_ ? "yes" : "no") + ")]";
+       return "[PIECE " + std::string(color_ == Color::WHITE ? "white" : "black") + "  " + std::string(1, to_char_fen()) + " at " + position_.to_string() + " (already moved ? " + (has_already_moved_ ? "yes" : "no") + ")]";
     }
 }

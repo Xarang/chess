@@ -89,7 +89,8 @@ namespace board {
         //std::cout << "move piece from position " << p.position_.to_string() << " to position " << new_position.to_string() << "\n";
         auto piece_it = std::find(pieces_.begin(), pieces_.end(), p);
         assert(*piece_it == p && "fetched piece is not equal to the queried piece");
-        piece_it->has_already_moved_ = false;
+        auto fen = p.to_char_fen();
+        piece_it->has_already_moved_ = std::find(initial_positions[fen].begin(), initial_positions[fen].end(), old_position) == initial_positions[fen].end();
         piece_it->position_ = old_position;
 
         (*this)[p.position_] = std::nullopt;
