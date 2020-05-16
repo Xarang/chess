@@ -1,4 +1,5 @@
 #include <list>
+#include <iostream>
 #include "move.hh"
 
 namespace board
@@ -77,14 +78,22 @@ namespace board
         if (is_en_passant_) {
             tags.push_front("en passant");
         }
+        if (promotion_.has_value()) {
+            tags.push_front("promoting to -> " + std::string(1, piece_to_char(promotion_.value())));
+        }
 
         for (auto tag : tags) {
             str += " [ " + tag + " ] ";
         }
-        return str + "\n";
+        return str;
     }
 
     std::string Move::uci() {
-        return start_position_.to_string() + end_position_.to_string();
+        std::string promotion = "";
+        if (promotion_.has_value()) {
+            promotion = std::string(1, tolower(piece_to_char(promotion_.value())));
+            //std::cerr << "promotion: " << promotion << "\n";
+        }
+        return start_position_.to_string() + end_position_.to_string() + promotion;
     }
 }

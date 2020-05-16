@@ -24,8 +24,8 @@ namespace board {
             if (start_position.rank_get() + direction * 2 == end_position.rank_get()) {
                 move.is_double_pawn_push_ = true;
                 return move;
-            } else if (en_passant_target_square_.back().has_value() &&
-                       en_passant_target_square_.back().value() == end_position &&
+            } else if (past_moves_en_passant_target_squares_.back().has_value() &&
+                       past_moves_en_passant_target_squares_.back().value() == end_position &&
                        end_position.file_get() != start_position.file_get()) {
                 move.is_capture_ = true;
                 move.is_en_passant_ = true;

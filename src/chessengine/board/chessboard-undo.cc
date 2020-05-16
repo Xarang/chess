@@ -8,9 +8,9 @@ namespace board {
 
     void Chessboard::undo_move(Move move) {
         current_turn_ -= 1;
-        /*if(turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size() - 1] > 0)
-            turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size() - 1] -= 1;*/
-        turns_since_last_piece_taken_or_pawn_moved_.pop_back();
+        /*if(past_moves_halfmove_clocks_[past_moves_halfmove_clocks_.size() - 1] > 0)
+            past_moves_halfmove_clocks_[past_moves_halfmove_clocks_.size() - 1] -= 1;*/
+        past_moves_halfmove_clocks_.pop_back();
 
         //undo the move
         undo_move_piece((*this)[move.end_position_].value(), move.start_position_);
@@ -47,13 +47,13 @@ namespace board {
         }
 
         //Undo en passant (not sure about this)
-        en_passant_target_square_.pop_back();
+        past_moves_en_passant_target_squares_.pop_back();
 
         /*int direction = whose_turn_is_it() == Color::WHITE ? +1 : -1;
-        en_passant_target_square_ = std::make_optional<Position>(move.start_position_.file_get(), move.start_position_.rank_get() + direction);
+        past_moves_en_passant_target_squares_ = std::make_optional<Position>(move.start_position_.file_get(), move.start_position_.rank_get() + direction);
 
         if (move.is_double_pawn_push_) {
-            en_passant_target_square_ = std::nullopt;
+            past_moves_en_passant_target_squares_ = std::nullopt;
         }*/
 
         if (move.promotion_.has_value()) {
@@ -63,13 +63,13 @@ namespace board {
 
         if (move.is_capture_) {
             //if (!move.is_en_passant_) {
-            auto piece = last_piece_capture.back();
-            last_piece_capture.pop_back();
+            auto piece = last_pieces_captured_.back();
+            last_pieces_captured_.pop_back();
             add_piece(piece);
             (*this)[move.end_position_] = piece;
             /*} else {
                 direction = whose_turn_is_it() == Color::WHITE ? 1 : -1;
-                remove_piece((*this)[Position(en_passant_target_square_->file_get(), en_passant_target_square_->rank_get() - direction)].value());
+                remove_piece((*this)[Position(past_moves_en_passant_target_squares_->file_get(), past_moves_en_passant_target_squares_->rank_get() - direction)].value());
             }*/
             //}
         }
@@ -97,7 +97,7 @@ namespace board {
         assert((*this)[piece_it->position_].value() == *piece_it && "copy constructor of piece did not copy properly");
 
         if (p.type_ == PieceType::PAWN) {
-            turns_since_last_piece_taken_or_pawn_moved_.pop_back();
+            past_moves_halfmove_clocks_.pop_back();
         }
 
         //make sure this did what we want

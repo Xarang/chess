@@ -44,15 +44,9 @@ namespace board {
         unsigned int current_turn_ = 0;
 
         //turns elapsed since a piece was last taken or a pawn moved
-        std::vector<int>turns_since_last_piece_taken_or_pawn_moved_ = {0};
-        std::vector<std::optional<Position>> en_passant_target_square_ = {std::nullopt};
-        //std::optional<Position> old_en_passant_target_square_ = std::nullopt;
-        
-        //map containing hashed representations of all boards since start (to_string'ed)
-        //if a key has 3 values it means the '3 fold' rule applies and the game is a draw
-        std::unordered_map<std::string, int> all_boards_since_start_ = std::unordered_map<std::string, int>();
-
-        std::vector<Piece> last_piece_capture;
+        std::vector<int> past_moves_halfmove_clocks_ = {0};
+        std::vector<std::optional<Position>> past_moves_en_passant_target_squares_ = {std::nullopt};
+        std::vector<Piece> last_pieces_captured_;
 
 
         //these 3 methods are used by do_move

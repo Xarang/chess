@@ -13,8 +13,8 @@ namespace board {
             move.end_position_.rank_get() == Rank::OUTOFBOUNDS) {
             return false;
         }
-        if (en_passant_target_square_.back().has_value() &&
-            move.end_position_ == en_passant_target_square_.back().value()
+        if (past_moves_en_passant_target_squares_.back().has_value() &&
+            move.end_position_ == past_moves_en_passant_target_squares_.back().value()
             && move.is_capture_ && move.piece_ == PieceType::PAWN) {
             //this is the place where en passant moves are flagged are so. no en passant moves should be created before this.
             move.is_en_passant_ = true;
@@ -137,7 +137,7 @@ namespace board {
         if (legal_moves.empty() && !is_check()) {
             return true;
         }
-        if (turns_since_last_piece_taken_or_pawn_moved_.back() >= 50) {
+        if (past_moves_halfmove_clocks_.back() >= 50) {
             return true;
         }
         return false;
@@ -186,10 +186,37 @@ namespace board {
         return res;
     }
 
+
+
+
     /*
     ** build a chessboard from a fen string representing a board state
     */
     Chessboard::Chessboard(std::string fen_string) : board_(8, 8) {
+
+        //string is fen representation
+
+        //create map representing initial board configuration to assess whether parsed piece have already moved or not
+        std::unordered_map<char, std::vector<Position>> initial_positions;
+        initial_positions.insert(std::make_pair('K', std::vector<Position>({Position(File::E, Rank::ONE)})));
+        initial_positions.insert(std::make_pair('Q', std::vector<Position>({Position(File::D, Rank::ONE)})));
+        initial_positions.insert(std::make_pair('R', std::vector<Position>({Position(File::A, Rank::ONE), Position(File::H, Rank::ONE)})));
+        initial_positions.insert(std::make_pair('N', std::vector<Position>({Position(File::B, Rank::ONE), Position(File::G, Rank::ONE)})));
+        initial_positions.insert(std::make_pair('B', std::vector<Position>({Position(File::C, Rank::ONE), Position(File::F, Rank::ONE)})));
+        initial_positions.insert(std::make_pair('k', std::vector<Position>({Position(File::E, Rank::EIGHT)})));
+        initial_positions.insert(std::make_pair('q', std::vector<Position>({Position(File::D, Rank::EIGHT)})));
+        initial_positions.insert(std::make_pair('r', std::vector<Position>({Position(File::A, Rank::EIGHT), Position(File::H, Rank::EIGHT)})));
+        initial_positions.insert(std::make_pair('n', std::vector<Position>({Position(File::B, Rank::EIGHT), Position(File::G, Rank::EIGHT)})));
+        initial_positions.insert(std::make_pair('b', std::vector<Position>({Position(File::C, Rank::EIGHT), Position(File::F, Rank::EIGHT)})));
+        auto initial_black_pawn_positions = std::vector<Position>();
+        auto initial_white_pawn_positions = std::vector<Position>();
+        for (File f = File::A; f != File::OUTOFBOUNDS; f = f + 1) {
+            initial_black_pawn_positions.emplace_back(Position(f, Rank::SEVEN));
+            initial_white_pawn_positions.emplace_back(Position(f, Rank::TWO));
+        }
+        initial_positions.insert(std::make_pair('P', initial_white_pawn_positions));
+        initial_positions.insert(std::make_pair('p', initial_black_pawn_positions));
+
         auto fen_string_stream = std::istringstream(fen_string);
         std::vector<std::string> fields;
         std::string s;
@@ -211,8 +238,12 @@ namespace board {
                 if (isdigit(*it)) {
                     fileIndex += (int) *it - '0';
                 } else {
-                    pieces_.push_back(Piece(Position((File) fileIndex, (Rank) rankIndex),
+                    auto piece = (Piece(Position((File) fileIndex, (Rank) rankIndex),
                                             islower(*it) ? Color::BLACK : Color::WHITE, char_to_piece(toupper(*it))));
+                    if (std::find(initial_positions[*it].begin(), initial_positions[*it].end(), piece.position_) == initial_positions[*it].end()) {
+                        piece.has_already_moved_ = true;
+                    }
+                    pieces_.emplace_back(piece);
                     fileIndex++;
                 }
             }
@@ -235,7 +266,7 @@ namespace board {
         if (fields[3] != "-") {
             File f = (File) (fields[3].at(0) - 'a');
             Rank r = (Rank) (fields[3].at(1) - '1');
-            en_passant_target_square_.push_back(std::make_optional<Position>(f, r));
+            past_moves_en_passant_target_squares_.push_back(std::make_optional<Position>(f, r));
         }
     }
 
@@ -247,16 +278,25 @@ namespace board {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 if (!(board_(i, j) == b.board_(i, j))) {
-                    std::cout << "the elt at " << i << " " << j << " is different\n";
+                    std::cout << "the piece in MAT[" << i << "][" << j <<"]  is different\n";
                     return false;
                 }
             }
         }
-        for (auto elt : pieces_) {
-            if (find(b.pieces_.begin(), b.pieces_.end(), elt) == b.pieces_.end()) {
-                return false;
+        if (pieces_ != b.pieces_) {
+            std::cout << "piece list different\n";
+            std::cout << "size: " << pieces_.size() << "\n";
+            std::cout << "other: " << b.pieces_.size() << "\n";
+            for (unsigned i = 0; i < pieces_.size(); i++) {
+                if (!(pieces_.at(i) == b.pieces_.at(i))) {
+                    std::cout << "pieces #" << i << " is different: got: " << pieces_.at(i).to_string() << "; expected: " << b.pieces_.at(i).to_string() << "\n";
+                }
+                if (find(b.pieces_.begin(), b.pieces_.end(), pieces_.at(i)) == b.pieces_.end()) {
+                    std::cout << "could not find piece #" << i << " in other board\n";
+                }
             }
         }
+
         if (is_white_turn_ != b.is_white_turn_) {
             std::cout << "Is_whit_turn is different " << is_white_turn_ << " vs " << b.is_white_turn_;
             return false;
@@ -285,23 +325,24 @@ namespace board {
             std::cout << "current is different " << current_turn_ << " vs " << b.current_turn_;
             return false;
         }
-        if (turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size() - 1]
-            !=
-            b.turns_since_last_piece_taken_or_pawn_moved_[b.turns_since_last_piece_taken_or_pawn_moved_.size() - 1]) {
-            std::cout << "turns_since_last_piece_taken_or_pawn_moved_ is different "
-                      << turns_since_last_piece_taken_or_pawn_moved_[
-                              turns_since_last_piece_taken_or_pawn_moved_.size() - 1] << " vs "
-                      << b.turns_since_last_piece_taken_or_pawn_moved_[
-                              b.turns_since_last_piece_taken_or_pawn_moved_.size() - 1];
+        if (past_moves_halfmove_clocks_ != b.past_moves_halfmove_clocks_) {
+            std::cout << "past_moves_halfmove_clocks_ different\n" << "\n";
+            std::cout << "size: " << past_moves_halfmove_clocks_.size() << "\n";
+            std::cout << "other: " << b.past_moves_halfmove_clocks_.size() << "\n";
             return false;
         }
-        for (unsigned long i = 0; i < en_passant_target_square_.size(); i++) {
-            if (en_passant_target_square_[i].has_value()) {
-                if (en_passant_target_square_[i].value() != b.en_passant_target_square_[i].value()) {
-                    std::cout << "en passant target suqare are different\n";
-                }
-            }
+        if (last_pieces_captured_ != b.last_pieces_captured_) {
+            std::cout << "last pieces captured different\n";
+            std::cout << "size: " << last_pieces_captured_.size() << "\n";
+            std::cout << "other: " << b.last_pieces_captured_.size() << "\n";
         }
+        if (past_moves_halfmove_clocks_ != b.past_moves_halfmove_clocks_) {
+            std::cout << "past_moves_halfmove_clocks_ different\n" << "\n";
+            std::cout << "size: " << past_moves_halfmove_clocks_.size() << "\n";
+            std::cout << "other: " << b.past_moves_halfmove_clocks_.size() << "\n";
+            return false;
+        }
+
         return true;
     }
 

@@ -10,9 +10,9 @@ namespace board {
     void Chessboard::do_move(Move move) {
 
         current_turn_ += 1;
-        //turns_since_last_piece_taken_or_pawn_moved_[turns_since_last_piece_taken_or_pawn_moved_.size() - 1]+=1;
-        auto temp = turns_since_last_piece_taken_or_pawn_moved_.back() + 1;
-        turns_since_last_piece_taken_or_pawn_moved_.push_back(temp);
+        //past_moves_halfmove_clocks_[past_moves_halfmove_clocks_.size() - 1]+=1;
+        auto temp = past_moves_halfmove_clocks_.back() + 1;
+        past_moves_halfmove_clocks_.push_back(temp);
 
         //handle capture (+ special behaviour for en-passant)
         if (move.is_capture_) {
@@ -20,7 +20,7 @@ namespace board {
                 remove_piece((*this)[move.end_position_].value());
             } else {
                 int direction = whose_turn_is_it() == Color::WHITE ? 1 : -1;
-                auto target = en_passant_target_square_.back().value();
+                auto target = past_moves_en_passant_target_squares_.back().value();
                 remove_piece((*this)[Position(target.file_get(), target.rank_get() - direction)].value());
             }
         }
@@ -29,7 +29,7 @@ namespace board {
         if (!move.is_en_passant_) {
             move_piece((*this)[move.start_position_].value(), move.end_position_);
         } else {
-            move_piece((*this)[move.start_position_].value(), en_passant_target_square_.back().value());
+            move_piece((*this)[move.start_position_].value(), past_moves_en_passant_target_squares_.back().value());
         }
 
         if (move.is_king_castling_ || move.is_queen_castling_) {
@@ -63,12 +63,12 @@ namespace board {
         }
 
         //if the board previously had a 'en passant target square', it is now consume
-        en_passant_target_square_.push_back(std::nullopt);
+        past_moves_en_passant_target_squares_.push_back(std::nullopt);
 
         if (move.is_double_pawn_push_) {
             //mark the square that can be "prise en passant"'ed next turn
             int direction = whose_turn_is_it() == Color::WHITE ? +1 : -1;
-            en_passant_target_square_.push_back(std::make_optional<Position>(move.start_position_.file_get(),
+            past_moves_en_passant_target_squares_.push_back(std::make_optional<Position>(move.start_position_.file_get(),
                                                                              move.start_position_.rank_get() +
                                                                              direction));
         }
@@ -84,10 +84,10 @@ namespace board {
 
 
     void Chessboard::add_piece(const std::optional<Piece> p) {
-        assert(p.has_value() && "last_piece_capture has no value");
+        assert(p.has_value() && "last_pieces_captured_ has no value");
         pieces_.push_back(p.value());
         (*this)[p->position_] = p;
-        turns_since_last_piece_taken_or_pawn_moved_.pop_back();
+        past_moves_halfmove_clocks_.pop_back();
     }
 
     void Chessboard::move_piece(const Piece &p, Position new_position) {
@@ -103,7 +103,7 @@ namespace board {
         assert((*this)[piece_it->position_].value() == *piece_it && "copy constructor of piece did not copy properly");
 
         if (p.type_ == PieceType::PAWN) {
-            turns_since_last_piece_taken_or_pawn_moved_.push_back(0);
+            past_moves_halfmove_clocks_.push_back(0);
         }
 
         //make sure this did what we want
@@ -129,9 +129,9 @@ namespace board {
         assert(std::find(pieces_.begin(), pieces_.end(), p) != pieces_.end() && "queried piece not in piece list");
         auto piece_it = std::find(pieces_.begin(), pieces_.end(), p);
         pieces_.erase(piece_it);
-        last_piece_capture.push_back((*this)[p.position_].value());
+        last_pieces_captured_.push_back((*this)[p.position_].value());
         (*this)[p.position_] = std::nullopt;
-        turns_since_last_piece_taken_or_pawn_moved_.push_back(0);
+        past_moves_halfmove_clocks_.push_back(0);
 
         //make sure this did what we want
         assert(std::find(pieces_.begin(), pieces_.end(), p) == pieces_.end());

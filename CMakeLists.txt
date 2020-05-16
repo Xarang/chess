@@ -39,7 +39,7 @@ set(SRC
     src/chessengine/board/chessboard-do.cc
     src/chessengine/board/chessboard-undo.cc
     src/chessengine/board/color.cc
-    src/chessengine/board/move-builder.cc
+        src/chessengine/board/piece-move-builder.cc
     src/chessengine/board/move-legality-checker.cc
     src/chessengine/board/move.cc
     src/chessengine/board/piece.cc
@@ -51,7 +51,7 @@ set(SRC
     src/unitary-test.cc
     src/ai/uci.cc
     src/ai/minimax.cc
-         )
+        src/chessengine/board/piece-move-generator.cc)
 
 include_directories(
     src/

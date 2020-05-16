@@ -5,7 +5,7 @@
 #include "ai/minimax.hh"
 #include "chessengine/board/chessboard.hh"
 #include "chessengine/board/color.hh"
-#include "chessengine/board/move-builder.hh"
+#include "chessengine/board/piece-move-builder.hh"
 
 namespace ai {
     int AI::evaluate(board::Chessboard& myBoard) {
