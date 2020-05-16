@@ -1,8 +1,12 @@
 #pragma once
 
 #include <iostream>
+#include <unordered_map>
+#include <vector>
+#include <chessengine/board/chessboard.hh>
 
 #include "listener.hh"
+std::unordered_map<char, std::vector<board::Position>> board::Chessboard::initial_positions;
 
 static std::string piece_name(int value) {
     switch (value) {
@@ -30,7 +34,9 @@ class BestListener2022 : public listener::Listener {
 
     public:
 
-        BestListener2022() : interface_(nullptr) {}; 
+        BestListener2022() : interface_(nullptr) {
+            board::Chessboard::initialise_chessboard_static_attributes();
+        };
 
     /**
         ** \brief Register the ChessboardInterface for later use.

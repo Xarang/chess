@@ -1,5 +1,5 @@
-#include "listener-test-suite.hh"
 
+#include "listener-test-suite.hh"
 void foo() {
 
 }

@@ -4,6 +4,12 @@
 
 #include "listener.hh"
 
+#include <unordered_map>
+#include <vector>
+#include "board/chessboard.hh"
+
+std::unordered_map<char, std::vector<board::Position>> board::Chessboard::initial_positions;
+
 class ListenerTestSuite : public listener::Listener {
 private:
     const board::ChessboardInterface* interface_;
@@ -12,7 +18,9 @@ private:
 
 public:
 
-    ListenerTestSuite() : interface_(nullptr) {};
+    ListenerTestSuite() : interface_(nullptr) {
+        board::Chessboard::initialise_chessboard_static_attributes();
+    };
 
     /**
         ** \brief Register the ChessboardInterface for later use.
