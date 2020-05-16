@@ -129,7 +129,7 @@ namespace board {
     bool Chessboard::is_draw() {
         //player has 0 legal moves (but is not checked)
         //or
-        //same board configuration happened 3 times
+        //same board configuration happened 3 times (handled elsewhere)
         //or
         //no pawn moved or piece captured in last 50 turns
 
@@ -147,13 +147,14 @@ namespace board {
         return board_((int) pos.file_get(), (int) pos.rank_get());
     }
 
+    //same as [], but read only
     const std::optional<Piece> Chessboard::read(Position pos) const {
         return board_((int) pos.file_get(), (int) pos.rank_get());
     }
 
 
     std::string Chessboard::to_string() const {
-        //TODO: output a FEN string representing the board (https://fr.wikipedia.org/wiki/Notation_Forsyth-Edwards)
+        //outputs a FEN string representing the board (https://fr.wikipedia.org/wiki/Notation_Forsyth-Edwards)
         std::string res = "";
         board::Rank currRank = Rank::EIGHT;
         for (size_t i = 0; i < 8; i++) {
