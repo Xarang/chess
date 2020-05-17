@@ -85,7 +85,7 @@ namespace ai {
 
         float bestValue = -INFINITY;
         board::Move bestMove;
-
+        
         auto moves = myBoard.generate_legal_moves();
 
         for (auto move : moves) {
@@ -98,9 +98,8 @@ namespace ai {
             }
         }
         duration = (clock() - start) / (double) CLOCKS_PER_SEC;
-        std::cerr << "The turn took " << duration << "\n";
         remaining_time_ -= duration;
-        if (duration <= 500)
+        if (duration >= 400)
             depth_ = 1;
         return bestMove;
     }

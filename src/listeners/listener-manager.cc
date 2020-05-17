@@ -156,17 +156,17 @@ namespace listener {
 
             //outputs received position string to log file
             std::string board_str = ai::get_board();
-            std::cerr << "got position: " << board_str << std::endl;
+            //std::cerr << "got position: " << board_str << std::endl;
 
             auto board = board::Chessboard::parse_uci(board_str);
-            std::cerr << "position parsed into chessboard: " << board.to_string() << "\n";
+            //std::cerr << "position parsed into chessboard: " << board.to_string() << "\n";
             //ai get best move for board;
             //auto moves = board_->generate_legal_moves();
 
             auto move = chess_ai.searchMove(board).uci();
 
             //outputs best move to log file
-            std::cerr << "best move: " << move << std::endl;
+            //std::cerr << "best move: " << move << std::endl;
 
             //send move
             ai::play_move(move);

@@ -89,8 +89,8 @@ namespace board {
 
         //build the list of all "potential" moves, not accounting for OOB and blocked paths
         for (auto piece_set : pieces_) {
-            for (auto piece : piece_set.second) {
-                if (piece.color_ == whose_turn_is_it()) {
+            if (piece_set.first.second == whose_turn_is_it()){
+                for (auto piece : piece_set.second) {
                     std::list<Move> pieceMoves = piece.getAllPotentialMoves();
                     for (auto move : pieceMoves) {
                         allMoves.push_front(move);
