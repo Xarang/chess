@@ -91,5 +91,13 @@ target_sources(chessengine PRIVATE "src/main.cc" ${SRC})
 target_link_libraries(chessengine PRIVATE ${LIBRARIES})
 
 
+# STATIC TARGET
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+    add_executable(chessengine-static)
+    target_sources(chessengine-static PRIVATE "src/main.cc" ${SRC})
+    target_link_libraries(chessengine-static PRIVATE ${LIBRARIES} -static)
+endif()
+
+
 # TESTS
 # Check if GTest is installed
