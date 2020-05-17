@@ -6,12 +6,15 @@
 
 namespace board {
 
-    void Chessboard::undo_move(Move move) {
+    void Chessboard::undo_move(Move move, bool change_turn) {
         assert(!past_moves_halfmove_clocks_.empty());
         assert(!past_moves_en_passant_target_squares_.empty());
 
         current_turn_ -= 1;
-        change_turn();
+        if (change_turn) {
+            this->change_turn();
+        }
+
 
         //pop back last entry in all turn-by-turn registers
         past_moves_halfmove_clocks_.pop_back();

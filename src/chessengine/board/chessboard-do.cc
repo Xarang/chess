@@ -7,7 +7,7 @@
 namespace board {
 
 
-    void Chessboard::do_move(Move move) {
+    void Chessboard::do_move(Move move, bool change_turn) {
 
         current_turn_ += 1;
         //past_moves_halfmove_clocks_[past_moves_halfmove_clocks_.size() - 1]+=1;
@@ -85,8 +85,9 @@ namespace board {
             promote_piece((*this)[move.end_position_].value(), move.promotion_.value());
         }
 
-
-        is_white_turn_ = !is_white_turn_;
+        if (change_turn) {
+            this->change_turn();
+        }
     }
 
 

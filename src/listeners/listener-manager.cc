@@ -65,7 +65,7 @@ namespace listener {
                                 }
                             }
                             //check current game state for the player that did the move
-                            board_->do_move(move); //player 1
+                            board_->do_move(move, false && "do not change turn"); //player 1
 
                             //3 fold rule check
                             auto fen = board_->to_string();
@@ -81,9 +81,6 @@ namespace listener {
                                 }
                             }
 
-                            //player 2
-                            board_->change_turn();
-                            //player 1
                             register_move(board_->whose_turn_is_it(), move, captured_piece); //do_move changes the player so we have to get the other player here (!whose_turn_is_it)   
                             board_->change_turn();
                             //player 2
@@ -102,7 +99,6 @@ namespace listener {
                                     return register_game_draw();
                                 }
                             }
-                            //player 2
                         }
                         catch (std::exception &e) {
                             throw std::runtime_error("error happened while executing move: " + move.to_string() + " : " + e.what() + "\n");

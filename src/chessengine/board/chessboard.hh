@@ -111,7 +111,7 @@ namespace board {
         static Chessboard parse_uci(std::string uci_position);
 
         //main methods
-        void do_move(Move);
+        void do_move(Move, bool change_turn = true);
 
         bool is_move_legal(Move &, bool check_self_check = true);
 
@@ -123,7 +123,7 @@ namespace board {
 
         bool is_draw();
 
-        void undo_move(Move);
+        void undo_move(Move, bool change_turn = true);
 
         std::optional<Piece> &operator[](Position p);
 
@@ -145,7 +145,7 @@ namespace board {
         friend class MoveLegalityChecker;
 
         //make a copy of the board with the move passed as argument executed
-        Chessboard project(Move move) const;
+        Chessboard project(Move move, bool change_turn = true) const;
 
         //this is used to initialise initial_positions attribute, which represents the expected initial configuration of a chessboard
         static std::unordered_map<char, std::vector<Position>> initial_positions;

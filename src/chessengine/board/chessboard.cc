@@ -52,8 +52,7 @@ namespace board {
                 return false;
             }
             //
-            auto projection = project(move);
-            projection.is_white_turn_ = !projection.is_white_turn_;
+            auto projection = project(move, false && "do not change turn");
             if (projection.is_check()) {
                 return false;
             }
@@ -82,14 +81,14 @@ namespace board {
     }
 
     //copies the board and perform a move on it
-    Chessboard Chessboard::project(Move move) const {
+    Chessboard Chessboard::project(Move move, bool change_turn) const {
         auto copy = Chessboard(*this);
-        copy.do_move(move);
+        copy.do_move(move, change_turn);
         return copy;
     }
 
     bool Chessboard::is_check() {
-        //std::cout << "is check ?" << "\n";
+
         //generate legal moves for opponent and check if one on them captures your king.
         change_turn();
         std::list<Move> opponent_moves = generate_legal_moves(false); //this false means that this call to generate_legal_moves will not check for check itself (since the other player has initiative anyway)
