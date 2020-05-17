@@ -52,10 +52,17 @@ namespace board {
                 return false;
             }
             //
-            auto projection = project(move, false && "do not change turn");
-            if (projection.is_check()) {
-                return false;
-            }
+
+            do_move(move, false);
+            bool checked = is_check();
+            undo_move(move, false);
+            return !checked;
+
+
+            //auto projection = project(move, false && "do not change turn");
+            //if (projection.is_check()) {
+            //    return false;
+            //}
         }
 
         return true;

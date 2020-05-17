@@ -45,8 +45,8 @@ namespace board
 
     int UnitaryTest::utest_undo_move_rnd() {
         std::cout << "Unit test: RND test\n";
-        for (int i = 0; i < 100; i++) {
-            auto fen = generateRNDBoard((rand()%1000));
+        for (int i = 0; i < 100000; i++) {
+            auto fen = generateRNDBoard(i);
             Chessboard board(fen);
             auto legals_moves = board.generate_legal_moves(true);
             for (auto moves : legals_moves)
