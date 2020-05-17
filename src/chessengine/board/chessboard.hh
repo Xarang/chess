@@ -150,16 +150,16 @@ namespace board {
         //this is used to initialise initial_positions attribute, which represents the expected initial configuration of a chessboard
         static std::unordered_map<char, std::vector<Position>> initial_positions;
         static void initialise_chessboard_static_attributes() {
-            initial_positions.insert(std::make_pair('Q', std::vector<Position>({Position(File::D, Rank::ONE)})));
-            initial_positions.insert(std::make_pair('R', std::vector<Position>({Position(File::A, Rank::ONE), Position(File::H, Rank::ONE)})));
-            initial_positions.insert(std::make_pair('K', std::vector<Position>({Position(File::E, Rank::ONE)})));
-            initial_positions.insert(std::make_pair('N', std::vector<Position>({Position(File::B, Rank::ONE), Position(File::G, Rank::ONE)})));
-            initial_positions.insert(std::make_pair('B', std::vector<Position>({Position(File::C, Rank::ONE), Position(File::F, Rank::ONE)})));
-            initial_positions.insert(std::make_pair('k', std::vector<Position>({Position(File::E, Rank::EIGHT)})));
-            initial_positions.insert(std::make_pair('q', std::vector<Position>({Position(File::D, Rank::EIGHT)})));
-            initial_positions.insert(std::make_pair('r', std::vector<Position>({Position(File::A, Rank::EIGHT), Position(File::H, Rank::EIGHT)})));
-            initial_positions.insert(std::make_pair('n', std::vector<Position>({Position(File::B, Rank::EIGHT), Position(File::G, Rank::EIGHT)})));
-            initial_positions.insert(std::make_pair('b', std::vector<Position>({Position(File::C, Rank::EIGHT), Position(File::F, Rank::EIGHT)})));
+            initial_positions.insert({'R', { Position(File::A, Rank::ONE), Position(File::H, Rank::ONE)}});
+            initial_positions.insert({'K', { Position(File::E, Rank::ONE)}});
+            initial_positions.insert({'Q', { Position(File::D, Rank::ONE)}});
+            initial_positions.insert({'N', { Position(File::B, Rank::ONE), Position(File::G, Rank::ONE)}});
+            initial_positions.insert({'B', { Position(File::C, Rank::ONE), Position(File::F, Rank::ONE)}});
+            initial_positions.insert({'k', { Position(File::E, Rank::EIGHT)}});
+            initial_positions.insert({'q', { Position(File::D, Rank::EIGHT)}});
+            initial_positions.insert({'r', { Position(File::A, Rank::EIGHT), Position(File::H, Rank::EIGHT)}});
+            initial_positions.insert({'n', { Position(File::B, Rank::EIGHT), Position(File::G, Rank::EIGHT)}});
+            initial_positions.insert({'b', { Position(File::C, Rank::EIGHT), Position(File::F, Rank::EIGHT)}});
             auto initial_black_pawn_positions = std::vector<Position>();
             auto initial_white_pawn_positions = std::vector<Position>();
             for (File f = File::A; f != File::OUTOFBOUNDS; f = f + 1) {

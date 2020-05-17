@@ -51,6 +51,7 @@ namespace board {
             if ((move.is_king_castling_ || move.is_queen_castling_) && is_check()) {
                 return false;
             }
+            //
             auto projection = project(move);
             projection.is_white_turn_ = !projection.is_white_turn_;
             if (projection.is_check()) {
@@ -91,8 +92,7 @@ namespace board {
         //std::cout << "is check ?" << "\n";
         //generate legal moves for opponent and check if one on them captures your king.
         change_turn();
-        std::list<Move> opponent_moves = generate_legal_moves(
-                false); //this false means that this call to generate_legal_moves will not check for check itself (since the other player has initiative anyway)
+        std::list<Move> opponent_moves = generate_legal_moves(false); //this false means that this call to generate_legal_moves will not check for check itself (since the other player has initiative anyway)
         change_turn();
 
         auto king = pieces_[{PieceType::KING, whose_turn_is_it()}].front();
