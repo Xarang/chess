@@ -2,3 +2,4 @@ python-chess
 termcolor
 argparse
 numpy
+python-chess
