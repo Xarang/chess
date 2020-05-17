@@ -6,7 +6,7 @@
 
 namespace board {
 
-    void Chessboard::undo_move(Move move, bool change_turn) {
+    void Chessboard::undo_move(Move& move, bool change_turn) {
         assert(!past_moves_halfmove_clocks_.empty());
         assert(!past_moves_en_passant_target_squares_.empty());
 

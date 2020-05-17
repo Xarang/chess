@@ -8,13 +8,15 @@ namespace board {
     bool Chessboard::is_move_legal(Move &move, bool check_self_check) {
 
         //do not consider moves that have OOB positions
-        if (move.start_position_.file_get() == File::OUTOFBOUNDS || move.start_position_.rank_get() == Rank::OUTOFBOUNDS
+        if (move.start_position_.file_get() == File::OUTOFBOUNDS ||
+            move.start_position_.rank_get() == Rank::OUTOFBOUNDS
             || move.end_position_.file_get() == File::OUTOFBOUNDS ||
             move.end_position_.rank_get() == Rank::OUTOFBOUNDS) {
             return false;
         }
         if (past_moves_en_passant_target_squares_.back().has_value() &&
-            move.end_position_ == past_moves_en_passant_target_squares_.back().value()
+            move.end_position_ ==
+            past_moves_en_passant_target_squares_.back().value()
             && move.is_capture_ && move.piece_ == PieceType::PAWN) {
             //this is the place where en passant moves are flagged are so. no en passant moves should be created before this.
             move.is_en_passant_ = true;
@@ -36,29 +38,50 @@ namespace board {
             //do not consider capture moves that end on an empty square...except for en-passant
             return false;
         }
-
         //check if the movement is 'correct' relative to the piece type, and potential piece blocking the movement
         if (!MoveLegalityChecker::is_move_legal(*this, move)) {
             return false;
         }
-
-
         //now that we know the move is 'valid', we check if it is illegal due to " can not check yourself " clause
-
         //check if this move would make/leave the king vulnerable
         //if you are already checked, this is not an option
         if (check_self_check) {
-            if ((move.is_king_castling_ || move.is_queen_castling_) && is_check()) {
-                return false;
-            }
-            //
-            auto projection = project(move, false && "do not change turn");
-            if (projection.is_check()) {
-                return false;
-            }
+
+            if (move.is_king_castling_ || move.is_queen_castling_) {
+                if (is_check()) {
+                    return false;
+                }
+                //check that the castling is not passing through other pieces
+                auto king = pieces_[{PieceType::KING, whose_turn_is_it()}].front();
+                auto moves_to_castling = MoveBuilder::generate_castling_decomposition(king, move.is_king_castling_);
+                bool was_checked_on_the_way = false;
+                for (auto it = moves_to_castling.begin(); it != moves_to_castling.end(); it++) {
+                    //we know that these tiles are free
+                    do_move(*it, false);
+                    if (is_check()) {
+                        was_checked_on_the_way = true;
+                    }
+                }
+                for (auto it = moves_to_castling.rbegin(); it != moves_to_castling.rend(); it++) {
+                    //we know that these tiles are free
+                    undo_move(*it, false);
+                }
+                return !was_checked_on_the_way;
+            } //castlings handled
+
+            do_move(move, false);
+            bool checked = is_check();
+            undo_move(move, false);
+            return !checked;
+
         }
 
         return true;
+        //auto projection = project(move, false && "do not change turn");
+        //if (projection.is_check()) {
+        //    return false;
+        //}
+
     }
 
     std::list<Move> Chessboard::generate_legal_moves(bool check_self_check) {
@@ -76,11 +99,13 @@ namespace board {
             }
         }
 
-        allMoves.remove_if([this, check_self_check](Move &m) { return !this->is_move_legal(m, check_self_check); });
+        allMoves.remove_if([this, check_self_check](Move &m) {
+            return !this->is_move_legal(m, check_self_check);
+        });
         return allMoves;
     }
 
-    //copies the board and perform a move on it
+//copies the board and perform a move on it
     Chessboard Chessboard::project(Move move, bool change_turn) const {
         auto copy = Chessboard(*this);
         copy.do_move(move, change_turn);
@@ -91,7 +116,8 @@ namespace board {
 
         //generate legal moves for opponent and check if one on them captures your king.
         change_turn();
-        std::list<Move> opponent_moves = generate_legal_moves(false); //this false means that this call to generate_legal_moves will not check for check itself (since the other player has initiative anyway)
+        std::list<Move> opponent_moves = generate_legal_moves(
+                false); //this false means that this call to generate_legal_moves will not check for check itself (since the other player has initiative anyway)
         change_turn();
 
         auto king = pieces_[{PieceType::KING, whose_turn_is_it()}].front();
@@ -141,11 +167,12 @@ namespace board {
         return board_((int) pos.file_get(), (int) pos.rank_get());
     }
 
-    //same as [], but read only
+//same as [], but read only
     const std::optional<Piece> Chessboard::read(Position pos) const {
-        if (pos.file_get() == File::OUTOFBOUNDS || pos.rank_get() == Rank::OUTOFBOUNDS)
+        if (pos.file_get() == File::OUTOFBOUNDS ||
+            pos.rank_get() == Rank::OUTOFBOUNDS)
             return std::nullopt;
-        return board_((int)pos.file_get(), (int)pos.rank_get());
+        return board_((int) pos.file_get(), (int) pos.rank_get());
     }
 
 
@@ -184,9 +211,9 @@ namespace board {
     }
 
 
-    /*
-    ** build a chessboard from a fen string representing a board state
-    */
+/*
+** build a chessboard from a fen string representing a board state
+*/
     Chessboard::Chessboard(std::string fen_string) : board_(8, 8) {
 
         //string is fen representation
@@ -212,13 +239,17 @@ namespace board {
                 if (isdigit(*it)) {
                     fileIndex += (int) *it - '0';
                 } else {
-                    auto piece = (Piece(Position((File) fileIndex, (Rank) rankIndex),
-                                        islower(*it) ? Color::BLACK : Color::WHITE, char_to_piece(toupper(*it))));
-                    if (std::find(initial_positions[*it].begin(), initial_positions[*it].end(), piece.position_) ==
+                    auto piece = (Piece(
+                            Position((File) fileIndex, (Rank) rankIndex),
+                            islower(*it) ? Color::BLACK : Color::WHITE,
+                            char_to_piece(toupper(*it))));
+                    if (std::find(initial_positions[*it].begin(),
+                                  initial_positions[*it].end(),
+                                  piece.position_) ==
                         initial_positions[*it].end()) {
                         piece.has_already_moved_ = true;
                     }
-                    pieces_[{piece.type_,piece.color_}].emplace_back(piece);
+                    pieces_[{piece.type_, piece.color_}].emplace_back(piece);
                     fileIndex++;
                 }
             }
@@ -244,23 +275,30 @@ namespace board {
         if (fields[3] != "-") {
             File f = (File) (fields[3].at(0) - 'a');
             Rank r = (Rank) (fields[3].at(1) - '1');
-            past_moves_en_passant_target_squares_.push_back(std::make_optional<Position>(f, r));
+            past_moves_en_passant_target_squares_.push_back(
+                    std::make_optional<Position>(f, r));
         }
     }
 
 
-    //private methods used to factorise basic move operations
-    //heavily asserted for now, to make sure they do what we want them to do
+//private methods used to factorise basic move operations
+//heavily asserted for now, to make sure they do what we want them to do
 
     bool Chessboard::operator==(Chessboard b) {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 if (!(board_(i, j) == b.board_(i, j))) {
-                    std::cout << "the piece in MAT[" << i << "][" << j << "]  is different\n";
+                    std::cout << "the piece in MAT[" << i << "][" << j
+                              << "]  is different\n";
                     std::cout << "MAT[ " << i << "][" << j << "] :"
-                              << (board_(i, j).has_value() ? board_(i, j)->to_string() : "nullopt") << "\n";
+                              << (board_(i, j).has_value() ? board_(i,
+                                                                    j)->to_string()
+                                                           : "nullopt") << "\n";
                     std::cout << "other.MAT[ " << i << "][" << j << "] :"
-                              << (b.board_(i, j).has_value() ? b.board_(i, j)->to_string() : "nullopt") << "\n";
+                              << (b.board_(i, j).has_value() ? b.board_(i,
+                                                                        j)->to_string()
+                                                             : "nullopt")
+                              << "\n";
                     return false;
                 }
             }
@@ -268,45 +306,56 @@ namespace board {
         for (auto piece_set : pieces_) {
             auto equivalent_piece_set = b.pieces_[piece_set.first];
             for (auto piece : piece_set.second) {
-                if (std::find (equivalent_piece_set.begin(), equivalent_piece_set.end(), piece) == equivalent_piece_set.end()) {
-                    std::cout << "could not find piece: " << piece.to_string() << " in other piece map\n";
+                if (std::find(equivalent_piece_set.begin(),
+                              equivalent_piece_set.end(), piece) ==
+                    equivalent_piece_set.end()) {
+                    std::cout << "could not find piece: " << piece.to_string()
+                              << " in other piece map\n";
                     return false;
                 }
             }
         }
 
         if (is_white_turn_ != b.is_white_turn_) {
-            std::cout << "Is_whit_turn is different " << is_white_turn_ << " vs " << b.is_white_turn_;
+            std::cout << "Is_whit_turn is different " << is_white_turn_
+                      << " vs "
+                      << b.is_white_turn_;
             return false;
         }
         if (did_white_queen_castling_ != b.did_white_queen_castling_) {
-            std::cout << "did_white_queen_castling is different " << did_white_queen_castling_ << " vs "
+            std::cout << "did_white_queen_castling is different "
+                      << did_white_queen_castling_ << " vs "
                       << b.did_white_queen_castling_;
             return false;
         }
         if (did_white_king_castling_ != b.did_white_king_castling_) {
-            std::cout << "did_white_king_castling is different " << did_white_king_castling_ << " vs "
+            std::cout << "did_white_king_castling is different "
+                      << did_white_king_castling_ << " vs "
                       << b.did_white_king_castling_;
             return false;
         }
         if (did_black_queen_castling_ != b.did_black_queen_castling_) {
-            std::cout << "did_black_queen_castling is different " << did_black_queen_castling_ << " vs "
+            std::cout << "did_black_queen_castling is different "
+                      << did_black_queen_castling_ << " vs "
                       << b.did_black_queen_castling_;
             return false;
         }
         if (did_black_king_castling_ != b.did_black_king_castling_) {
-            std::cout << "did_black_king_castling is different " << did_black_king_castling_ << " vs "
+            std::cout << "did_black_king_castling is different "
+                      << did_black_king_castling_ << " vs "
                       << b.did_black_king_castling_;
             return false;
         }
         if (current_turn_ != b.current_turn_) {
-            std::cout << "current is different " << current_turn_ << " vs " << b.current_turn_;
+            std::cout << "current is different " << current_turn_ << " vs "
+                      << b.current_turn_;
             return false;
         }
         if (past_moves_halfmove_clocks_ != b.past_moves_halfmove_clocks_) {
             std::cout << "past_moves_halfmove_clocks_ different\n" << "\n";
             std::cout << "size: " << past_moves_halfmove_clocks_.size() << "\n";
-            std::cout << "other: " << b.past_moves_halfmove_clocks_.size() << "\n";
+            std::cout << "other: " << b.past_moves_halfmove_clocks_.size()
+                      << "\n";
             return false;
         }
         if (last_pieces_captured_ != b.last_pieces_captured_) {
@@ -317,7 +366,8 @@ namespace board {
         if (past_moves_halfmove_clocks_ != b.past_moves_halfmove_clocks_) {
             std::cout << "past_moves_halfmove_clocks_ different\n" << "\n";
             std::cout << "size: " << past_moves_halfmove_clocks_.size() << "\n";
-            std::cout << "other: " << b.past_moves_halfmove_clocks_.size() << "\n";
+            std::cout << "other: " << b.past_moves_halfmove_clocks_.size()
+                      << "\n";
             return false;
         }
 

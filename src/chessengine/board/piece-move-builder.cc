@@ -46,5 +46,19 @@ namespace board {
         m.is_queen_castling_ = true;
         return m;
     }
+
+    std::vector<Move> MoveBuilder::generate_castling_decomposition(Piece p, bool king_castling) {
+        int direction = king_castling ? +1 : -1;
+        File end_file = king_castling ? File::G : File::C;
+        std::vector<Move> moves;
+        for (File f = p.position_.file_get(); f != end_file; f = f + direction) {
+            auto move = Move();
+            move.start_position_ = Position(f, p.position_.rank_get());
+            move.end_position_ = Position(f + direction, p.position_.rank_get());
+            move.piece_ = PieceType::KING;
+            moves.emplace_back(move); //back, will pop them from front
+        }
+        return moves;
+    }
 }
    

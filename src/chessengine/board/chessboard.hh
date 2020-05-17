@@ -9,6 +9,7 @@
 #include "color.hh"
 
 #include "move.hh"
+#include "piece-move-builder.hh"
 
 #include "piece.hh"
 #include "piece-type.hh"
@@ -111,9 +112,9 @@ namespace board {
         static Chessboard parse_uci(std::string uci_position);
 
         //main methods
-        void do_move(Move, bool change_turn = true);
+        void do_move(Move&, bool change_turn = true);
 
-        bool is_move_legal(Move &, bool check_self_check = true);
+        bool is_move_legal(Move&, bool check_self_check = true);
 
         std::list<Move> generate_legal_moves(bool check_self_check = true);
 
@@ -123,7 +124,7 @@ namespace board {
 
         bool is_draw();
 
-        void undo_move(Move, bool change_turn = true);
+        void undo_move(Move&, bool change_turn = true);
 
         std::optional<Piece> &operator[](Position p);
 

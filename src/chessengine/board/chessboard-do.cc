@@ -7,7 +7,7 @@
 namespace board {
 
 
-    void Chessboard::do_move(Move move, bool change_turn) {
+    void Chessboard::do_move(Move& move, bool change_turn) {
 
         current_turn_ += 1;
         //past_moves_halfmove_clocks_[past_moves_halfmove_clocks_.size() - 1]+=1;

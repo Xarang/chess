@@ -16,7 +16,6 @@ def run_perft(path_chessengine, path_listener, path_perft_directory):
 
 def run_perft_file(path_chessengine, path_listener, path_perft):
 
-    time_start = time.time()
     python_move_log = []
     chessengine_move_log = []
     def python_perft(depth, board) -> int:
@@ -43,8 +42,14 @@ def run_perft_file(path_chessengine, path_listener, path_perft):
     with open(path_perft) as f:
         perft_line = str.strip(f.readline())
         fen, depth = ' '.join(perft_line.split()[:-1]), perft_line.split()[-1]
+
+        python_time = time.time()
         a = python_perft(int(depth), Board(fen))
+        python_time = time.time() - python_time
+
+        chessengine_time = time.time()
         b = chessengine_perft()
+        chessengine_time = time.time() - chessengine_time
 
         if a != b:
             print(path_perft + ": python and engine did not find the same amount of moves. Python got " + str(a) + " whereas engine got " + str(b))
@@ -83,8 +88,7 @@ def run_perft_file(path_chessengine, path_listener, path_perft):
                             print(board + " engine got move: " + move + " whereas python did not")
             cprint(path_perft + " failure...", "red")
         else:
-            time_end = time.time()
-            cprint(path_perft + " python and chess engine got the same perft results. Hurray ! computation took: " + str(time_end - time_start) + " seconds", "green")
-        #print("-- chessengine output", chessengine_move_log, "--")
-        #print("-- python output", python_move_log, "--")
+            success_message = (path_perft + " success...").ljust(70, '.')
+            cprint(success_message + " chessengine time: " + str(chessengine_time)[:7] + " python time: " + str(python_time)[:7] + "  (" + str(((python_time - chessengine_time) / chessengine_time * 100))[:5] + "%)", "green")
+
 

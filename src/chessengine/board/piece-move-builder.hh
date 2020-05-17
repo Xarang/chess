@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "move.hh"
 #include "piece.hh"
 
@@ -13,5 +15,6 @@ namespace board {
             static Move double_pawn_push(Piece p);
             static Move king_castling(Piece p);
             static Move queen_castling(Piece p);
+            static std::vector<Move> generate_castling_decomposition(Piece p, bool king_castling);
     };
 }
