@@ -18,7 +18,7 @@ def initialise_engine(path):
     print("sent uci introduction")
 
 
-    for stdout_line in iter(engine_process.stdout.readline, ""):
+    for stdout_line in iter(ent -mgine_process.stdout.readline, ""):
         if (stdout_line.strip() == "readyok"):
             break
         print("got line from process: " + stdout_line)
