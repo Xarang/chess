@@ -24,7 +24,7 @@ namespace board {
         Position black_h_rook(File::H, Rank::EIGHT);
 
         if (move.is_king_castling_ || move.is_queen_castling_) {
-            auto rook = chessboard.whose_turn_is_it() == Color::WHITE ? 
+            auto rook = chessboard.whose_turn_is_it() == Color::WHITE ?
                             chessboard.read(move.is_king_castling_ ? white_h_rook : white_a_rook)
                           : chessboard.read(move.is_king_castling_ ? black_h_rook : black_a_rook);
             if (!rook.has_value()) {

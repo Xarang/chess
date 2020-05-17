@@ -9,6 +9,7 @@
 #include "color.hh"
 
 #include "move.hh"
+#include "piece-move-builder.hh"
 
 #include "piece.hh"
 #include "piece-type.hh"
