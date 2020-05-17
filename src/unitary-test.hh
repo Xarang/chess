@@ -20,7 +20,7 @@ namespace board {
 
     private:
         //test for undo_move
-        int utest_undo_move();
+        int utest_undo_move_rnd();
 
         //test for ...
         std::string generateRNDBoard(int brds) {
@@ -85,6 +85,5 @@ namespace board {
         }
 
         char brd[8][8];
-        std::string fen_array[1] = {"Fen strings here"};
     };
 }

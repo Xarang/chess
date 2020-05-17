@@ -11,6 +11,7 @@ namespace board {
         assert(!past_moves_en_passant_target_squares_.empty());
 
         current_turn_ -= 1;
+        change_turn();
 
         //pop back last entry in all turn-by-turn registers
         past_moves_halfmove_clocks_.pop_back();
@@ -59,12 +60,11 @@ namespace board {
         if (move.is_capture_) {
             //if (!move.is_en_passant_) {
             auto piece = last_pieces_captured_.back();
-            last_pieces_captured_.pop_back();
             undo_remove_piece(piece);
-            (*this)[move.end_position_] = piece;
+            last_pieces_captured_.pop_back();
+
         }
 
-        is_white_turn_ = !is_white_turn_;
     }
 
     void Chessboard::undo_remove_piece(std::optional<Piece> p) {

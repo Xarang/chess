@@ -23,15 +23,17 @@ namespace board {
             int direction = color == Color::BLACK ? -1 : 1;
             if (start_position.rank_get() + direction * 2 == end_position.rank_get()) {
                 move.is_double_pawn_push_ = true;
-                return move;
-            } else if (past_moves_en_passant_target_squares_.back().has_value() &&
-                       past_moves_en_passant_target_squares_.back().value() == end_position &&
-                       end_position.file_get() != start_position.file_get()) {
-                move.is_capture_ = true;
-                move.is_en_passant_ = true;
-                return move;
             }
-        } else if (move.piece_ == PieceType::KING) {
+            else if (end_position.file_get() != start_position.file_get()) {
+                move.is_capture_ = true;
+                if (past_moves_en_passant_target_squares_.back().has_value() &&
+                    past_moves_en_passant_target_squares_.back().value() == end_position) {
+                    move.is_en_passant_ = true;
+                }
+            }
+            return move;
+        }
+        else if (move.piece_ == PieceType::KING) {
             if (end_position.file_get() + 2 == start_position.file_get()) {
                 move.is_king_castling_ = true;
                 return move;
