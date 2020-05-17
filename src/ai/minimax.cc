@@ -81,6 +81,8 @@ namespace ai {
         double duration;
         clock_t start = clock();
 
+        color_ = myBoard.whose_turn_is_it();
+
         float bestValue = -INFINITY;
         board::Move bestMove;
 
