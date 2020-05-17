@@ -120,7 +120,7 @@ namespace listener {
         }
     }
 
-    static unsigned long long perft(board::Chessboard b, int depth, bool debug) {
+    static unsigned long long perft(board::Chessboard& b, int depth, bool debug) {
         if (depth == 0) {
             return 1;
         }
@@ -132,8 +132,10 @@ namespace listener {
                     std::cout << b.to_string() << " " << move.uci() << "\n";
                 }
             }
-            auto projection = b.project(move);
-            sum += perft(projection, depth - 1, debug);
+            //auto projection = b.project(move);
+            b.do_move(move);
+            sum += perft(b, depth - 1, debug);
+            b.undo_move(move);
         }   
         return sum;
     }
