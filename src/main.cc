@@ -14,6 +14,64 @@
 #include "pgn/pgn-exception.hh"
 #include "unitary-test.hh"
 
+//tracing related functions
+#include <stdio.h>
+#include <time.h>
+#include <dlfcn.h>
+
+static FILE *fp_trace;
+
+void
+__attribute__ ((constructor))
+trace_begin (void)
+{
+    fp_trace = fopen("trace.out", "w");
+}
+
+void
+__attribute__ ((destructor))
+trace_end (void)
+{
+    if(fp_trace != NULL) {
+        fclose(fp_trace);
+    }
+}
+
+
+extern "C" {
+#define __NON_INSTRUMENT_FUNCTION__    __attribute__((__no_instrument_function__))
+
+    void
+    __NON_INSTRUMENT_FUNCTION__
+    __cyg_profile_func_enter(void *func, void *caller) {
+        Dl_info info_func;
+        Dl_info info_caller;
+        if (fp_trace != NULL) {
+            if (dladdr(func, &info_func) && dladdr(caller, &info_caller)) {
+                fprintf(fp_trace, "e %s %lu\n",
+                        info_func.dli_sname,
+                        time(NULL));
+            }
+        }
+    }
+
+    void
+    __NON_INSTRUMENT_FUNCTION__
+    __cyg_profile_func_exit(void *func, void *caller) {
+        Dl_info info_func;
+        Dl_info info_caller;
+        if (fp_trace != NULL) {
+            if (dladdr(func, &info_func) && dladdr(caller, &info_caller)) {
+                fprintf(fp_trace, "e %s %lu\n",
+                        info_func.dli_sname,
+                        time(NULL));
+            }
+        }
+    }
+}
+
+////// main program starts here
+
 //static attributes declarations for all classes that need it
 std::unordered_map<char, std::vector<board::Position>> board::Chessboard::initial_positions;
 
