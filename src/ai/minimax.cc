@@ -15,7 +15,8 @@ namespace ai {
         auto pieces = myBoard.get_pieces();
 
         res += pair_modify(pieces);
-        //res -= black_pair_modify(pieces);
+
+        res += knight_pawns(pieces);
 
         for (auto piece_pair : pieces)
         {
@@ -111,9 +112,20 @@ namespace ai {
             res += 40;
         if (pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::PAWN, board::Color::WHITE))->second.size() == 0)
             res -= 70;
-        if (pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::ROOK, board::Color::BLACK))->second.size() == 0)
+        if (pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::PAWN, board::Color::BLACK))->second.size() == 0)
             res += 70;
         return res;
+    }
+
+    int AI::knight_pawns(std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair> pieces) {
+        int res = 0;
+        int whitePawns = pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::PAWN, board::Color::WHITE))->second.size();
+        int whiteKnights = pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::KNIGHT, board::Color::WHITE))->second.size()
+        int blackPawns = pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::PAWN, board::Color::WHITE))->second.size();
+        int blackKnights = pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::KNIGHT, board::Color::WHITE))->second.size()
+
+        res -= (8 - whitePawns) * 15 * whiteKnights;
+        res += (8 - blackPawns) * 15 * blackKnights;
     }
 
     board::Move AI::searchMove() {

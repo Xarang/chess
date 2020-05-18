@@ -180,7 +180,8 @@ namespace ai {
         //PairModifiers
         int pair_modify(std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair> pieces);
 
-
+        //Knight value
+        int knight_pawns(std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair> pieces);
 
             /*
              * For mobility values, we might need a specific class in order to take into account multiple paramters:
