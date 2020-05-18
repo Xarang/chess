@@ -8,6 +8,7 @@
 namespace ai {
     struct AI {
         friend board::Chessboard;
+        board::Chessboard myBoard;
         clock_t remaining_time_ = 5000;
         int depth_ = 2;
         board::Color color_ = board::Color::WHITE;
@@ -170,10 +171,10 @@ namespace ai {
         std::list<std::string> openingBlack = { "d7d5"};
 
         //BackwardPawnCheck
-        int backwardPawnCheck(board::Position myPos, board::Chessboard myboard);
+        int backwardPawnCheck(board::Position myPos);
 
         //CandidatePawnCheck
-        int candidatePawnCheck(board::Position myPos, board::Chessboard myboard);
+        int candidatePawnCheck(board::Position myPos);
 
 
         /*
@@ -181,8 +182,8 @@ namespace ai {
          * Value of going forward > Value of going backwards
          * Population near the possible cells we can move to
          */
-        int evaluate(board::Chessboard& board);
-        float minimax(board::Position myPos, int depth, bool is_black, board::Chessboard& board);
-        board::Move searchMove(board::Chessboard& board);
+        int evaluate();
+        float minimax(int depth, bool is_black);
+        board::Move searchMove();
     };
 }

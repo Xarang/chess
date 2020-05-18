@@ -9,8 +9,9 @@
 #include "chessengine/board/piece-move-builder.hh"
 
 namespace ai {
-    int AI::evaluate(board::Chessboard& myBoard) {
+    int AI::evaluate() {
         int res = 0;
+
         auto pieces = myBoard.get_pieces();
         for (auto piece_pair : pieces)
         {
@@ -27,8 +28,8 @@ namespace ai {
                         res += (*table_valuesBlack[piece.type_])[(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
 
                     if (piece.type_ == board::PieceType::PAWN) {
-                        res += backwardPawnCheck(piece.position_, myBoard);
-                        res += candidatePawnCheck(piece.position_, myBoard);
+                        res += backwardPawnCheck(piece.position_);
+                        res += candidatePawnCheck(piece.position_);
                     }
                 }
                 else
@@ -39,8 +40,8 @@ namespace ai {
                     else
                         res -= (*table_valuesBlack[piece.type_])[(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
                     if (piece.type_ == board::PieceType::PAWN) {
-                        res -= backwardPawnCheck(piece.position_, myBoard);
-                        res -= candidatePawnCheck(piece.position_, myBoard);
+                        res -= backwardPawnCheck(piece.position_);
+                        res -= candidatePawnCheck(piece.position_);
                     }
                 }
             }
@@ -48,19 +49,19 @@ namespace ai {
         return res;
     }
 
-    float AI::minimax(board::Position myPos, int depth, bool ai_turn, board::Chessboard& myBoard) {
-        (void) myPos;
+    float AI::minimax(int depth, bool ai_turn) {
          if (depth == 0 || myBoard.is_checkmate())
-             return evaluate(myBoard);
+             return evaluate();
 
          auto moves = myBoard.generate_legal_moves();
 
-         // Black wants to minimize
+         // Ai wants to minimize
          if (ai_turn) {
              float maxEval = -INFINITY;
              for (auto move : moves) {
-                 auto proj = myBoard.project(move);
-                 auto eval = minimax(move.end_position_, depth - 1, !ai_turn, proj);
+                 myBoard.do_move(move, true);
+                 auto eval = minimax(depth - 1, !ai_turn);
+                 myBoard.undo_move(move);
                  maxEval = std::max(maxEval, eval);
              }
              return maxEval;
@@ -69,15 +70,16 @@ namespace ai {
          else {
              float minEval = +INFINITY;
              for (auto move : moves) {
-                 auto proj = myBoard.project(move);
-                 auto eval = minimax(move.end_position_, depth - 1, !ai_turn, proj);
+                 myBoard.do_move(move, true);
+                 auto eval = minimax(depth - 1, !ai_turn);
+                 myBoard.undo_move(move);
                  minEval = std::min(minEval, eval);
              }
              return minEval;
          }
     }
 
-    board::Move AI::searchMove(board::Chessboard& myBoard) {
+    board::Move AI::searchMove() {
         double duration;
         clock_t start = clock();
 
@@ -85,12 +87,13 @@ namespace ai {
 
         float bestValue = -INFINITY;
         board::Move bestMove;
-        
+
         auto moves = myBoard.generate_legal_moves();
 
         for (auto move : moves) {
-            auto proj = myBoard.project(move);
-            auto value = minimax(move.end_position_, depth_, false, proj);
+            myBoard.do_move(move);
+            auto value = minimax(depth_, false);
+            myBoard.undo_move(move, true);
             if (value > bestValue)
             {
                 bestValue = value;
@@ -98,30 +101,31 @@ namespace ai {
             }
         }
         duration = (clock() - start) / (double) CLOCKS_PER_SEC;
+        std::cerr << "time to make move: " << duration << "\n";
         remaining_time_ -= duration;
-        if (duration >= 400)
+        if (duration >= 4000)
             depth_ = 1;
         return bestMove;
     }
 
-    int AI::backwardPawnCheck(board::Position myPos, board::Chessboard myboard) {
+    int AI::backwardPawnCheck(board::Position myPos) {
         int res = 0;
         if (color_ == board::Color::WHITE) {
-            auto backLeft = myboard.read(board::Position(myPos.file_get() - 1, myPos.rank_get() - 1));
+            auto backLeft = myBoard.read(board::Position(myPos.file_get() - 1, myPos.rank_get() - 1));
             if (backLeft.has_value() && backLeft.value().type_ == board::PieceType::PAWN)
                 res += 30;
-            auto backRight = myboard.read(board::Position(myPos.file_get() + 1, myPos.rank_get() - 1));
+            auto backRight = myBoard.read(board::Position(myPos.file_get() + 1, myPos.rank_get() - 1));
             if (backRight.has_value() && backRight.value().type_ == board::PieceType::PAWN) {
                 if (res > 0)
                     res -= 10;
                 res += 30;
             }
         } else {
-            auto backLeft = myboard.read(board::Position(myPos.file_get() - 1, myPos.rank_get() + 1));
+            auto backLeft = myBoard.read(board::Position(myPos.file_get() - 1, myPos.rank_get() + 1));
             if (backLeft.has_value() && backLeft.value().type_ == board::PieceType::PAWN)
                 res += 10;
 
-            auto backRight = myboard.read(board::Position(myPos.file_get() + 1, myPos.rank_get() + 1));
+            auto backRight = myBoard.read(board::Position(myPos.file_get() + 1, myPos.rank_get() + 1));
             if (backRight.has_value() && backRight.value().type_ == board::PieceType::PAWN) {
                 if (res > 0)
                     res -= 10;
@@ -132,18 +136,18 @@ namespace ai {
     }
 
     //Candidate Pawn should not take into account special Pieces.
-    int AI::candidatePawnCheck(board::Position myPos, board::Chessboard myboard) {
+    int AI::candidatePawnCheck(board::Position myPos) {
         int res = 0;
         int i = 0;
         if (color_ == board::Color::WHITE) {
-            while (!myboard[board::Position(myPos.file_get() + i, myPos.rank_get())].has_value()) {
+            while (!myBoard[board::Position(myPos.file_get() + i, myPos.rank_get())].has_value()) {
                 i++;
             }
             if (myPos.file_get() - i == board::File::H)
                 res += 50;
         }
         else {
-            while (!myboard[board::Position(myPos.file_get() - i, myPos.rank_get())].has_value()) {
+            while (!myBoard[board::Position(myPos.file_get() - i, myPos.rank_get())].has_value()) {
                 i++;
             }
             if (myPos.file_get() - i == board::File::A)
