@@ -12,8 +12,11 @@ namespace ai {
     int AI::evaluate() {
         int res = 0;
         nb_eval += 1;
-
         auto pieces = myBoard.get_pieces();
+
+        res += pair_modify(pieces);
+        //res -= black_pair_modify(pieces);
+
         for (auto piece_pair : pieces)
         {
             for (auto piece : piece_pair.second)
@@ -88,6 +91,29 @@ namespace ai {
              }
              return minEval;
          }
+    }
+
+    int AI::pair_modify(std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair> pieces) {
+        int res = 0;
+        //Bonus
+        if (pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::BISHOP, board::Color::WHITE))->second.size() > 1)
+            res += 50;
+        if (pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::BISHOP, board::Color::BLACK))->second.size() > 1)
+            res -= 50;
+        //Malus
+        if (pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::KNIGHT, board::Color::WHITE))->second.size() > 1)
+            res -= 30;
+        if (pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::KNIGHT, board::Color::BLACK))->second.size() > 1)
+            res += 30;
+        if (pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::ROOK, board::Color::WHITE))->second.size() > 1)
+            res -= 40;
+        if (pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::ROOK, board::Color::BLACK))->second.size() > 1)
+            res += 40;
+        if (pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::PAWN, board::Color::WHITE))->second.size() == 0)
+            res -= 70;
+        if (pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::ROOK, board::Color::BLACK))->second.size() == 0)
+            res += 70;
+        return res;
     }
 
     board::Move AI::searchMove() {

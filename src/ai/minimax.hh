@@ -177,12 +177,16 @@ namespace ai {
         //CandidatePawnCheck
         int candidatePawnCheck(board::Position myPos);
 
+        //PairModifiers
+        int pair_modify(std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair> pieces);
 
-        /*
-         * For mobility values, we might need a specific class in order to take into account multiple paramters:
-         * Value of going forward > Value of going backwards
-         * Population near the possible cells we can move to
-         */
+
+
+            /*
+             * For mobility values, we might need a specific class in order to take into account multiple paramters:
+             * Value of going forward > Value of going backwards
+             * Population near the possible cells we can move to
+             */
         int evaluate();
         float minimax(int depth, bool is_black, float alpha, float beta);
         board::Move searchMove();
