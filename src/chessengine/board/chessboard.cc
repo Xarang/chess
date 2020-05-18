@@ -93,7 +93,14 @@ namespace board {
                 for (auto piece : piece_set.second) {
                     std::list<Move> pieceMoves = piece.getAllPotentialMoves();
                     for (auto move : pieceMoves) {
-                        allMoves.push_front(move);
+                        if (move.is_capture_)
+                        {
+                            allMoves.push_front(move);
+                        }
+                        else
+                        {
+                            allMoves.push_back(move);
+                        }
                     }
                 }
             }

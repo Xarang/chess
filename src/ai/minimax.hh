@@ -8,8 +8,9 @@
 namespace ai {
     struct AI {
         friend board::Chessboard;
+        board::Chessboard myBoard;
         clock_t remaining_time_ = 5000;
-        int depth_ = 2;
+        int depth_ = 3;
         board::Color color_ = board::Color::WHITE;
 
         //Piece Material Values
@@ -170,19 +171,24 @@ namespace ai {
         std::list<std::string> openingBlack = { "d7d5"};
 
         //BackwardPawnCheck
-        int backwardPawnCheck(board::Position myPos, board::Chessboard myboard);
+        int backwardPawnCheck(board::Position myPos);
 
         //CandidatePawnCheck
-        int candidatePawnCheck(board::Position myPos, board::Chessboard myboard);
+        int candidatePawnCheck(board::Position myPos);
 
+        //PairModifiers
+        int pair_modify(std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair> pieces);
 
-        /*
-         * For mobility values, we might need a specific class in order to take into account multiple paramters:
-         * Value of going forward > Value of going backwards
-         * Population near the possible cells we can move to
-         */
-        int evaluate(board::Chessboard& board);
-        float minimax(board::Position myPos, int depth, bool is_black, board::Chessboard& board);
-        board::Move searchMove(board::Chessboard& board);
+        //Knight value
+        int knight_pawns(std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair> pieces);
+
+            /*
+             * For mobility values, we might need a specific class in order to take into account multiple paramters:
+             * Value of going forward > Value of going backwards
+             * Population near the possible cells we can move to
+             */
+        int evaluate();
+        float minimax(int depth, bool is_black, float alpha, float beta);
+        board::Move searchMove();
     };
 }

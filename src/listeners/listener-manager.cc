@@ -160,10 +160,11 @@ namespace listener {
 
             auto board = board::Chessboard::parse_uci(board_str);
             //std::cerr << "position parsed into chessboard: " << board.to_string() << "\n";
+            chess_ai.myBoard = board;
             //ai get best move for board;
             //auto moves = board_->generate_legal_moves();
 
-            auto move = chess_ai.searchMove(board).uci();
+            auto move = chess_ai.searchMove().uci();
 
             //outputs best move to log file
             //std::cerr << "best move: " << move << std::endl;
@@ -179,7 +180,8 @@ namespace listener {
             //TODO: show ai score for this move
             auto new_board = board_->project(move);
             ai::AI myAI;
-            std::cout << move.uci() << " " << myAI.evaluate(new_board) << "\n";
+            myAI.myBoard = new_board;
+            std::cout << move.uci() << " " << myAI.evaluate() << "\n";
         }
     }
 
