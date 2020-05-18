@@ -12,7 +12,6 @@ namespace ai {
         clock_t remaining_time_ = 5000;
         int depth_ = 3;
         board::Color color_ = board::Color::WHITE;
-        int nb_eval = 0;
 
         //Piece Material Values
         std::map<board::PieceType, int> material_values = {

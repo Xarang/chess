@@ -11,7 +11,6 @@
 namespace ai {
     int AI::evaluate() {
         int res = 0;
-        nb_eval += 1;
         auto pieces = myBoard.get_pieces();
 
         res += pair_modify(pieces);
@@ -120,12 +119,13 @@ namespace ai {
     int AI::knight_pawns(std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair> pieces) {
         int res = 0;
         int whitePawns = pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::PAWN, board::Color::WHITE))->second.size();
-        int whiteKnights = pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::KNIGHT, board::Color::WHITE))->second.size()
+        int whiteKnights = pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::KNIGHT, board::Color::WHITE))->second.size();
         int blackPawns = pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::PAWN, board::Color::WHITE))->second.size();
-        int blackKnights = pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::KNIGHT, board::Color::WHITE))->second.size()
+        int blackKnights = pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::KNIGHT, board::Color::WHITE))->second.size();
 
         res -= (8 - whitePawns) * 15 * whiteKnights;
         res += (8 - blackPawns) * 15 * blackKnights;
+        return res;
     }
 
     board::Move AI::searchMove() {
@@ -150,12 +150,9 @@ namespace ai {
             }
         }
         duration = (clock() - start) / (double) CLOCKS_PER_SEC;
-        std::cerr << "time to make move: " << duration << "\n";
         remaining_time_ -= duration;
         if (duration >= 4000)
             depth_ = 1;
-        std::cerr << "nb eval = " << nb_eval << "\n";
-        nb_eval = 0;
         return bestMove;
     }
 
