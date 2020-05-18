@@ -11,6 +11,7 @@
 namespace ai {
     int AI::evaluate() {
         int res = 0;
+        nb_eval += 1;
 
         auto pieces = myBoard.get_pieces();
         for (auto piece_pair : pieces)
@@ -49,7 +50,7 @@ namespace ai {
         return res;
     }
 
-    float AI::minimax(int depth, bool ai_turn) {
+    float AI::minimax(int depth, bool ai_turn, float alpha, float beta) {
          if (depth == 0 || myBoard.is_checkmate())
              return evaluate();
 
@@ -60,9 +61,14 @@ namespace ai {
              float maxEval = -INFINITY;
              for (auto move : moves) {
                  myBoard.do_move(move, true);
-                 auto eval = minimax(depth - 1, !ai_turn);
+                 auto eval = minimax(depth - 1, !ai_turn, alpha, beta);
                  myBoard.undo_move(move);
                  maxEval = std::max(maxEval, eval);
+                 alpha = std::max(alpha, eval);
+                 if (beta <= alpha)
+                 {
+                     break;
+                 }
              }
              return maxEval;
          }
@@ -71,9 +77,14 @@ namespace ai {
              float minEval = +INFINITY;
              for (auto move : moves) {
                  myBoard.do_move(move, true);
-                 auto eval = minimax(depth - 1, !ai_turn);
+                 auto eval = minimax(depth - 1, !ai_turn, alpha, beta);
                  myBoard.undo_move(move);
                  minEval = std::min(minEval, eval);
+                 beta = std::min(beta, eval);
+                 if (beta <= alpha)
+                 {
+                     break;
+                 }
              }
              return minEval;
          }
@@ -92,7 +103,7 @@ namespace ai {
 
         for (auto move : moves) {
             myBoard.do_move(move);
-            auto value = minimax(depth_, false);
+            auto value = minimax(depth_, false, -INFINITY, +INFINITY);
             myBoard.undo_move(move, true);
             if (value > bestValue)
             {
@@ -105,6 +116,8 @@ namespace ai {
         remaining_time_ -= duration;
         if (duration >= 4000)
             depth_ = 1;
+        std::cerr << "nb eval = " << nb_eval << "\n";
+        nb_eval = 0;
         return bestMove;
     }
 
