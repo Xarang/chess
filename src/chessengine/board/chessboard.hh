@@ -102,6 +102,9 @@ namespace board {
 
         Chessboard(const Chessboard &other) = default;
 
+
+        bool occupied_by(board::Color myColor, board::PieceType myType, board::Position myPos);
+
         //FEN string based constructor
         Chessboard(std::string fen_string);
 

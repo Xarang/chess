@@ -182,6 +182,7 @@ namespace ai {
         //Knight value
         int knight_pawns(std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair> pieces);
 
+        int bishopEval();
             /*
              * For mobility values, we might need a specific class in order to take into account multiple paramters:
              * Value of going forward > Value of going backwards
