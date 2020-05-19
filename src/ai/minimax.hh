@@ -10,7 +10,7 @@ namespace ai {
         friend board::Chessboard;
         board::Chessboard myBoard;
         clock_t remaining_time_ = 5000;
-        int depth_ = 3;
+        int depth_ = 2;
         board::Color color_ = board::Color::WHITE;
 
         //Piece Material Values
