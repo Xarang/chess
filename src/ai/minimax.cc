@@ -54,7 +54,7 @@ namespace ai {
         return res;
     }
 
-    float AI::minimax(int depth, bool ai_turn, float alpha, float beta) {
+    float AI::minimax(const int& depth, const bool& ai_turn, float alpha, float beta) {
          if (depth == 0 || myBoard.is_checkmate())
              return evaluate();
 
@@ -94,7 +94,7 @@ namespace ai {
          }
     }
 
-    int AI::pair_modify(std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair> pieces) {
+    int AI::pair_modify(const std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair>& pieces) {
         int res = 0;
         //Bonus
         if (pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::BISHOP, board::Color::WHITE))->second.size() > 1)
@@ -117,7 +117,7 @@ namespace ai {
         return res;
     }
 
-    int AI::knight_pawns(std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair> pieces) {
+    int AI::knight_pawns(const std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair>& pieces) {
         int res = 0;
         int whitePawns = pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::PAWN, board::Color::WHITE))->second.size();
         int whiteKnights = pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::KNIGHT, board::Color::WHITE))->second.size();
@@ -227,13 +227,14 @@ namespace ai {
             }
         }
         duration = (clock() - start) / (double) CLOCKS_PER_SEC;
+        std::cerr << "time taken: " << duration << "\n";
         remaining_time_ -= duration;
         if (duration >= 4000)
             depth_ = 1;
         return bestMove;
     }
 
-    int AI::backwardPawnCheck(board::Position myPos) {
+    int AI::backwardPawnCheck(const board::Position& myPos) {
         int res = 0;
         if (color_ == board::Color::WHITE) {
             auto backLeft = myBoard.read(board::Position(myPos.file_get() - 1, myPos.rank_get() - 1));
@@ -261,7 +262,7 @@ namespace ai {
     }
 
     //Candidate Pawn should not take into account special Pieces.
-    int AI::candidatePawnCheck(board::Position myPos) {
+    int AI::candidatePawnCheck(const board::Position& myPos) {
         int res = 0;
         int i = 0;
         if (color_ == board::Color::WHITE) {
