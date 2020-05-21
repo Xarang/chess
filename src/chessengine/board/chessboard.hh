@@ -72,13 +72,13 @@ namespace board {
 
         //these 3 methods are used by do_move
         void remove_piece(const Piece &p);
-        void move_piece(const Piece &p, Position new_position);
-        void promote_piece(const Piece &p, PieceType type);
+        void move_piece(const Piece &p, const Position& new_position);
+        void promote_piece(const Piece &p, const PieceType& type);
 
         //theses methods are used by undo_move
         void undo_remove_piece(std::optional<Piece> p);
-        void undo_move_piece(const Piece &p, Position old_position);
-        void undo_promote_piece(const Piece &p, PieceType type);
+        void undo_move_piece(const Piece &p, const Position& old_position);
+        void undo_promote_piece(const Piece &p, const PieceType& type);
 
     public:
 
@@ -115,7 +115,7 @@ namespace board {
         static Chessboard parse_uci(std::string uci_position);
 
         //main methods
-        void do_move(Move&, bool change_turn = true);
+        void do_move(const Move&, bool change_turn = true);
 
         bool is_move_legal(Move&, bool check_self_check = true);
 
@@ -127,13 +127,13 @@ namespace board {
 
         bool is_draw();
 
-        void undo_move(Move&, bool change_turn = true);
+        void undo_move(const Move&, bool change_turn = true);
 
         std::optional<Piece> &operator[](Position p);
 
 
         //Getters
-        std::unordered_map<std::pair<PieceType, Color>, std::vector<Piece>, hash_pair> get_pieces() {
+        const std::unordered_map<std::pair<PieceType, Color>, std::vector<Piece>, hash_pair>& get_pieces() {
             return pieces_;
         }
 
@@ -177,13 +177,13 @@ namespace board {
 
     class MoveLegalityChecker {
         public:
-        static bool is_move_legal_QUEEN(Chessboard& b, Move& move);
-        static bool is_move_legal_KING(Chessboard& b, Move& move);
-        static bool is_move_legal_ROOK(Chessboard& b, Move& move);
-        static bool is_move_legal_KNIGHT(Chessboard& b, Move& move);
-        static bool is_move_legal_BISHOP(Chessboard& b, Move& move);
-        static bool is_move_legal_PAWN(Chessboard& b, Move& move);
-        static bool is_move_legal(Chessboard& b, Move& move);
+        static bool is_move_legal_QUEEN(const Chessboard& b, const Move& move);
+        static bool is_move_legal_KING(const Chessboard& b, const Move& move);
+        static bool is_move_legal_ROOK(const Chessboard& b, const Move& move);
+        static bool is_move_legal_KNIGHT(const Chessboard& b, const Move& move);
+        static bool is_move_legal_BISHOP(const Chessboard& b, const Move& move);
+        static bool is_move_legal_PAWN(const Chessboard& b, const Move& move);
+        static bool is_move_legal(const Chessboard& b, const Move& move);
     };
 
 }

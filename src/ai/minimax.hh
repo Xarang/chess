@@ -14,7 +14,7 @@ namespace ai {
         board::Color color_ = board::Color::WHITE;
 
         //Piece Material Values
-        std::map<board::PieceType, int> material_values = {
+        std::map<const board::PieceType, const int> material_values = {
                 {board::PieceType::QUEEN,  900},
                 {board::PieceType::ROOK,   500},
                 {board::PieceType::BISHOP, 330},
@@ -24,7 +24,7 @@ namespace ai {
         };
 
         //Piece Square Values
-        std::map<board::PieceType, int (*)[8][8]> table_valuesWhite = {
+        std::map<const board::PieceType, const int (*)[8][8]> table_valuesWhite = {
                 {board::PieceType::QUEEN,  &queenTable},
                 {board::PieceType::ROOK,   &rookTableWhite},
                 {board::PieceType::BISHOP, &bishopTable},
@@ -33,7 +33,7 @@ namespace ai {
                 {board::PieceType::KING,   &kingMiddleTableWhite}
         };
 
-        std::map<board::PieceType, int (*)[8][8]> table_valuesBlack = {
+        std::map<const board::PieceType, const int (*)[8][8]> table_valuesBlack = {
                 {board::PieceType::QUEEN,  &queenTable},
                 {board::PieceType::ROOK,   &rookTableBlack},
                 {board::PieceType::BISHOP, &bishopTable},
@@ -42,7 +42,7 @@ namespace ai {
                 {board::PieceType::KING,   &kingMiddleTableBlack}
         };
 
-        int pawnTableWhite[8][8] = {
+        const int pawnTableWhite[8][8] = {
                 {0,  0,  0,  0,  0,  0,  0,  0},
                 {50, 50, 50, 50, 50, 50, 50, 50},
                 {10, 10, 20, 30, 30, 20, 10, 10},
@@ -53,7 +53,7 @@ namespace ai {
                 {0,  0,  0,  0,  0,  0,  0,  0}
         };
 
-        int pawnTableBlack[8][8] = {
+        const int pawnTableBlack[8][8] = {
                 {0,  0,  0,  0,  0,  0,  0,  0},
                 {5, 10, 10,-20,-20, 10, 10,  5},
                 {5, -5,-10,  0,  0,-10, -5,  5},
@@ -64,7 +64,7 @@ namespace ai {
                 {0,  0,  0,  0,  0,  0,  0,  0}
         };
 
-        int knightTable[8][8] = {
+        const int knightTable[8][8] = {
                 {-50,-40,-30,-30,-30,-30,-40,-50},
                 {-40,-20,  0,  0,  0,  0,-20,-40},
                 {-30,  0, 10, 15, 15, 10,  0,-30},
@@ -75,7 +75,7 @@ namespace ai {
                 {-50,-40,-30,-30,-30,-30,-40,-50}
         };
 
-        int bishopTable[8][8] = {
+        const int bishopTable[8][8] = {
                 {-20,-10,-10,-10,-10,-10,-10,-20},
                 {-10,  0,  0,  0,  0,  0,  0,-10},
                 {-10,  0,  5, 10, 10,  5,  0,-10},
@@ -86,7 +86,7 @@ namespace ai {
                 {-20,-10,-10,-10,-10,-10,-10,-20}
         };
 
-        int rookTableWhite[8][8] = {
+        const int rookTableWhite[8][8] = {
                 {0,  0,  0,  0,  0,  0,  0,  0},
                 {5, 10, 10, 10, 10, 10, 10,  5},
                 {-5,  0,  0,  0,  0,  0,  0, -5},
@@ -97,7 +97,7 @@ namespace ai {
                 {0,  0,  0,  5,  5,  0,  0,  0}
         };
 
-        int rookTableBlack[8][8] = {
+        const int rookTableBlack[8][8] = {
                 {0,  0,  0,  5,  5,  0,  0,  0},
                 {-5,  0,  0,  0,  0,  0,  0, -5},
                 {-5,  0,  0,  0,  0,  0,  0, -5},
@@ -108,7 +108,7 @@ namespace ai {
                 {0,  0,  0,  0,  0,  0,  0,  0}
         };
 
-        int queenTable[8][8] = {
+        const int queenTable[8][8] = {
                 {-20,-10,-10, -5, -5,-10,-10,-20},
                 {-10,  0,  0,  0,  0,  0,  0,-10},
                 {-10,  0,  5,  5,  5,  5,  0,-10},
@@ -119,7 +119,7 @@ namespace ai {
                 {-20,-10,-10, -5, -5,-10,-10,-20}
         };
 
-        int kingMiddleTableWhite[8][8] = {
+        const int kingMiddleTableWhite[8][8] = {
                 {-30,-40,-40,-50,-50,-40,-40,-30},
                 {-30,-40,-40,-50,-50,-40,-40,-30},
                 {-30,-40,-40,-50,-50,-40,-40,-30},
@@ -130,7 +130,7 @@ namespace ai {
                 {20, 30, 10,  0,  0, 10, 30, 20}
         };
 
-        int kingMiddleTableBlack[8][8] = {
+        const int kingMiddleTableBlack[8][8] = {
                 {20,30,10,0,0,10,30,20},
                 {20,20,10,0,0,10,30,20},
                 {-10,-20,-20,-20,-20,-20,-20,-10},
@@ -141,7 +141,7 @@ namespace ai {
                 {-30,-40,-40,-50,-50,-40, -40, -30}
         };
 
-        int kingEndTable[8][8] = {
+        const int kingEndTable[8][8] = {
                 {-50,-40,-30,-20,-20,-30,-40,-50},
                 {-30,-20,-10,  0,  0,-10,-20,-30},
                 {-30,-10, 20, 30, 30, 20,-10,-30},
@@ -171,16 +171,16 @@ namespace ai {
         std::list<std::string> openingBlack = { "d7d5"};
 
         //BackwardPawnCheck
-        int backwardPawnCheck(board::Position myPos);
+        int backwardPawnCheck(const board::Position& myPos);
 
         //CandidatePawnCheck
-        int candidatePawnCheck(board::Position myPos);
+        int candidatePawnCheck(const board::Position& myPos);
 
         //PairModifiers
-        int pair_modify(std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair> pieces);
+        int pair_modify(const std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair>& pieces);
 
         //Knight value
-        int knight_pawns(std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair> pieces);
+        int knight_pawns(const std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair>& pieces);
 
         int bishopEval();
             /*
@@ -189,7 +189,7 @@ namespace ai {
              * Population near the possible cells we can move to
              */
         int evaluate();
-        float minimax(int depth, bool is_black, float alpha, float beta);
+        float minimax(const int& depth, const bool& is_black, float alpha, float beta);
         board::Move searchMove();
     };
 }

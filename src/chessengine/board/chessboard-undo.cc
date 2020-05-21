@@ -6,7 +6,7 @@
 
 namespace board {
 
-    void Chessboard::undo_move(Move& move, bool change_turn) {
+    void Chessboard::undo_move(const Move& move, bool change_turn) {
         assert(!past_moves_halfmove_clocks_.empty());
         assert(!past_moves_en_passant_target_squares_.empty());
 
@@ -76,7 +76,7 @@ namespace board {
         (*this)[p->position_] = p;
     }
 
-    void Chessboard::undo_move_piece(const Piece &p, Position old_position) {
+    void Chessboard::undo_move_piece(const Piece &p, const Position& old_position) {
         std::vector<Piece>& piece_set = pieces_[{p.type_, p.color_}];
         auto piece_it = std::find(piece_set.begin(), piece_set.end(), p);
         assert(piece_it != piece_set.end() && "queried piece not in piece list");
@@ -96,7 +96,7 @@ namespace board {
         assert((*this)[old_position]->color_ == p.color_);
     }
 
-    void Chessboard::undo_promote_piece(const Piece &p, PieceType old_type) {
+    void Chessboard::undo_promote_piece(const Piece &p, const PieceType& old_type) {
         std::vector<Piece>& piece_set = pieces_[{p.type_, p.color_}];
         auto piece_it = std::find(piece_set.begin(), piece_set.end(), p);
         assert(piece_it != piece_set.end() && "queried piece not in piece list");
