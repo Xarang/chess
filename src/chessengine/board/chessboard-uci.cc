@@ -13,8 +13,9 @@ namespace board {
         Position start_position((File) uci_move.at(0) - 'a', (Rank) uci_move.at(1) - '1');
         Position end_position((File) uci_move.at(2) - 'a', (Rank) uci_move.at(3) - '1');
 
-        move.piece_ = (*this)[start_position]->type_;
-        auto color = (*this)[start_position]->color_;
+        auto piece_ptr = read(start_position);
+        move.piece_ = piece_ptr->type_;
+        auto color = piece_ptr->color_;
         move.start_position_ = start_position;
         move.end_position_ = end_position;
 
@@ -44,7 +45,7 @@ namespace board {
             }
         }
 
-        if ((*this)[end_position].has_value()) {
+        if (read(end_position)) {
             move.is_capture_ = true;
         }
 

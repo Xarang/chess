@@ -11,9 +11,9 @@ namespace board {
     using opt_piece_t = std::optional<side_piece_t>; 
 
     opt_piece_t ChessboardInterfaceImpl::operator[](const Position& position) const {
-        std::optional<Piece> p = cb_[position];
-        if (p.has_value()) {
-            return std::pair<PieceType, Color>(p->type_, p->color_);
+        auto piece_ptr = cb_.read(position);
+        if (piece_ptr) {
+            return std::pair<PieceType, Color>(piece_ptr->type_, piece_ptr->color_);
         }
         return std::nullopt;
     }

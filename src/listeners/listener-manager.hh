@@ -30,7 +30,6 @@ namespace listener {
             void run_pgn_file(std::string& filename);
             void run_perft(int depth, bool debug=false);
             void run_ai();
-            void evaluate_ai();
 
             //send informations about what happened on the chessboard to all listeners
             void register_move(board::Color color, board::Move move, std::optional<board::Piece> captured_piece);

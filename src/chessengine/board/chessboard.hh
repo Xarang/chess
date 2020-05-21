@@ -37,8 +37,8 @@ namespace board {
 
         //matrix representation of the board [FILE][RANK]
         //squares hold a nullptr if empty, a pointer to a piece in the piece list otherwise
-        boost::numeric::ublas::matrix<std::optional<Piece>> board_ = boost::numeric::ublas::matrix<std::optional<Piece>>(
-                8, 8);
+        boost::numeric::ublas::matrix<Piece**> board_ = boost::numeric::ublas::matrix<Piece**>(
+                8, 8, (Piece**)malloc(sizeof(void*)));
         //all our pieces
         std::unordered_map<std::pair<PieceType, Color>, std::vector<Piece>, hash_pair> pieces_ = {
                 { { PieceType::PAWN, Color::BLACK }, std::vector<Piece>() },
@@ -76,34 +76,53 @@ namespace board {
         void promote_piece(const Piece &p, PieceType type);
 
         //theses methods are used by undo_move
-        void undo_remove_piece(std::optional<Piece> p);
+        void undo_remove_piece(const Piece &p);
         void undo_move_piece(const Piece &p, Position old_position);
         void undo_promote_piece(const Piece &p, PieceType type);
 
     public:
 
-        // constructors 
-
-        //default constructor (much shorted now huh)
+        // constructors
         Chessboard() {
+
+            for (auto it = board_.begin1(); it < board_.end1(); it++) {
+                *(*it) = nullptr;
+            }
+
+            for (auto sets : pieces_) {
+                sets.second.reserve(16); //make sure no realloc happens
+            }
+
             for (auto position_per_fen_char : Chessboard::initial_positions) {
                 auto attributes = Piece::piecetype_and_color_from_fen(position_per_fen_char.first);
                 for (auto position : position_per_fen_char.second) {
-                    pieces_[{attributes.first, attributes.second}].push_back(Piece(position, attributes.second, attributes.first));
+                    std::vector<Piece>& piece_set = pieces_[{attributes.first, attributes.second}];
+                    piece_set.emplace_back(Piece(position, attributes.second, attributes.first));
+                   *((*this)[piece_set.back().position_]) = &(piece_set.back());
                 }
             }
             //fill the initial matrix
-            for (auto piece_set : pieces_) {
+          /*  for (auto piece_set : pieces_) {
                 for (auto piece : piece_set.second) {
-                    (*this)[Position(piece.position_.file_get(), piece.position_.rank_get())] = piece;
+                    *((*this)[Position(piece.position_.file_get(), piece.position_.rank_get())]) = &piece;
                 }
-            }
+                ²   
+            }*/
+            std::cout << to_string() << "\n";
         }
 
-        Chessboard(const Chessboard &other) = default;
+        //no chessboard copy thx
+        Chessboard(const Chessboard &other) = default; //TODO: make sure this does not break everything
 
         //FEN string based constructor
         Chessboard(std::string fen_string);
+
+        //destructor
+        ~Chessboard() {
+            for (auto it = board_.begin1(); it < board_.end1(); it++) {
+                free(*it);
+            }
+        }
 
         bool operator==(Chessboard b);
 
@@ -126,7 +145,7 @@ namespace board {
 
         void undo_move(Move&, bool change_turn = true);
 
-        std::optional<Piece> &operator[](Position p);
+        Piece** operator[](Position p);
 
 
         //Getters
@@ -137,16 +156,13 @@ namespace board {
         //utils
         std::string to_string() const;
 
-        Color whose_turn_is_it() const { return is_white_turn_ ? Color::WHITE : Color::BLACK; }
+        inline Color whose_turn_is_it() const { return is_white_turn_ ? Color::WHITE : Color::BLACK; }
 
-        const std::optional<Piece> read(Position p) const; //same as operator[], but read-only
+        const Piece* read(Position p) const; //same as operator[], but read-only
 
         void change_turn() { is_white_turn_ = !is_white_turn_; }
 
         friend class MoveLegalityChecker;
-
-        //make a copy of the board with the move passed as argument executed
-        Chessboard project(Move move, bool change_turn = true) const;
 
         //this is used to initialise initial_positions attribute, which represents the expected initial configuration of a chessboard
         static std::unordered_map<char, std::vector<Position>> initial_positions;

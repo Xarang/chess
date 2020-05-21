@@ -59,9 +59,9 @@ namespace listener {
                             if (move.is_capture_) {
                                 if (move.is_en_passant_) {
                                     auto actual_piece_position = board::Position(move.end_position_.file_get(), move.end_position_.rank_get() + (board_->whose_turn_is_it() == board::Color::WHITE ? -1 : 1));
-                                    captured_piece = std::make_optional<board::Piece>(((*board_)[actual_piece_position]).value());
+                                    captured_piece = std::make_optional<board::Piece>(*board_->read(actual_piece_position));
                                 } else {
-                                    captured_piece = std::make_optional<board::Piece>(((*board_)[move.end_position_]).value());
+                                    captured_piece = std::make_optional<board::Piece>(*board_->read(move.end_position_));
                                 }
                             }
                             //check current game state for the player that did the move
@@ -173,18 +173,6 @@ namespace listener {
             ai::play_move(move);
         }
     }
-
-    void ListenerManager::evaluate_ai() {
-        auto moves = board_->generate_legal_moves();
-        for (auto move : moves) {
-            //TODO: show ai score for this move
-            auto new_board = board_->project(move);
-            ai::AI myAI;
-            myAI.myBoard = new_board;
-            std::cout << move.uci() << " " << myAI.evaluate() << "\n";
-        }
-    }
-
 
     //listener calls
     void ListenerManager::register_move(board::Color color, board::Move move, std::optional<board::Piece> captured_piece) {

@@ -160,21 +160,21 @@ namespace ai {
         int res = 0;
         if (color_ == board::Color::WHITE) {
             auto backLeft = myBoard.read(board::Position(myPos.file_get() - 1, myPos.rank_get() - 1));
-            if (backLeft.has_value() && backLeft.value().type_ == board::PieceType::PAWN)
+            if (backLeft && backLeft->type_ == board::PieceType::PAWN)
                 res += 30;
             auto backRight = myBoard.read(board::Position(myPos.file_get() + 1, myPos.rank_get() - 1));
-            if (backRight.has_value() && backRight.value().type_ == board::PieceType::PAWN) {
+            if (backRight && backRight->type_ == board::PieceType::PAWN) {
                 if (res > 0)
                     res -= 10;
                 res += 30;
             }
         } else {
             auto backLeft = myBoard.read(board::Position(myPos.file_get() - 1, myPos.rank_get() + 1));
-            if (backLeft.has_value() && backLeft.value().type_ == board::PieceType::PAWN)
+            if (backLeft && backLeft->type_ == board::PieceType::PAWN)
                 res += 10;
 
             auto backRight = myBoard.read(board::Position(myPos.file_get() + 1, myPos.rank_get() + 1));
-            if (backRight.has_value() && backRight.value().type_ == board::PieceType::PAWN) {
+            if (backRight && backRight->type_ == board::PieceType::PAWN) {
                 if (res > 0)
                     res -= 10;
                 res += 30;
@@ -188,14 +188,14 @@ namespace ai {
         int res = 0;
         int i = 0;
         if (color_ == board::Color::WHITE) {
-            while (!myBoard[board::Position(myPos.file_get() + i, myPos.rank_get())].has_value()) {
+            while (!myBoard.read(board::Position(myPos.file_get() + i, myPos.rank_get()))) {
                 i++;
             }
             if (myPos.file_get() - i == board::File::H)
                 res += 50;
         }
         else {
-            while (!myBoard[board::Position(myPos.file_get() - i, myPos.rank_get())].has_value()) {
+            while (!myBoard.read(board::Position(myPos.file_get() - i, myPos.rank_get()))) {
                 i++;
             }
             if (myPos.file_get() - i == board::File::A)
