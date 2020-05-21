@@ -7,7 +7,7 @@
 namespace board {
 
 
-    void Chessboard::do_move(Move& move, bool change_turn) {
+    void Chessboard::do_move(const Move& move, bool change_turn) {
 
         current_turn_ += 1;
         //past_moves_halfmove_clocks_[past_moves_halfmove_clocks_.size() - 1]+=1;
@@ -92,7 +92,7 @@ namespace board {
 
 
 
-    void Chessboard::move_piece(const Piece &p, Position new_position) {
+    void Chessboard::move_piece(const Piece &p, const Position& new_position) {
         std::vector<Piece>& piece_set = pieces_[{p.type_, p.color_}];
         auto piece_it = std::find(piece_set.begin(), piece_set.end(), p);
         assert(piece_it != piece_set.end() && "queried piece not in piece list");
@@ -111,7 +111,7 @@ namespace board {
         assert((*this)[new_position]->color_ == p.color_);
     }
 
-    void Chessboard::promote_piece(const Piece &p, PieceType new_type) {
+    void Chessboard::promote_piece(const Piece &p, const PieceType& new_type) {
         std::vector<Piece>& piece_set = pieces_[{p.type_, p.color_}];
         auto piece_it = std::find(piece_set.begin(), piece_set.end(), p);
         assert(piece_it != piece_set.end() && "queried piece not in piece list");

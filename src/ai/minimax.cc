@@ -14,6 +14,7 @@ namespace ai {
         auto pieces = myBoard.get_pieces();
 
         res += pair_modify(pieces);
+        res += bishopEval();
 
         res += knight_pawns(pieces);
 
@@ -53,7 +54,7 @@ namespace ai {
         return res;
     }
 
-    float AI::minimax(int depth, bool ai_turn, float alpha, float beta) {
+    float AI::minimax(const int& depth, const bool& ai_turn, float alpha, float beta) {
          if (depth == 0 || myBoard.is_checkmate())
              return evaluate();
 
@@ -93,7 +94,7 @@ namespace ai {
          }
     }
 
-    int AI::pair_modify(std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair> pieces) {
+    int AI::pair_modify(const std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair>& pieces) {
         int res = 0;
         //Bonus
         if (pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::BISHOP, board::Color::WHITE))->second.size() > 1)
@@ -116,7 +117,7 @@ namespace ai {
         return res;
     }
 
-    int AI::knight_pawns(std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair> pieces) {
+    int AI::knight_pawns(const std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair>& pieces) {
         int res = 0;
         int whitePawns = pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::PAWN, board::Color::WHITE))->second.size();
         int whiteKnights = pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::KNIGHT, board::Color::WHITE))->second.size();
@@ -125,6 +126,82 @@ namespace ai {
 
         res -= (8 - whitePawns) * 15 * whiteKnights;
         res += (8 - blackPawns) * 15 * blackKnights;
+        return res;
+    }
+
+    int AI::bishopEval() {
+        int res = 0;
+        auto whiteBishops = myBoard.get_pieces().find(std::make_pair<board::PieceType, board::Color>(board::PieceType::BISHOP, board::Color::WHITE))->second;
+        auto blackBishops = myBoard.get_pieces().find(std::make_pair<board::PieceType, board::Color>(board::PieceType::BISHOP, board::Color::BLACK))->second;
+
+        for (auto piece : whiteBishops) {
+            if (piece.position_ == board::Position(board::File::A, board::Rank::SEVEN)
+                && (myBoard.occupied_by(board::Color::BLACK, board::PieceType::PAWN,
+                        board::Position(board::File::B, board::Rank::SIX))))
+                    res -= 30;
+            else if (piece.position_ == board::Position(board::File::H, board::Rank::SEVEN)
+                     && (myBoard.occupied_by(board::Color::BLACK, board::PieceType::PAWN,
+                             board::Position(board::File::G, board::Rank::SIX))))
+                    res -= 30;
+            else if (piece.position_ == board::Position(board::File::B, board::Rank::EIGHT)
+                     && (myBoard.occupied_by(board::Color::BLACK, board::PieceType::PAWN,
+                                             board::Position(board::File::C, board::Rank::SEVEN))))
+                    res -= 30;
+            else if (piece.position_ == board::Position(board::File::G, board::Rank::EIGHT)
+                     && (myBoard.occupied_by(board::Color::BLACK, board::PieceType::PAWN,
+                                             board::Position(board::File::F, board::Rank::SEVEN))))
+                res -= 30;
+            else if (piece.position_ == board::Position(board::File::A, board::Rank::SIX)
+                     && (myBoard.occupied_by(board::Color::BLACK, board::PieceType::PAWN,
+                                             board::Position(board::File::B, board::Rank::FIVE))))
+                res -= 30;
+            else if (piece.position_ == board::Position(board::File::H, board::Rank::SIX)
+                     && (myBoard.occupied_by(board::Color::BLACK, board::PieceType::PAWN,
+                                             board::Position(board::File::G, board::Rank::FIVE))))
+                res -= 30;
+            else if (piece.position_ == board::Position(board::File::F, board::Rank::ONE)
+                     && (myBoard.occupied_by(board::Color::WHITE, board::PieceType::KING,
+                                             board::Position(board::File::G, board::Rank::ONE))))
+                res += 30;
+            else if (piece.position_ == board::Position(board::File::C, board::Rank::ONE)
+                     && (myBoard.occupied_by(board::Color::WHITE, board::PieceType::KING,
+                                             board::Position(board::File::B, board::Rank::ONE))))
+                res += 30;
+            }
+        for (auto piece : blackBishops) {
+            if (piece.position_ == board::Position(board::File::A, board::Rank::TWO)
+                && (myBoard.occupied_by(board::Color::WHITE, board::PieceType::PAWN,
+                                        board::Position(board::File::B, board::Rank::THREE))))
+                res += 30;
+            else if (piece.position_ == board::Position(board::File::H, board::Rank::TWO)
+                     && (myBoard.occupied_by(board::Color::WHITE, board::PieceType::PAWN,
+                                             board::Position(board::File::G, board::Rank::THREE))))
+                res += 30;
+            else if (piece.position_ == board::Position(board::File::B, board::Rank::ONE)
+                     && (myBoard.occupied_by(board::Color::WHITE, board::PieceType::PAWN,
+                                             board::Position(board::File::C, board::Rank::TWO))))
+                res += 30;
+            else if (piece.position_ == board::Position(board::File::G, board::Rank::ONE)
+                     && (myBoard.occupied_by(board::Color::WHITE, board::PieceType::PAWN,
+                                             board::Position(board::File::F, board::Rank::TWO))))
+                res += 30;
+            else if (piece.position_ == board::Position(board::File::A, board::Rank::THREE)
+                     && (myBoard.occupied_by(board::Color::WHITE, board::PieceType::PAWN,
+                                             board::Position(board::File::B, board::Rank::FOUR))))
+                res += 30;
+            else if (piece.position_ == board::Position(board::File::H, board::Rank::THREE)
+                     && (myBoard.occupied_by(board::Color::BLACK, board::PieceType::PAWN,
+                                             board::Position(board::File::G, board::Rank::FOUR))))
+                res += 30;
+            else if (piece.position_ == board::Position(board::File::F, board::Rank::EIGHT)
+                     && (myBoard.occupied_by(board::Color::BLACK, board::PieceType::KING,
+                                             board::Position(board::File::G, board::Rank::EIGHT))))
+                res -= 30;
+            else if (piece.position_ == board::Position(board::File::C, board::Rank::EIGHT)
+                     && (myBoard.occupied_by(board::Color::BLACK, board::PieceType::KING,
+                                             board::Position(board::File::B, board::Rank::EIGHT))))
+                res -= 30;
+        }
         return res;
     }
 
@@ -151,12 +228,12 @@ namespace ai {
         }
         duration = (clock() - start) / (double) CLOCKS_PER_SEC;
         remaining_time_ -= duration;
-        if (duration >= 4000)
+        if (remaining_time <= 120)
             depth_ = 1;
         return bestMove;
     }
 
-    int AI::backwardPawnCheck(board::Position myPos) {
+    int AI::backwardPawnCheck(const board::Position& myPos) {
         int res = 0;
         if (color_ == board::Color::WHITE) {
             auto backLeft = myBoard.read(board::Position(myPos.file_get() - 1, myPos.rank_get() - 1));
@@ -184,7 +261,7 @@ namespace ai {
     }
 
     //Candidate Pawn should not take into account special Pieces.
-    int AI::candidatePawnCheck(board::Position myPos) {
+    int AI::candidatePawnCheck(const board::Position& myPos) {
         int res = 0;
         int i = 0;
         if (color_ == board::Color::WHITE) {

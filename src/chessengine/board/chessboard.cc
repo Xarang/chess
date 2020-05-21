@@ -5,6 +5,18 @@
 
 namespace board {
 
+    bool Chessboard::occupied_by(board::Color myColor, board::PieceType myType, board::Position myPos) {
+        auto piece = read(myPos);
+        if (piece.has_value()
+        && piece->color_ == myColor
+        && piece->type_ == myType) {
+            return true;
+        }
+        return false;
+
+        //pieces_.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::PAWN, board::Color::WHITE))
+    }
+
     bool Chessboard::is_move_legal(Move &move, bool check_self_check) {
 
         //do not consider moves that have OOB positions

@@ -10,7 +10,7 @@
 namespace board {
 
 
-        std::list<Move> PieceMoveGenerator::Pawn(Piece &p) {
+        std::list<Move> PieceMoveGenerator::Pawn(const Piece &p) {
             std::list<Move> moves;
             int direction = p.color_ == Color::WHITE ? 1 : -1;
             //double pawn advance
@@ -44,7 +44,7 @@ namespace board {
             return moves;
         }
 
-        std::list<Move> PieceMoveGenerator::Bishop(Piece &p) {
+        std::list<Move> PieceMoveGenerator::Bishop(const Piece &p) {
             std::list<Move> bishop_moves;
             File org_file = p.position_.file_get();
             Rank org_rank = p.position_.rank_get();
@@ -81,7 +81,7 @@ namespace board {
             return bishop_moves;
         }
 
-        std::list<Move> PieceMoveGenerator::Knight(Piece &p) {
+        std::list<Move> PieceMoveGenerator::Knight(const Piece &p) {
             std::list<Move> knight_moves;
 
             File org_file = p.position_.file_get();
@@ -109,7 +109,7 @@ namespace board {
             return knight_moves;
         }
 
-        std::list<Move> PieceMoveGenerator::Rook(Piece &p) {
+        std::list<Move> PieceMoveGenerator::Rook(const Piece &p) {
             std::list<Move> rook_moves;
 
             File org_file = p.position_.file_get();
@@ -147,7 +147,7 @@ namespace board {
             return rook_moves;
         }
 
-        std::list<Move> PieceMoveGenerator::Queen(Piece &p) {
+        std::list<Move> PieceMoveGenerator::Queen(const Piece &p) {
             std::list<Move> queen_moves;
 
             File org_file = p.position_.file_get();
@@ -190,7 +190,7 @@ namespace board {
             return queen_moves;
         }
 
-        std::list<Move> PieceMoveGenerator::King(Piece &p) {
+        std::list<Move> PieceMoveGenerator::King(const Piece &p) {
             std::list<Move> king_moves;
             if (!p.has_already_moved_) {
                 king_moves.push_back(MoveBuilder::king_castling(p));

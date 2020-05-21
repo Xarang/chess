@@ -35,12 +35,12 @@ namespace board
 
     class PieceMoveGenerator {
         public:
-            static std::list<Move> Pawn(Piece &p);
-            static std::list<Move> Knight(Piece &p);
-            static std::list<Move> Bishop(Piece &p);
-            static std::list<Move> Rook(Piece &p);
-            static std::list<Move> Queen(Piece &p);
-            static std::list<Move> King(Piece &p);
+            static std::list<Move> Pawn(const Piece &p);
+            static std::list<Move> Knight(const Piece &p);
+            static std::list<Move> Bishop(const Piece &p);
+            static std::list<Move> Rook(const Piece &p);
+            static std::list<Move> Queen(const Piece &p);
+            static std::list<Move> King(const Piece &p);
     };
 
 
