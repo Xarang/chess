@@ -227,9 +227,8 @@ namespace ai {
             }
         }
         duration = (clock() - start) / (double) CLOCKS_PER_SEC;
-        std::cerr << "time taken: " << duration << "\n";
         remaining_time_ -= duration;
-        if (duration >= 4000)
+        if (remaining_time <= 120)
             depth_ = 1;
         return bestMove;
     }

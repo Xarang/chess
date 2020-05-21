@@ -9,7 +9,7 @@ namespace ai {
     struct AI {
         friend board::Chessboard;
         board::Chessboard myBoard;
-        clock_t remaining_time_ = 5000;
+        clock_t remaining_time_ = 300;
         int depth_ = 3;
         board::Color color_ = board::Color::WHITE;
 
