@@ -177,10 +177,10 @@ namespace ai {
         int candidatePawnCheck(const board::Position& myPos);
 
         //PairModifiers
-        int pair_modify(const std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair>& pieces);
+        int pair_modify(const std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece*>, board::hash_pair>& pieces);
 
         //Knight value
-        int knight_pawns(const std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair>& pieces);
+        int knight_pawns(const std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece*>, board::hash_pair>& pieces);
 
         int bishopEval();
             /*
