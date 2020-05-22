@@ -99,24 +99,14 @@ namespace board {
         p->position_ = new_position;
         *((*this)[(p->position_)]) = p;
 
-        //make sure this did what we want
-        assert(read(new_position) == p);
     }
 
     void Chessboard::promote_piece(Piece* p, const PieceType& new_type) {
         std::vector<Piece*>& piece_set = pieces_[{p->type_, p->color_}];
         auto piece_it = std::find(piece_set.begin(), piece_set.end(), p);
-        assert(piece_it != piece_set.end() && "queried piece not in piece list");
         piece_set.erase(piece_it);
-
         p->type_ = new_type;
         put_piece(p);
-
-        std::vector<Piece*>& destination_set = pieces_[{p->type_, p->color_}];
-        assert(std::find(piece_set.begin(), piece_set.end(), p) == piece_set.end() &&
-               "promotion did not remove piece from its original piece set");
-        assert(std::find(destination_set.begin(), destination_set.end(), p) != destination_set.end() &&
-                "promotion did not add promoted piece to the proper set");
     }
 
     void Chessboard::remove_piece(Piece* p) {
@@ -124,13 +114,10 @@ namespace board {
         std::vector<Piece*>& piece_set = pieces_[{p->type_, p->color_}];
         auto piece_it = std::find(piece_set.begin(), piece_set.end(), p);
 
-        assert(piece_it != piece_set.end() && "queried piece not in piece list");
         piece_set.erase(piece_it);
         last_pieces_captured_.emplace_back(p);
         *((*this)[p->position_]) = nullptr;
 
-        //make sure this did what we want
-        assert(std::find(piece_set.begin(), piece_set.end(), p) == piece_set.end());
     }
 
 }

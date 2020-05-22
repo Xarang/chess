@@ -176,19 +176,6 @@ namespace board {
         return false;
     }
 
-    Piece** Chessboard::operator[](Position pos) {
-        return board_((int) pos.file_get(), (int) pos.rank_get());
-    }
-
-//same as [], but read only
-    const Piece* Chessboard::read(Position pos) const {
-        if (pos.file_get() == File::OUTOFBOUNDS ||
-            pos.rank_get() == Rank::OUTOFBOUNDS)
-            return nullptr;
-        return *board_((int) pos.file_get(), (int) pos.rank_get());
-    }
-
-
     std::string Chessboard::to_string() const {
         //outputs a FEN string representing the board (https://fr.wikipedia.org/wiki/Notation_Forsyth-Edwards)
         std::string res = "";
@@ -229,21 +216,14 @@ namespace board {
 */
     Chessboard::Chessboard(std::string fen_string) {
 
-        std::cerr << "initialising matrix\n";
+        //std::cerr << "initialising matrix\n";
         for (auto i = 0; i < 8; i++) {
             for (auto j = 0; j < 8; j++) {
                 board_(i,j) = (Piece**)(malloc(sizeof(void*)));
                 *board_(i,j) = nullptr;
             }
         }
-        /*
-        for (auto it = board_.begin1(); it < board_.end1(); it++) {
-            (*it) = (Piece**)(malloc(sizeof(void*)));
-            *(*it) = nullptr;
-        }
-         */
-        std::cerr << "matrix of pointers initialised\n";
-
+        //std::cerr << "matrix of pointers initialised\n";
 
         //string is fen representation
 

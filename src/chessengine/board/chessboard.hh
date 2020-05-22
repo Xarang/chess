@@ -89,20 +89,14 @@ namespace board {
         // constructors
         Chessboard() {
 
-            std::cerr << "initialising matrix\n";
+            //std::cerr << "initialising matrix\n";
             for (auto i = 0; i < 8; i++) {
                 for (auto j = 0; j < 8; j++) {
                     board_(i,j) = (Piece**)(malloc(sizeof(void*)));
                     *board_(i,j) = nullptr;
                 }
             }
-            /*
-            for (auto it = board_.begin1(); it < board_.end1(); it++) {
-                (*it) = (Piece**)(malloc(sizeof(void*)));
-                *(*it) = nullptr;
-            }
-             */
-            std::cerr << "matrix of pointers initialised\n";
+            //std::cerr << "matrix of pointers initialised\n";
 
             for (auto position_per_fen_char : Chessboard::initial_positions) {
                 auto attributes = Piece::piecetype_and_color_from_fen(position_per_fen_char.first);
@@ -110,7 +104,7 @@ namespace board {
                     put_piece(new Piece(position, attributes.second, attributes.first));
                 }
             }
-            std::cout << to_string() << "\n";
+            //std::cout << to_string() << "\n";
         }
 
         //no chessboard copy thx
@@ -124,7 +118,7 @@ namespace board {
 
         //destructor
         ~Chessboard() {
-            std::cerr << "entered chessboard destructor\n";
+            //std::cerr << "entered chessboard destructor\n";
             for (auto it = board_.begin1(); it < board_.end1(); it++) {
                 if (*(*it)) {
                     free(*(*it));
@@ -134,7 +128,7 @@ namespace board {
             for (auto it = last_pieces_captured_.begin(); it < last_pieces_captured_.end(); it++) {
                 free(*it);
             }
-            std::cerr << "destructed chessbaord\n";
+            //std::cerr << "destructed chessbaord\n";
         }
 
         bool operator==(Chessboard b);
@@ -158,7 +152,9 @@ namespace board {
 
         void undo_move(const Move&, bool change_turn = true);
 
-        Piece** operator[](Position p);
+        inline Piece** operator[](Position pos) {
+            return board_((int) pos.file_get(), (int) pos.rank_get());
+        }
 
 
         //Getters
@@ -171,7 +167,13 @@ namespace board {
 
         inline Color whose_turn_is_it() const { return is_white_turn_ ? Color::WHITE : Color::BLACK; }
 
-        const Piece* read(Position p) const; //same as operator[], but read-only
+        inline const Piece* read(Position pos) const {//same as operator[], but read-only
+            if (pos.file_get() == File::OUTOFBOUNDS ||
+                pos.rank_get() == Rank::OUTOFBOUNDS)
+                return nullptr;
+            return *board_((int) pos.file_get(), (int) pos.rank_get());
+        }
+
 
         void change_turn() { is_white_turn_ = !is_white_turn_; }
 
