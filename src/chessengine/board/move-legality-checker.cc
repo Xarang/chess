@@ -115,7 +115,7 @@ namespace board {
                     move.start_position_.rank_get() + Ri == move.end_position_.rank_get()) {
                     return true;
                 }
-                if (b.board_((int)move.start_position_.file_get() + Fi, (int)move.start_position_.rank_get() + Ri))
+                if (b.read(Position(move.start_position_.file_get() + Fi, move.start_position_.rank_get() + Ri)))
                     return false;
                 Fi += 1;
                 Ri += 1;
@@ -126,16 +126,18 @@ namespace board {
         {
             while (true)
             {
-                if (move.start_position_.file_get() + Fi == move.end_position_.file_get() &&
-                    move.start_position_.rank_get() - Ri == move.end_position_.rank_get()) {
-                    return true;
-                }
                 if (move.start_position_.file_get() + Fi == File::OUTOFBOUNDS
                     || move.start_position_.rank_get() - Ri == Rank::OUTOFBOUNDS){
                     bo = false;
                     break;
                 }
-                if (b.board_((int)move.start_position_.file_get() + Fi, (int)move.start_position_.rank_get() - Ri))
+
+                if (move.start_position_.file_get() + Fi == move.end_position_.file_get() &&
+                    move.start_position_.rank_get() - Ri == move.end_position_.rank_get()) {
+                    return true;
+                }
+
+                if (b.read(Position(move.start_position_.file_get() + Fi, move.start_position_.rank_get() - Ri)))
                     return false;
                 Fi += 1;
                 Ri += 1;
@@ -146,15 +148,17 @@ namespace board {
         {
             while (true)
             {
-                if (move.start_position_.file_get() - Fi == move.end_position_.file_get() &&
-                    move.start_position_.rank_get() + Ri == move.end_position_.rank_get())
-                {return true;}
-                if (move.start_position_.file_get() - Fi == File::OUTOFBOUNDS || move.start_position_.rank_get() + Ri == Rank::OUTOFBOUNDS)
-                {
+                if (move.start_position_.file_get() - Fi == File::OUTOFBOUNDS || move.start_position_.rank_get() + Ri == Rank::OUTOFBOUNDS) {
                     bo = false;
                     break;
                 }
-                if (b.board_((int)move.start_position_.file_get() - Fi, (int)move.start_position_.rank_get() + Ri))
+
+                if (move.start_position_.file_get() - Fi == move.end_position_.file_get() &&
+                    move.start_position_.rank_get() + Ri == move.end_position_.rank_get()) {
+                    return true;
+                }
+
+                if (b.read(Position(move.start_position_.file_get() - Fi, move.start_position_.rank_get() + Ri)))
                     return false;
                 Fi += 1;
                 Ri += 1;
@@ -164,15 +168,17 @@ namespace board {
         {
             while (true)
             {
-                if (move.start_position_.file_get() - Fi == move.end_position_.file_get() &&
-                    move.start_position_.rank_get() - Ri == move.end_position_.rank_get()) {
-                    return true;
-                }
                 if (move.start_position_.file_get() - Fi == File::OUTOFBOUNDS || move.start_position_.rank_get() - Ri == Rank::OUTOFBOUNDS) {
                     bo = false;
                     break;
                 }
-                if (b.board_((int)move.start_position_.file_get() - Fi, (int)move.start_position_.rank_get() - Ri)) {
+
+                if (move.start_position_.file_get() - Fi == move.end_position_.file_get() &&
+                    move.start_position_.rank_get() - Ri == move.end_position_.rank_get()) {
+                    return true;
+                }
+
+                if (b.read(Position(move.start_position_.file_get() - Fi, move.start_position_.rank_get() - Ri))) {
                     return false;
                 }
                 Fi += 1;
@@ -234,7 +240,7 @@ namespace board {
                 if (move.start_position_.file_get() + Fi == File::OUTOFBOUNDS) {
                     return false;
                 }
-                if (b.board_((int)move.start_position_.file_get() + Fi, (int)move.start_position_.rank_get()))
+                if (b.read(Position(move.start_position_.file_get() + Fi, move.start_position_.rank_get())))
                     break;
                 Fi += 1;
             }
@@ -247,7 +253,7 @@ namespace board {
                 if (move.start_position_.file_get() - Fi == File::OUTOFBOUNDS) {
                     return false;
                 }
-                if (b.board_((int)move.start_position_.file_get() - Fi, (int)move.start_position_.rank_get()))
+                if (b.read(Position(move.start_position_.file_get() - Fi, move.start_position_.rank_get())))
                     break;
                 Fi += 1;
             }
@@ -260,7 +266,7 @@ namespace board {
                 if (move.start_position_.rank_get() + Ri == Rank::OUTOFBOUNDS) {
                     return false;
                 }
-                if (b.board_((int)move.start_position_.file_get(), (int)move.start_position_.rank_get() + Ri))
+                if (b.read(Position(move.start_position_.file_get(), move.start_position_.rank_get() + Ri)))
                     break;
                 Ri += 1;
             }
@@ -273,7 +279,7 @@ namespace board {
                 if (move.start_position_.rank_get() - Ri == Rank::OUTOFBOUNDS) {
                     return false;
                 }
-                if (b.board_((int)move.start_position_.file_get(), (int)move.start_position_.rank_get() - Ri)) {
+                if (b.read(Position(move.start_position_.file_get(), move.start_position_.rank_get() - Ri))) {
                     break;
                 }
                 Ri += 1;
