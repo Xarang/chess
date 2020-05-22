@@ -7,7 +7,7 @@
 namespace board {
 
 
-    void Chessboard::do_move(Move& move, bool change_turn) {
+    void Chessboard::do_move(const Move& move, bool change_turn) {
 
         current_turn_ += 1;
         //past_moves_halfmove_clocks_[past_moves_halfmove_clocks_.size() - 1]+=1;
@@ -23,19 +23,19 @@ namespace board {
         //handle capture (+ special behaviour for en-passant)
         if (move.is_capture_) {
             if (!move.is_en_passant_) {
-                remove_piece(*read(move.end_position_));
+                remove_piece(*((*this)[move.end_position_]));
             } else {
                 int direction = whose_turn_is_it() == Color::WHITE ? 1 : -1;
                 auto target = past_moves_en_passant_target_squares_.back().value();
-                remove_piece(*read(Position(target.file_get(), target.rank_get() - direction)));
+                remove_piece(*(*this)[Position(target.file_get(), target.rank_get() - direction)]);
             }
         }
 
         //handle movement (+ special behaviour for en-passant)
         if (!move.is_en_passant_) {
-            move_piece(*read(move.start_position_), move.end_position_);
+            move_piece(*(*this)[move.start_position_], move.end_position_);
         } else {
-            move_piece(*read(move.start_position_), past_moves_en_passant_target_squares_.back().value());
+            move_piece(*(*this)[move.start_position_], past_moves_en_passant_target_squares_.back().value());
         }
 
         if (move.is_king_castling_ || move.is_queen_castling_) {
@@ -65,7 +65,7 @@ namespace board {
                     association.second = true;
                 }
             }
-            move_piece(*read(rook_position), rook_destination);
+            move_piece(*((*this)[rook_position]), rook_destination);
         }
 
 
@@ -82,7 +82,7 @@ namespace board {
 
         if (move.promotion_.has_value()) {
             //move already happened so we use the endposition
-            promote_piece(*read(move.end_position_), move.promotion_.value());
+            promote_piece(*((*this)[move.end_position_]), move.promotion_.value());
         }
 
         if (change_turn) {
@@ -91,52 +91,43 @@ namespace board {
     }
 
 
+    //TODO: change  const Piece &p to Piece* ?
+    void Chessboard::move_piece(Piece* p, const Position& new_position) {
 
-    void Chessboard::move_piece(const Piece &p, Position new_position) {
-        std::vector<Piece>& piece_set = pieces_[{p.type_, p.color_}];
-        auto piece_it = std::find(piece_set.begin(), piece_set.end(), p);
-        assert(piece_it != piece_set.end() && "queried piece not in piece list");
-        piece_it->has_already_moved_ = true;
-        piece_it->position_ = new_position;
-
-        *((*this)[p.position_]) = nullptr;
-        *((*this)[piece_it->position_]) = &(*piece_it);
+        *((*this)[p->position_]) = nullptr;
+        p->has_already_moved_ = true;
+        p->position_ = new_position;
+        *((*this)[(p->position_)]) = p;
 
         //make sure this did what we want
-        assert(read(new_position) == &(*piece_it));
+        assert(read(new_position) == p);
     }
 
-    void Chessboard::promote_piece(const Piece &p, PieceType new_type) {
-        std::vector<Piece>& piece_set = pieces_[{p.type_, p.color_}];
+    void Chessboard::promote_piece(Piece* p, const PieceType& new_type) {
+        std::vector<Piece*>& piece_set = pieces_[{p->type_, p->color_}];
         auto piece_it = std::find(piece_set.begin(), piece_set.end(), p);
         assert(piece_it != piece_set.end() && "queried piece not in piece list");
-
-        Piece promoted(*piece_it); //copy
         piece_set.erase(piece_it);
 
-        promoted.type_ = new_type;
-        std::vector<Piece>& destination_set = pieces_[{new_type, p.color_}];
-        destination_set.emplace_back(promoted);
-        *((*this)[promoted.position_]) = &(destination_set.back());
+        p->type_ = new_type;
+        put_piece(p);
 
+        std::vector<Piece*>& destination_set = pieces_[{p->type_, p->color_}];
         assert(std::find(piece_set.begin(), piece_set.end(), p) == piece_set.end() &&
                "promotion did not remove piece from its original piece set");
-        assert(std::find(destination_set.begin(), destination_set.end(), promoted) != destination_set.end() &&
+        assert(std::find(destination_set.begin(), destination_set.end(), p) != destination_set.end() &&
                 "promotion did not add promoted piece to the proper set");
     }
 
-    void Chessboard::remove_piece(const Piece &p) {
+    void Chessboard::remove_piece(Piece* p) {
         //std::cerr << "remove piece: " << p.to_string() << "\n";
-        std::vector<Piece>& piece_set = pieces_[{p.type_, p.color_}];
+        std::vector<Piece*>& piece_set = pieces_[{p->type_, p->color_}];
         auto piece_it = std::find(piece_set.begin(), piece_set.end(), p);
-        if (piece_it == piece_set.end()) {
-            std::cerr << p.to_string() << "\n";
-        }
+
         assert(piece_it != piece_set.end() && "queried piece not in piece list");
         piece_set.erase(piece_it);
-        last_pieces_captured_.push_back(*(read(p.position_)));
-        *((*this)[p.position_]) = nullptr;
-
+        last_pieces_captured_.emplace_back(p);
+        *((*this)[p->position_]) = nullptr;
 
         //make sure this did what we want
         assert(std::find(piece_set.begin(), piece_set.end(), p) == piece_set.end());

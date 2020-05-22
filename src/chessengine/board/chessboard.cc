@@ -5,6 +5,18 @@
 
 namespace board {
 
+    bool Chessboard::occupied_by(board::Color myColor, board::PieceType myType, board::Position myPos) {
+        auto piece = read(myPos);
+        if (piece.has_value()
+        && piece->color_ == myColor
+        && piece->type_ == myType) {
+            return true;
+        }
+        return false;
+
+        //pieces_.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::PAWN, board::Color::WHITE))
+    }
+
     bool Chessboard::is_move_legal(Move &move, bool check_self_check) {
 
         //do not consider moves that have OOB positions
@@ -91,7 +103,7 @@ namespace board {
         for (auto piece_set : pieces_) {
             if (piece_set.first.second == whose_turn_is_it()){
                 for (auto piece : piece_set.second) {
-                    std::list<Move> pieceMoves = piece.getAllPotentialMoves();
+                    std::list<Move> pieceMoves = piece->getAllPotentialMoves();
                     for (auto move : pieceMoves) {
                         if (move.is_capture_)
                         {
@@ -124,8 +136,8 @@ namespace board {
         auto king = pieces_[{PieceType::KING, whose_turn_is_it()}].front();
 
         for (auto move : opponent_moves) {
-            if (move.end_position_.file_get() == king.position_.file_get() &&
-                move.end_position_.rank_get() == king.position_.rank_get()) {
+            if (move.end_position_.file_get() == king->position_.file_get() &&
+                move.end_position_.rank_get() == king->position_.rank_get()) {
                 return true;
             }
         }
@@ -244,28 +256,22 @@ namespace board {
                 if (isdigit(*it)) {
                     fileIndex += (int) *it - '0';
                 } else {
-                    auto piece = (Piece(
+                    auto piece = new Piece(
                             Position((File) fileIndex, (Rank) rankIndex),
                             islower(*it) ? Color::BLACK : Color::WHITE,
-                            char_to_piece(toupper(*it))));
+                            char_to_piece(toupper(*it)));
                     if (std::find(initial_positions[*it].begin(),
                                   initial_positions[*it].end(),
-                                  piece.position_) ==
+                                  piece->position_) ==
                         initial_positions[*it].end()) {
-                        piece.has_already_moved_ = true;
+                        piece->has_already_moved_ = true;
                     }
-                    pieces_[{piece.type_, piece.color_}].emplace_back(piece);
+                    put_piece(piece);
                     fileIndex++;
                 }
             }
             rankIndex--;
         }
-        for (auto piece_set : pieces_) {
-            for (auto piece : piece_set.second) {
-                *((*this)[piece.position_]) = &piece;
-            }
-        }
-
 
         //parse informations regarding the current state of the game
         //whose turn is it
@@ -309,7 +315,7 @@ namespace board {
                 if (std::find(equivalent_piece_set.begin(),
                               equivalent_piece_set.end(), piece) ==
                     equivalent_piece_set.end()) {
-                    std::cout << "could not find piece: " << piece.to_string()
+                    std::cout << "could not find piece: " << piece->to_string()
                               << " in other piece map\n";
                     return false;
                 }
@@ -372,6 +378,11 @@ namespace board {
         }
 
         return true;
+    }
+
+    void Chessboard::put_piece(Piece *piece) {
+        pieces_[{piece->type_, piece->color_}].push_back(piece);
+        *((*this)[piece->position_]) = piece;
     }
 
 

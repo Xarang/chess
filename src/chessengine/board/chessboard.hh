@@ -40,17 +40,17 @@ namespace board {
         boost::numeric::ublas::matrix<Piece**> board_ = boost::numeric::ublas::matrix<Piece**>(
                 8, 8, (Piece**)malloc(sizeof(void*)));
         //all our pieces
-        std::unordered_map<std::pair<PieceType, Color>, std::vector<Piece>, hash_pair> pieces_ = {
-                { { PieceType::PAWN, Color::BLACK }, std::vector<Piece>() },
-                { { PieceType::KNIGHT, Color::BLACK }, std::vector<Piece>() },
-                { { PieceType::BISHOP, Color::BLACK }, std::vector<Piece>() },
-                { { PieceType::QUEEN, Color::BLACK }, std::vector<Piece>() },
-                { { PieceType::KING, Color::BLACK }, std::vector<Piece>() },
-                { { PieceType::PAWN, Color::WHITE }, std::vector<Piece>() },
-                { { PieceType::KNIGHT, Color::WHITE }, std::vector<Piece>() },
-                { { PieceType::BISHOP, Color::WHITE }, std::vector<Piece>() },
-                { { PieceType::QUEEN, Color::WHITE }, std::vector<Piece>() },
-                { { PieceType::KING, Color::WHITE }, std::vector<Piece>() },
+        std::unordered_map<std::pair<PieceType, Color>, std::vector<Piece*>, hash_pair> pieces_ = {
+                { { PieceType::PAWN, Color::BLACK }, std::vector<Piece*>() },
+                { { PieceType::KNIGHT, Color::BLACK }, std::vector<Piece*>() },
+                { { PieceType::BISHOP, Color::BLACK }, std::vector<Piece*>() },
+                { { PieceType::QUEEN, Color::BLACK }, std::vector<Piece*>() },
+                { { PieceType::KING, Color::BLACK }, std::vector<Piece*>() },
+                { { PieceType::PAWN, Color::WHITE }, std::vector<Piece*>() },
+                { { PieceType::KNIGHT, Color::WHITE }, std::vector<Piece*>() },
+                { { PieceType::BISHOP, Color::WHITE }, std::vector<Piece*>() },
+                { { PieceType::QUEEN, Color::WHITE }, std::vector<Piece*>() },
+                { { PieceType::KING, Color::WHITE }, std::vector<Piece*>() },
         };
 
         //whose turn is it ?
@@ -68,17 +68,21 @@ namespace board {
         //turns elapsed since a piece was last taken or a pawn moved
         std::vector<int> past_moves_halfmove_clocks_ = {0};
         std::vector<std::optional<Position>> past_moves_en_passant_target_squares_ = {std::nullopt};
-        std::vector<Piece> last_pieces_captured_;
+        std::vector<Piece*> last_pieces_captured_;
+
+        //used by constructors
+        void put_piece(Piece* p);
 
         //these 3 methods are used by do_move
-        void remove_piece(const Piece &p);
-        void move_piece(const Piece &p, Position new_position);
-        void promote_piece(const Piece &p, PieceType type);
+        void remove_piece(Piece *p);
+        void move_piece(Piece *p, const Position& new_position);
+        void promote_piece(Piece *p, const PieceType& type);
 
         //theses methods are used by undo_move
-        void undo_remove_piece(const Piece &p);
-        void undo_move_piece(const Piece &p, Position old_position);
-        void undo_promote_piece(const Piece &p, PieceType type);
+        void undo_remove_piece(Piece *p);
+        void undo_move_piece(Piece *p, const Position& old_position);
+        void undo_promote_piece(Piece *p, const PieceType& type);
+
 
     public:
 
@@ -90,29 +94,23 @@ namespace board {
             }
 
             for (auto sets : pieces_) {
-                sets.second.reserve(16); //make sure no realloc happens
+                sets.second.reserve(10); //make sure no realloc happens
             }
 
             for (auto position_per_fen_char : Chessboard::initial_positions) {
                 auto attributes = Piece::piecetype_and_color_from_fen(position_per_fen_char.first);
                 for (auto position : position_per_fen_char.second) {
-                    std::vector<Piece>& piece_set = pieces_[{attributes.first, attributes.second}];
-                    piece_set.emplace_back(Piece(position, attributes.second, attributes.first));
-                   *((*this)[piece_set.back().position_]) = &(piece_set.back());
+                    put_piece(new Piece(position, attributes.second, attributes.first));
                 }
             }
-            //fill the initial matrix
-          /*  for (auto piece_set : pieces_) {
-                for (auto piece : piece_set.second) {
-                    *((*this)[Position(piece.position_.file_get(), piece.position_.rank_get())]) = &piece;
-                }
-                ²   
-            }*/
             std::cout << to_string() << "\n";
         }
 
         //no chessboard copy thx
         Chessboard(const Chessboard &other) = default; //TODO: make sure this does not break everything
+
+
+        bool occupied_by(board::Color myColor, board::PieceType myType, board::Position myPos);
 
         //FEN string based constructor
         Chessboard(std::string fen_string);
@@ -120,6 +118,9 @@ namespace board {
         //destructor
         ~Chessboard() {
             for (auto it = board_.begin1(); it < board_.end1(); it++) {
+                free(*it);
+            }
+            for (auto it = last_pieces_captured_.begin(); it < last_pieces_captured_.end(); it++) {
                 free(*it);
             }
         }
@@ -131,7 +132,7 @@ namespace board {
         static Chessboard parse_uci(std::string uci_position);
 
         //main methods
-        void do_move(Move&, bool change_turn = true);
+        void do_move(const Move&, bool change_turn = true);
 
         bool is_move_legal(Move&, bool check_self_check = true);
 
@@ -143,13 +144,13 @@ namespace board {
 
         bool is_draw();
 
-        void undo_move(Move&, bool change_turn = true);
+        void undo_move(const Move&, bool change_turn = true);
 
         Piece** operator[](Position p);
 
 
         //Getters
-        std::unordered_map<std::pair<PieceType, Color>, std::vector<Piece>, hash_pair> get_pieces() {
+        const std::unordered_map<std::pair<PieceType, Color>, std::vector<Piece*>, hash_pair>& get_pieces() {
             return pieces_;
         }
 
@@ -190,13 +191,13 @@ namespace board {
 
     class MoveLegalityChecker {
         public:
-        static bool is_move_legal_QUEEN(Chessboard& b, Move& move);
-        static bool is_move_legal_KING(Chessboard& b, Move& move);
-        static bool is_move_legal_ROOK(Chessboard& b, Move& move);
-        static bool is_move_legal_KNIGHT(Chessboard& b, Move& move);
-        static bool is_move_legal_BISHOP(Chessboard& b, Move& move);
-        static bool is_move_legal_PAWN(Chessboard& b, Move& move);
-        static bool is_move_legal(Chessboard& b, Move& move);
+        static bool is_move_legal_QUEEN(const Chessboard& b, const Move& move);
+        static bool is_move_legal_KING(const Chessboard& b, const Move& move);
+        static bool is_move_legal_ROOK(const Chessboard& b, const Move& move);
+        static bool is_move_legal_KNIGHT(const Chessboard& b, const Move& move);
+        static bool is_move_legal_BISHOP(const Chessboard& b, const Move& move);
+        static bool is_move_legal_PAWN(const Chessboard& b, const Move& move);
+        static bool is_move_legal(const Chessboard& b, const Move& move);
     };
 
 }

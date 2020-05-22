@@ -3,7 +3,7 @@
 
 namespace board {
 
-    bool MoveLegalityChecker::is_move_legal_QUEEN(Chessboard& chessboard, Move& move) {
+    bool MoveLegalityChecker::is_move_legal_QUEEN(const Chessboard& chessboard, const Move& move) {
 
         bool b = is_move_legal_BISHOP(chessboard, move);
         if (b)
@@ -15,7 +15,7 @@ namespace board {
     }
 
     //TODO: use chessboard to assess legality (currently not using it)
-    bool MoveLegalityChecker::is_move_legal_KING(Chessboard& chessboard, Move& move) {
+    bool MoveLegalityChecker::is_move_legal_KING(const Chessboard& chessboard, const Move& move) {
         auto king = chessboard.read(move.start_position_);
 
         Position white_a_rook(File::A, Rank::ONE);
@@ -71,7 +71,9 @@ namespace board {
         return abs((int)start_file - (int)end_file) <= 1 && abs((int)start_rank - (int)end_rank) <= 1;
     }
 
-    bool MoveLegalityChecker::is_move_legal_KNIGHT(Chessboard&, Move& move){
+
+    //TODO: use chessboard to assess legality (currently not using it)
+    bool MoveLegalityChecker::is_move_legal_KNIGHT(const Chessboard&, const Move& move){
 
         auto startFile = move.start_position_.file_get();
         auto startRank = move.start_position_.rank_get();
@@ -96,7 +98,7 @@ namespace board {
         return startFile + 1 == endFile && startRank + 2 == endRank;
     }
 
-    bool MoveLegalityChecker::is_move_legal_BISHOP(Chessboard& b, Move& move) {
+    bool MoveLegalityChecker::is_move_legal_BISHOP(const Chessboard& b, const Move& move) {
         int Fi = 1;
         int Ri = 1;
         bool bo = true;
@@ -180,7 +182,7 @@ namespace board {
         return bo;
     }
 
-    bool MoveLegalityChecker::is_move_legal_PAWN(Chessboard& b, Move& move) {
+    bool MoveLegalityChecker::is_move_legal_PAWN(const Chessboard& b, const Move& move) {
 
         //std::cout << "checking legality of pawn move: " + move.to_string() << "\n";
         int rank_direction = b.is_white_turn_ ? 1 : -1;
@@ -222,7 +224,7 @@ namespace board {
         return true;
     }
 
-    bool MoveLegalityChecker::is_move_legal_ROOK(Chessboard& b, Move& move) {
+    bool MoveLegalityChecker::is_move_legal_ROOK(const Chessboard& b, const Move& move) {
         int Fi = 1;
         int Ri = 1;
 
@@ -280,7 +282,7 @@ namespace board {
         }
     }
 
-    bool MoveLegalityChecker::is_move_legal(Chessboard& b, Move &move) {
+    bool MoveLegalityChecker::is_move_legal(const Chessboard& b, const Move &move) {
         switch (move.piece_) {
             case PieceType::PAWN:
                 return is_move_legal_PAWN(b, move);
