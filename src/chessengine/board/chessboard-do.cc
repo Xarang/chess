@@ -12,11 +12,11 @@ namespace board {
         current_turn_ += 1;
         //past_moves_halfmove_clocks_[past_moves_halfmove_clocks_.size() - 1]+=1;
         if (move.is_halfmove_clock_resetter()) {
-            past_moves_halfmove_clocks_.push_back(0);
+            past_moves_halfmove_clocks_.emplace_back(0);
         }
         else {
             auto temp = past_moves_halfmove_clocks_.back() + 1;
-            past_moves_halfmove_clocks_.push_back(temp);
+            past_moves_halfmove_clocks_.emplace_back(temp);
         }
 
 

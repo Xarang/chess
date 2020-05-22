@@ -105,23 +105,14 @@ namespace board {
                 for (auto piece : piece_set.second) {
                     std::list<Move> pieceMoves = piece->getAllPotentialMoves();
                     for (auto move : pieceMoves) {
-                        if (move.is_capture_)
-                        {
                             if (is_move_legal(move, check_self_check)) {
                                 allMoves.push_front(move);
                             }
-                        }
-                        else
-                        {
-                            if (is_move_legal(move, check_self_check)) {
-                                allMoves.push_back(move);
-                            }
-                        }
                     }
                 }
             }
-        }
 
+        }
         return allMoves;
     }
 
@@ -231,14 +222,14 @@ namespace board {
         std::vector<std::string> fields;
         std::string s;
         while (getline(fen_string_stream, s, ' ')) {
-            fields.push_back(s);
+            fields.emplace_back(s);
         }
 
         //parse the board position
         auto piece_placement_stream = std::istringstream(fields[0]);
         std::vector<std::string> ranks;
         while (getline(piece_placement_stream, s, '/')) {
-            ranks.push_back(s);
+            ranks.emplace_back(s);
         }
 
         int rankIndex = 7;
@@ -278,7 +269,7 @@ namespace board {
         if (fields[3] != "-") {
             File f = (File) (fields[3].at(0) - 'a');
             Rank r = (Rank) (fields[3].at(1) - '1');
-            past_moves_en_passant_target_squares_.push_back(
+            past_moves_en_passant_target_squares_.emplace_back(
                     std::make_optional<Position>(f, r));
         }
     }
@@ -374,7 +365,7 @@ namespace board {
 
     void Chessboard::put_piece(Piece *piece) {
         //std::cerr << "placing piece: " << piece->to_string() << "\n";
-        pieces_[{piece->type_, piece->color_}].push_back(piece);
+        pieces_[{piece->type_, piece->color_}].emplace_back(piece);
         //assert((*this)[piece->position_] != nullptr);
         *((*this)[piece->position_]) = piece;
         //std::cerr << "piece placed\n";

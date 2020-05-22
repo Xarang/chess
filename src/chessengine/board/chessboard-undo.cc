@@ -70,7 +70,7 @@ namespace board {
 
     void Chessboard::undo_remove_piece(Piece* p) {
         std::vector<Piece*>& piece_set = pieces_[{p->type_, p->color_}];
-        piece_set.push_back(p);
+        piece_set.emplace_back(p);
         *((*this)[p->position_]) = p;
     }
 

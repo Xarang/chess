@@ -127,7 +127,7 @@ namespace pgn_parser
 
             while (std::getline(ss, sub_token, '.'))
                 if (sub_token.length())
-                    tokens.push_back(sub_token);
+                    tokens.emplace_back(sub_token);
         }
 
         /* separating tokens in number | move | end */
@@ -146,7 +146,7 @@ namespace pgn_parser
                 {
                     /* it should be an action */
                     parse_action(tok);
-                    moves_txt.push_back(tok);
+                    moves_txt.emplace_back(tok);
                 }
             }
         } catch (const pgn_parser::PgnParsingException& parse_error)
@@ -184,7 +184,7 @@ namespace pgn_parser
             {
                 auto move = parse_castling(word, side_);
                 move.report_set(parse_report(word));
-                moves_.push_back(move);
+                moves_.emplace_back(move);
             } catch (const pgn_parser::PgnParsingException& parse_error)
             {
                 std::cerr << parse_error.what() << '\n';

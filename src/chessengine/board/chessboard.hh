@@ -175,7 +175,7 @@ namespace board {
         }
 
 
-        void change_turn() { is_white_turn_ = !is_white_turn_; }
+        inline void change_turn() { is_white_turn_ = !is_white_turn_; }
 
         friend class MoveLegalityChecker;
 

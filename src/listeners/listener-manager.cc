@@ -19,8 +19,8 @@ namespace listener {
             }
             void *listenerFunc = dlsym(lib, "listener_create");
             listener::Listener* lst = reinterpret_cast<listener::Listener*(*)()>(listenerFunc)();
-            listeners_.push_back(lst);
-            plugins_.push_back(lib);
+            listeners_.emplace_back(lst);
+            plugins_.emplace_back(lib);
         }
     }
 
