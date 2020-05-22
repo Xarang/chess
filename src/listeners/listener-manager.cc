@@ -160,8 +160,10 @@ namespace listener {
 
             chess_ai.myBoard = board::Chessboard::parse_uci(board_str);
             if (chess_ai.myBoard == nullptr) {
-                std::cerr << "could not parse board sent by UCI\n";
+                //std::cerr << "could not parse board sent by UCI\n";
+                throw new std::runtime_error("bad board");
             }
+            //std::cerr << "parsed board\n";
             //std::cerr << "position parsed into chessboard: " << board.to_string() << "\n";
             //ai get best move for board;
             //auto moves = board_->generate_legal_moves();

@@ -13,7 +13,20 @@ namespace board {
         Position start_position((File) uci_move.at(0) - 'a', (Rank) uci_move.at(1) - '1');
         Position end_position((File) uci_move.at(2) - 'a', (Rank) uci_move.at(3) - '1');
 
+        if (start_position.file_get() == File::OUTOFBOUNDS || start_position.rank_get() == Rank::OUTOFBOUNDS) {
+            std::cerr << "start out of bounds! " << start_position.to_string() << "\n";
+        }
+
+        if (end_position.file_get() == File::OUTOFBOUNDS || end_position.rank_get() == Rank::OUTOFBOUNDS) {
+            std::cerr << "end out of bounds! " << start_position.to_string() << "\n";
+        }
+
+
         auto piece_ptr = read(start_position);
+
+        if (piece_ptr == nullptr) {
+            std::cerr << "no piece there! " << start_position.to_string() << "\n";
+        }
         move.piece_ = piece_ptr->type_;
         auto color = piece_ptr->color_;
         move.start_position_ = start_position;
@@ -35,11 +48,11 @@ namespace board {
             return move;
         }
         else if (move.piece_ == PieceType::KING) {
-            if (end_position.file_get() + 2 == start_position.file_get()) {
+            if (end_position.file_get() - 2 == start_position.file_get()) {
                 move.is_king_castling_ = true;
                 return move;
             }
-            if (end_position.file_get() - 2 == start_position.file_get()) {
+            if (end_position.file_get() + 2 == start_position.file_get()) {
                 move.is_queen_castling_ = true;
                 return move;
             }
@@ -91,7 +104,9 @@ namespace board {
             std::string move;
             while (uci_string_stream >> move) {
                 Move parsed_uci_move = board->parse_uci_move(move);
+                std::cerr << "parsed move: " << parsed_uci_move.to_string() << "\n";
                 board->do_move(parsed_uci_move);
+                std::cerr << "did move: " << parsed_uci_move.to_string() << "\n";
             }
             return board;
         }
