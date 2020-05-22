@@ -48,7 +48,7 @@ int main(int argc, const char *argv[]) {
     }
 
     if (variables.count("pgn")) {
-        auto board = board::Chessboard();
+        auto board = std::make_shared<board::Chessboard>();
         listenerManager.register_board(board);
         //pgn here
         std::string pgnfilename = variables["pgn"].as<std::string>();
@@ -70,8 +70,8 @@ int main(int argc, const char *argv[]) {
         }
         content.erase(content.size() - 1, 1);
 
-        auto board = board::Chessboard(content);
-        listenerManager.register_board(board);
+        auto board = std::make_shared<board::Chessboard>(content);
+        listenerManager.register_board(std::move(board));
         listenerManager.run_perft(std::atoi(depth.c_str()), variables.count("debug"));
         
     }

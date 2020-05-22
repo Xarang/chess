@@ -15,7 +15,7 @@ namespace listener {
             std::vector<void*> plugins_;
             std::vector<Listener*> listeners_;
 
-            std::optional<board::Chessboard> board_;
+            std::shared_ptr<board::Chessboard> board_;
             std::optional<board::ChessboardInterfaceImpl> interface_;
 
             std::unordered_map<std::string, int> all_boards_since_start_ = std::unordered_map<std::string, int>();
@@ -23,7 +23,7 @@ namespace listener {
         public:
             void close_listeners();
             void load_plugins(std::vector<std::string> plugins);
-            void register_board(::board::Chessboard& board);
+            void register_board(const std::shared_ptr<board::Chessboard>& board);
             ListenerManager() = default;
 
             //tasks

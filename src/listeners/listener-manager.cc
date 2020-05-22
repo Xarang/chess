@@ -24,10 +24,10 @@ namespace listener {
         }
     }
 
-    void ListenerManager::register_board(board::Chessboard& b) {
-        board_ = std::make_optional<board::Chessboard>(b);
+    void ListenerManager::register_board(const std::shared_ptr<board::Chessboard> &b) {
+        board_ = b;
         all_boards_since_start_.insert(std::pair<std::string, int>(board_->to_string(), 1));
-        interface_ = std::make_optional<board::ChessboardInterfaceImpl>(board_.value());
+        interface_ = std::make_optional<board::ChessboardInterfaceImpl>(board_);
         for (auto listener : listeners_) {
             listener->register_board(interface_.value());
         }
@@ -141,7 +141,7 @@ namespace listener {
     }
 
     void ListenerManager::run_perft(int depth, bool debug) {
-        auto n = perft(board_.value(), depth, debug);
+        auto n = perft(board_.operator*(), depth, debug);
         std::cout << n << "\n";
     }
 

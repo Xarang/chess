@@ -381,8 +381,11 @@ namespace board {
     }
 
     void Chessboard::put_piece(Piece *piece) {
+        //std::cerr << "placing piece: " << piece->to_string() << "\n";
         pieces_[{piece->type_, piece->color_}].push_back(piece);
+        //assert((*this)[piece->position_] != nullptr);
         *((*this)[piece->position_]) = piece;
+        //std::cerr << "piece placed\n";
     }
 
 

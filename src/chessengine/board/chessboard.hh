@@ -38,7 +38,7 @@ namespace board {
         //matrix representation of the board [FILE][RANK]
         //squares hold a nullptr if empty, a pointer to a piece in the piece list otherwise
         boost::numeric::ublas::matrix<Piece**> board_ = boost::numeric::ublas::matrix<Piece**>(
-                8, 8, (Piece**)malloc(sizeof(void*)));
+                8, 8, nullptr/*(Piece**)malloc(sizeof(void*))*/);
         //all our pieces
         std::unordered_map<std::pair<PieceType, Color>, std::vector<Piece*>, hash_pair> pieces_ = {
                 { { PieceType::PAWN, Color::BLACK }, std::vector<Piece*>() },
@@ -89,13 +89,20 @@ namespace board {
         // constructors
         Chessboard() {
 
+            std::cerr << "initialising matrix\n";
+            for (auto i = 0; i < 8; i++) {
+                for (auto j = 0; j < 8; j++) {
+                    board_(i,j) = (Piece**)(malloc(sizeof(void*)));
+                    *board_(i,j) = nullptr;
+                }
+            }
+            /*
             for (auto it = board_.begin1(); it < board_.end1(); it++) {
+                (*it) = (Piece**)(malloc(sizeof(void*)));
                 *(*it) = nullptr;
             }
-
-            for (auto sets : pieces_) {
-                sets.second.reserve(10); //make sure no realloc happens
-            }
+             */
+            std::cerr << "matrix of pointers initialised\n";
 
             for (auto position_per_fen_char : Chessboard::initial_positions) {
                 auto attributes = Piece::piecetype_and_color_from_fen(position_per_fen_char.first);
@@ -117,12 +124,17 @@ namespace board {
 
         //destructor
         ~Chessboard() {
+            std::cerr << "entered chessboard destructor\n";
             for (auto it = board_.begin1(); it < board_.end1(); it++) {
+                if (*(*it)) {
+                    free(*(*it));
+                }
                 free(*it);
             }
             for (auto it = last_pieces_captured_.begin(); it < last_pieces_captured_.end(); it++) {
                 free(*it);
             }
+            std::cerr << "destructed chessbaord\n";
         }
 
         bool operator==(Chessboard b);
