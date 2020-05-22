@@ -8,7 +8,7 @@
 namespace ai {
     struct AI {
         friend board::Chessboard;
-        board::Chessboard myBoard;
+        std::shared_ptr<board::Chessboard> myBoard;
         clock_t remaining_time_ = 300;
         int depth_ = 3;
         board::Color color_ = board::Color::WHITE;

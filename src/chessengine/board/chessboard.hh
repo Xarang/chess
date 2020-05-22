@@ -108,7 +108,7 @@ namespace board {
         }
 
         //no chessboard copy thx
-        Chessboard(const Chessboard &other) = default; //TODO: make sure this does not break everything
+        Chessboard(const Chessboard &other) = delete; //TODO: make sure this does not break everything
 
 
         bool occupied_by(board::Color myColor, board::PieceType myType, board::Position myPos);
@@ -118,7 +118,7 @@ namespace board {
 
         //destructor
         ~Chessboard() {
-            std::cerr << "entered chessboard destructor\n";
+            //std::cerr << "entered chessboard destructor\n";
             for (auto it = board_.begin1(); it < board_.end1(); it++) {
                 if (*(*it)) {
                     delete(*(*it));
@@ -128,14 +128,14 @@ namespace board {
             for (auto it = last_pieces_captured_.begin(); it < last_pieces_captured_.end(); it++) {
                 delete(*it);
             }
-            std::cerr << "destructed chessbaord\n";
+            //std::cerr << "destructed chessbaord\n";
         }
 
         bool operator==(Chessboard b);
 
         Move parse_uci_move(std::string uci_move);
 
-        static Chessboard parse_uci(std::string uci_position);
+        static std::shared_ptr<Chessboard> parse_uci(std::string uci_position);
 
         //main methods
         void do_move(const Move&, bool change_turn = true);

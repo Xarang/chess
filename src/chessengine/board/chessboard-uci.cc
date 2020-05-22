@@ -53,7 +53,7 @@ namespace board {
     }
 
 
-    Chessboard Chessboard::parse_uci(std::string uci_position) {
+    std::shared_ptr<Chessboard> Chessboard::parse_uci(std::string uci_position) {
         auto uci_string_stream = std::istringstream(uci_position);
         std::string s;
         uci_string_stream >> s;
@@ -63,7 +63,7 @@ namespace board {
         } else {
             throw std::runtime_error("position string does not start with position");
         }
-        auto board = Chessboard();
+        auto board = std::make_shared<Chessboard>();
 
         if (s == "fen") {
             try {
@@ -75,7 +75,7 @@ namespace board {
                     } else
                         break;
                 }
-                board = Chessboard(fen);
+                board = std::make_shared<Chessboard>(fen);
             }
             catch (std::exception &e) {
                 std::cerr << "error while recreating board position from uci fen string";
@@ -90,8 +90,8 @@ namespace board {
         try {
             std::string move;
             while (uci_string_stream >> move) {
-                Move parsed_uci_move = board.parse_uci_move(move);
-                board.do_move(parsed_uci_move);
+                Move parsed_uci_move = board->parse_uci_move(move);
+                board->do_move(parsed_uci_move);
             }
             return board;
         }
@@ -99,7 +99,7 @@ namespace board {
             std::cerr << "error while recreating board position from uci move list :" << e.what() << "\n";
         }
 
-        return Chessboard();
+        return nullptr;
     }
 
 

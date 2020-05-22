@@ -158,9 +158,11 @@ namespace listener {
             std::string board_str = ai::get_board();
             //std::cerr << "got position: " << board_str << std::endl;
 
-            auto board = board::Chessboard::parse_uci(board_str);
+            chess_ai.myBoard = board::Chessboard::parse_uci(board_str);
+            if (chess_ai.myBoard == nullptr) {
+                std::cerr << "could not parse board sent by UCI\n";
+            }
             //std::cerr << "position parsed into chessboard: " << board.to_string() << "\n";
-            chess_ai.myBoard = board;
             //ai get best move for board;
             //auto moves = board_->generate_legal_moves();
 
