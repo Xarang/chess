@@ -77,7 +77,6 @@ namespace board {
     }
 
     void Chessboard::undo_move_piece(Piece *p, const Position& old_position) {
-        std::vector<Piece*>& piece_set = pieces_[{p->type_, p->color_}];
 
         *((*this)[p->position_]) = nullptr;
         auto fen = p->to_char_fen();
@@ -98,7 +97,7 @@ namespace board {
         p->type_ = old_type;
         put_piece(p);
 
-        std::vector<Piece*>& destination_set = pieces_[{old_type, p.color_}];
+        std::vector<Piece*>& destination_set = pieces_[{old_type, p->color_}];
         assert(std::find(piece_set.begin(), piece_set.end(), p) == piece_set.end() &&
                "demotion did not remove piece from its original piece set");
         assert(std::find(destination_set.begin(), destination_set.end(), p) != destination_set.end() &&

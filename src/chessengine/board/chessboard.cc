@@ -7,9 +7,9 @@ namespace board {
 
     bool Chessboard::occupied_by(board::Color myColor, board::PieceType myType, board::Position myPos) {
         auto piece = read(myPos);
-        if (piece.has_value()
-        && piece->color_ == myColor
-        && piece->type_ == myType) {
+        if (piece
+            && piece->color_ == myColor
+            && piece->type_ == myType) {
             return true;
         }
         return false;
@@ -65,7 +65,7 @@ namespace board {
                 }
                 //check that the castling is not passing through other pieces
                 auto king = pieces_[{PieceType::KING, whose_turn_is_it()}].front();
-                auto moves_to_castling = MoveBuilder::generate_castling_decomposition(king, move.is_king_castling_);
+                auto moves_to_castling = MoveBuilder::generate_castling_decomposition(*king, move.is_king_castling_);
                 bool was_checked_on_the_way = false;
                 for (auto it = moves_to_castling.begin(); it != moves_to_castling.end(); it++) {
                     //we know that these tiles are free
