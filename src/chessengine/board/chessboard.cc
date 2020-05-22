@@ -18,7 +18,7 @@ namespace board {
     }
 
     bool Chessboard::is_move_legal(Move &move, bool check_self_check) {
-
+        //std::cout << "is move legal : " << move.to_string() << " ?\n";
         //do not consider moves that have OOB positions
         if (move.start_position_.file_get() == File::OUTOFBOUNDS ||
             move.start_position_.rank_get() == Rank::OUTOFBOUNDS
@@ -35,7 +35,7 @@ namespace board {
         }
 
         //do not consider moves that move a piece that does not exist
-        if (read(move.start_position_))
+        if (read(move.start_position_) == nullptr)
             return false;
 
         auto piece = read(move.end_position_);
@@ -229,9 +229,21 @@ namespace board {
 */
     Chessboard::Chessboard(std::string fen_string) {
 
+        std::cerr << "initialising matrix\n";
+        for (auto i = 0; i < 8; i++) {
+            for (auto j = 0; j < 8; j++) {
+                board_(i,j) = (Piece**)(malloc(sizeof(void*)));
+                *board_(i,j) = nullptr;
+            }
+        }
+        /*
         for (auto it = board_.begin1(); it < board_.end1(); it++) {
+            (*it) = (Piece**)(malloc(sizeof(void*)));
             *(*it) = nullptr;
         }
+         */
+        std::cerr << "matrix of pointers initialised\n";
+
 
         //string is fen representation
 
