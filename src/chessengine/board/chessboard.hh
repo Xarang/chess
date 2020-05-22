@@ -118,17 +118,17 @@ namespace board {
 
         //destructor
         ~Chessboard() {
-            //std::cerr << "entered chessboard destructor\n";
+            std::cerr << "entered chessboard destructor\n";
             for (auto it = board_.begin1(); it < board_.end1(); it++) {
                 if (*(*it)) {
-                    free(*(*it));
+                    delete(*(*it));
                 }
                 free(*it);
             }
             for (auto it = last_pieces_captured_.begin(); it < last_pieces_captured_.end(); it++) {
-                free(*it);
+                delete(*it);
             }
-            //std::cerr << "destructed chessbaord\n";
+            std::cerr << "destructed chessbaord\n";
         }
 
         bool operator==(Chessboard b);
