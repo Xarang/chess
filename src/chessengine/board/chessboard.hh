@@ -40,17 +40,17 @@ namespace board {
         boost::numeric::ublas::matrix<std::optional<Piece>> board_ = boost::numeric::ublas::matrix<std::optional<Piece>>(
                 8, 8);
         //all our pieces
-        std::unordered_map<std::pair<PieceType, Color>, std::vector<Piece>, hash_pair> pieces_ = {
-                { { PieceType::PAWN, Color::BLACK }, std::vector<Piece>() },
-                { { PieceType::KNIGHT, Color::BLACK }, std::vector<Piece>() },
-                { { PieceType::BISHOP, Color::BLACK }, std::vector<Piece>() },
-                { { PieceType::QUEEN, Color::BLACK }, std::vector<Piece>() },
-                { { PieceType::KING, Color::BLACK }, std::vector<Piece>() },
-                { { PieceType::PAWN, Color::WHITE }, std::vector<Piece>() },
-                { { PieceType::KNIGHT, Color::WHITE }, std::vector<Piece>() },
-                { { PieceType::BISHOP, Color::WHITE }, std::vector<Piece>() },
-                { { PieceType::QUEEN, Color::WHITE }, std::vector<Piece>() },
-                { { PieceType::KING, Color::WHITE }, std::vector<Piece>() },
+        std::unordered_map<std::pair<PieceType, Color>, std::vector<Piece*>, hash_pair> pieces_ = {
+                { { PieceType::PAWN, Color::BLACK }, std::vector<Piece*>() },
+                { { PieceType::KNIGHT, Color::BLACK }, std::vector<Piece*>() },
+                { { PieceType::BISHOP, Color::BLACK }, std::vector<Piece*>() },
+                { { PieceType::QUEEN, Color::BLACK }, std::vector<Piece*>() },
+                { { PieceType::KING, Color::BLACK }, std::vector<Piece*>() },
+                { { PieceType::PAWN, Color::WHITE }, std::vector<Piece*>() },
+                { { PieceType::KNIGHT, Color::WHITE }, std::vector<Piece*>() },
+                { { PieceType::BISHOP, Color::WHITE }, std::vector<Piece*>() },
+                { { PieceType::QUEEN, Color::WHITE }, std::vector<Piece*>() },
+                { { PieceType::KING, Color::WHITE }, std::vector<Piece*>() },
         };
 
         //whose turn is it ?
@@ -69,6 +69,9 @@ namespace board {
         std::vector<int> past_moves_halfmove_clocks_ = {0};
         std::vector<std::optional<Position>> past_moves_en_passant_target_squares_ = {std::nullopt};
         std::vector<Piece> last_pieces_captured_;
+
+        //used by constructors
+        void put_piece(PieceType t, Color c, Position p);
 
         //these 3 methods are used by do_move
         void remove_piece(const Piece &p);
@@ -89,13 +92,7 @@ namespace board {
             for (auto position_per_fen_char : Chessboard::initial_positions) {
                 auto attributes = Piece::piecetype_and_color_from_fen(position_per_fen_char.first);
                 for (auto position : position_per_fen_char.second) {
-                    pieces_[{attributes.first, attributes.second}].push_back(Piece(position, attributes.second, attributes.first));
-                }
-            }
-            //fill the initial matrix
-            for (auto piece_set : pieces_) {
-                for (auto piece : piece_set.second) {
-                    (*this)[Position(piece.position_.file_get(), piece.position_.rank_get())] = piece;
+                    put_piece(attributes.first, attributes.second, position);
                 }
             }
         }
@@ -133,7 +130,7 @@ namespace board {
 
 
         //Getters
-        const std::unordered_map<std::pair<PieceType, Color>, std::vector<Piece>, hash_pair>& get_pieces() {
+        const std::unordered_map<std::pair<PieceType, Color>, std::vector<Piece*>, hash_pair>& get_pieces() {
             return pieces_;
         }
 

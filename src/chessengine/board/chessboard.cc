@@ -393,5 +393,11 @@ namespace board {
         return true;
     }
 
+    void Chessboard::put_piece(PieceType t, Color c, Position p) {
+        auto piece = new Piece(p, c, t);
+        pieces_[{t, c}].push_back(piece);
+        (*this)[p] = piece;
+    }
+
 
 }
