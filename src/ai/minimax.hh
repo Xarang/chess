@@ -8,7 +8,7 @@
 namespace ai {
     struct AI {
         friend board::Chessboard;
-        board::Chessboard myBoard;
+        std::shared_ptr<board::Chessboard> myBoard;
         clock_t remaining_time_ = 300;
         int depth_ = 3;
         board::Color color_ = board::Color::WHITE;
@@ -177,10 +177,10 @@ namespace ai {
         int candidatePawnCheck(const board::Position& myPos);
 
         //PairModifiers
-        int pair_modify(const std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair>& pieces);
+        int pair_modify(const std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece*>, board::hash_pair>& pieces);
 
         //Knight value
-        int knight_pawns(const std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair>& pieces);
+        int knight_pawns(const std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece*>, board::hash_pair>& pieces);
 
         int bishopEval();
             /*

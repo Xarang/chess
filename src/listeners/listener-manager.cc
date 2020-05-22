@@ -24,10 +24,10 @@ namespace listener {
         }
     }
 
-    void ListenerManager::register_board(board::Chessboard& b) {
-        board_ = std::make_optional<board::Chessboard>(b);
+    void ListenerManager::register_board(const std::shared_ptr<board::Chessboard> &b) {
+        board_ = b;
         all_boards_since_start_.insert(std::pair<std::string, int>(board_->to_string(), 1));
-        interface_ = std::make_optional<board::ChessboardInterfaceImpl>(board_.value());
+        interface_ = std::make_optional<board::ChessboardInterfaceImpl>(board_);
         for (auto listener : listeners_) {
             listener->register_board(interface_.value());
         }
@@ -59,9 +59,9 @@ namespace listener {
                             if (move.is_capture_) {
                                 if (move.is_en_passant_) {
                                     auto actual_piece_position = board::Position(move.end_position_.file_get(), move.end_position_.rank_get() + (board_->whose_turn_is_it() == board::Color::WHITE ? -1 : 1));
-                                    captured_piece = std::make_optional<board::Piece>(((*board_)[actual_piece_position]).value());
+                                    captured_piece = std::make_optional<board::Piece>(*board_->read(actual_piece_position));
                                 } else {
-                                    captured_piece = std::make_optional<board::Piece>(((*board_)[move.end_position_]).value());
+                                    captured_piece = std::make_optional<board::Piece>(*board_->read(move.end_position_));
                                 }
                             }
                             //check current game state for the player that did the move
@@ -141,7 +141,7 @@ namespace listener {
     }
 
     void ListenerManager::run_perft(int depth, bool debug) {
-        auto n = perft(board_.value(), depth, debug);
+        auto n = perft(board_.operator*(), depth, debug);
         std::cout << n << "\n";
     }
 
@@ -158,9 +158,13 @@ namespace listener {
             std::string board_str = ai::get_board();
             //std::cerr << "got position: " << board_str << std::endl;
 
-            auto board = board::Chessboard::parse_uci(board_str);
+            chess_ai.myBoard = board::Chessboard::parse_uci(board_str);
+            if (chess_ai.myBoard == nullptr) {
+                //std::cerr << "could not parse board sent by UCI\n";
+                throw new std::runtime_error("bad board");
+            }
+            //std::cerr << "parsed board\n";
             //std::cerr << "position parsed into chessboard: " << board.to_string() << "\n";
-            chess_ai.myBoard = board;
             //ai get best move for board;
             //auto moves = board_->generate_legal_moves();
 
@@ -173,18 +177,6 @@ namespace listener {
             ai::play_move(move);
         }
     }
-
-    void ListenerManager::evaluate_ai() {
-        auto moves = board_->generate_legal_moves();
-        for (auto move : moves) {
-            //TODO: show ai score for this move
-            auto new_board = board_->project(move);
-            ai::AI myAI;
-            myAI.myBoard = new_board;
-            std::cout << move.uci() << " " << myAI.evaluate() << "\n";
-        }
-    }
-
 
     //listener calls
     void ListenerManager::register_move(board::Color color, board::Move move, std::optional<board::Piece> captured_piece) {

@@ -11,7 +11,7 @@
 namespace ai {
     int AI::evaluate() {
         int res = 0;
-        auto pieces = myBoard.get_pieces();
+        auto pieces = myBoard->get_pieces();
 
         res += pair_modify(pieces);
         res += bishopEval();
@@ -22,31 +22,31 @@ namespace ai {
         {
             for (auto piece : piece_pair.second)
             {
-                if (color_ == piece.color_)
+                if (color_ == piece->color_)
                 {
                     //Individual piece value
-                    res += material_values[piece.type_];
+                    res += material_values[piece->type_];
                     //Piece's positional value
                     if (color_ == board::Color::WHITE)
-                        res += (*table_valuesWhite[piece.type_])[(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
+                        res += (*table_valuesWhite[piece->type_])[(int)piece->position_.file_get()][(int)piece->position_.rank_get()];
                     else
-                        res += (*table_valuesBlack[piece.type_])[(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
+                        res += (*table_valuesBlack[piece->type_])[(int)piece->position_.file_get()][(int)piece->position_.rank_get()];
 
-                    if (piece.type_ == board::PieceType::PAWN) {
-                        res += backwardPawnCheck(piece.position_);
-                        res += candidatePawnCheck(piece.position_);
+                    if (piece->type_ == board::PieceType::PAWN) {
+                        res += backwardPawnCheck(piece->position_);
+                        res += candidatePawnCheck(piece->position_);
                     }
                 }
                 else
                 {
-                    res -= material_values[piece.type_];
+                    res -= material_values[piece->type_];
                     if (color_ == board::Color::WHITE)
-                        res -= (*table_valuesWhite[piece.type_])[(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
+                        res -= (*table_valuesWhite[piece->type_])[(int)piece->position_.file_get()][(int)piece->position_.rank_get()];
                     else
-                        res -= (*table_valuesBlack[piece.type_])[(int)piece.position_.file_get()][(int)piece.position_.rank_get()];
-                    if (piece.type_ == board::PieceType::PAWN) {
-                        res -= backwardPawnCheck(piece.position_);
-                        res -= candidatePawnCheck(piece.position_);
+                        res -= (*table_valuesBlack[piece->type_])[(int)piece->position_.file_get()][(int)piece->position_.rank_get()];
+                    if (piece->type_ == board::PieceType::PAWN) {
+                        res -= backwardPawnCheck(piece->position_);
+                        res -= candidatePawnCheck(piece->position_);
                     }
                 }
             }
@@ -55,18 +55,18 @@ namespace ai {
     }
 
     float AI::minimax(const int& depth, const bool& ai_turn, float alpha, float beta) {
-         if (depth == 0 || myBoard.is_checkmate())
+         if (depth == 0 || myBoard->is_checkmate())
              return evaluate();
 
-         auto moves = myBoard.generate_legal_moves();
+         auto moves = myBoard->generate_legal_moves();
 
          // Ai wants to minimize
          if (ai_turn) {
              float maxEval = -INFINITY;
              for (auto move : moves) {
-                 myBoard.do_move(move, true);
+                 myBoard->do_move(move, true);
                  auto eval = minimax(depth - 1, !ai_turn, alpha, beta);
-                 myBoard.undo_move(move);
+                 myBoard->undo_move(move);
                  maxEval = std::max(maxEval, eval);
                  alpha = std::max(alpha, eval);
                  if (beta <= alpha)
@@ -80,9 +80,9 @@ namespace ai {
          else {
              float minEval = +INFINITY;
              for (auto move : moves) {
-                 myBoard.do_move(move, true);
+                 myBoard->do_move(move, true);
                  auto eval = minimax(depth - 1, !ai_turn, alpha, beta);
-                 myBoard.undo_move(move);
+                 myBoard->undo_move(move);
                  minEval = std::min(minEval, eval);
                  beta = std::min(beta, eval);
                  if (beta <= alpha)
@@ -94,7 +94,7 @@ namespace ai {
          }
     }
 
-    int AI::pair_modify(const std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair>& pieces) {
+    int AI::pair_modify(const std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece*>, board::hash_pair>& pieces) {
         int res = 0;
         //Bonus
         if (pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::BISHOP, board::Color::WHITE))->second.size() > 1)
@@ -117,7 +117,7 @@ namespace ai {
         return res;
     }
 
-    int AI::knight_pawns(const std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece>, board::hash_pair>& pieces) {
+    int AI::knight_pawns(const std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece*>, board::hash_pair>& pieces) {
         int res = 0;
         int whitePawns = pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::PAWN, board::Color::WHITE))->second.size();
         int whiteKnights = pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::KNIGHT, board::Color::WHITE))->second.size();
@@ -131,74 +131,74 @@ namespace ai {
 
     int AI::bishopEval() {
         int res = 0;
-        auto whiteBishops = myBoard.get_pieces().find(std::make_pair<board::PieceType, board::Color>(board::PieceType::BISHOP, board::Color::WHITE))->second;
-        auto blackBishops = myBoard.get_pieces().find(std::make_pair<board::PieceType, board::Color>(board::PieceType::BISHOP, board::Color::BLACK))->second;
+        auto whiteBishops = myBoard->get_pieces().find(std::make_pair<board::PieceType, board::Color>(board::PieceType::BISHOP, board::Color::WHITE))->second;
+        auto blackBishops = myBoard->get_pieces().find(std::make_pair<board::PieceType, board::Color>(board::PieceType::BISHOP, board::Color::BLACK))->second;
 
         for (auto piece : whiteBishops) {
-            if (piece.position_ == board::Position(board::File::A, board::Rank::SEVEN)
-                && (myBoard.occupied_by(board::Color::BLACK, board::PieceType::PAWN,
+            if (piece->position_ == board::Position(board::File::A, board::Rank::SEVEN)
+                && (myBoard->occupied_by(board::Color::BLACK, board::PieceType::PAWN,
                         board::Position(board::File::B, board::Rank::SIX))))
                     res -= 30;
-            else if (piece.position_ == board::Position(board::File::H, board::Rank::SEVEN)
-                     && (myBoard.occupied_by(board::Color::BLACK, board::PieceType::PAWN,
+            else if (piece->position_ == board::Position(board::File::H, board::Rank::SEVEN)
+                     && (myBoard->occupied_by(board::Color::BLACK, board::PieceType::PAWN,
                              board::Position(board::File::G, board::Rank::SIX))))
                     res -= 30;
-            else if (piece.position_ == board::Position(board::File::B, board::Rank::EIGHT)
-                     && (myBoard.occupied_by(board::Color::BLACK, board::PieceType::PAWN,
+            else if (piece->position_ == board::Position(board::File::B, board::Rank::EIGHT)
+                     && (myBoard->occupied_by(board::Color::BLACK, board::PieceType::PAWN,
                                              board::Position(board::File::C, board::Rank::SEVEN))))
                     res -= 30;
-            else if (piece.position_ == board::Position(board::File::G, board::Rank::EIGHT)
-                     && (myBoard.occupied_by(board::Color::BLACK, board::PieceType::PAWN,
+            else if (piece->position_ == board::Position(board::File::G, board::Rank::EIGHT)
+                     && (myBoard->occupied_by(board::Color::BLACK, board::PieceType::PAWN,
                                              board::Position(board::File::F, board::Rank::SEVEN))))
                 res -= 30;
-            else if (piece.position_ == board::Position(board::File::A, board::Rank::SIX)
-                     && (myBoard.occupied_by(board::Color::BLACK, board::PieceType::PAWN,
+            else if (piece->position_ == board::Position(board::File::A, board::Rank::SIX)
+                     && (myBoard->occupied_by(board::Color::BLACK, board::PieceType::PAWN,
                                              board::Position(board::File::B, board::Rank::FIVE))))
                 res -= 30;
-            else if (piece.position_ == board::Position(board::File::H, board::Rank::SIX)
-                     && (myBoard.occupied_by(board::Color::BLACK, board::PieceType::PAWN,
+            else if (piece->position_ == board::Position(board::File::H, board::Rank::SIX)
+                     && (myBoard->occupied_by(board::Color::BLACK, board::PieceType::PAWN,
                                              board::Position(board::File::G, board::Rank::FIVE))))
                 res -= 30;
-            else if (piece.position_ == board::Position(board::File::F, board::Rank::ONE)
-                     && (myBoard.occupied_by(board::Color::WHITE, board::PieceType::KING,
+            else if (piece->position_ == board::Position(board::File::F, board::Rank::ONE)
+                     && (myBoard->occupied_by(board::Color::WHITE, board::PieceType::KING,
                                              board::Position(board::File::G, board::Rank::ONE))))
                 res += 30;
-            else if (piece.position_ == board::Position(board::File::C, board::Rank::ONE)
-                     && (myBoard.occupied_by(board::Color::WHITE, board::PieceType::KING,
+            else if (piece->position_ == board::Position(board::File::C, board::Rank::ONE)
+                     && (myBoard->occupied_by(board::Color::WHITE, board::PieceType::KING,
                                              board::Position(board::File::B, board::Rank::ONE))))
                 res += 30;
             }
         for (auto piece : blackBishops) {
-            if (piece.position_ == board::Position(board::File::A, board::Rank::TWO)
-                && (myBoard.occupied_by(board::Color::WHITE, board::PieceType::PAWN,
+            if (piece->position_ == board::Position(board::File::A, board::Rank::TWO)
+                && (myBoard->occupied_by(board::Color::WHITE, board::PieceType::PAWN,
                                         board::Position(board::File::B, board::Rank::THREE))))
                 res += 30;
-            else if (piece.position_ == board::Position(board::File::H, board::Rank::TWO)
-                     && (myBoard.occupied_by(board::Color::WHITE, board::PieceType::PAWN,
+            else if (piece->position_ == board::Position(board::File::H, board::Rank::TWO)
+                     && (myBoard->occupied_by(board::Color::WHITE, board::PieceType::PAWN,
                                              board::Position(board::File::G, board::Rank::THREE))))
                 res += 30;
-            else if (piece.position_ == board::Position(board::File::B, board::Rank::ONE)
-                     && (myBoard.occupied_by(board::Color::WHITE, board::PieceType::PAWN,
+            else if (piece->position_ == board::Position(board::File::B, board::Rank::ONE)
+                     && (myBoard->occupied_by(board::Color::WHITE, board::PieceType::PAWN,
                                              board::Position(board::File::C, board::Rank::TWO))))
                 res += 30;
-            else if (piece.position_ == board::Position(board::File::G, board::Rank::ONE)
-                     && (myBoard.occupied_by(board::Color::WHITE, board::PieceType::PAWN,
+            else if (piece->position_ == board::Position(board::File::G, board::Rank::ONE)
+                     && (myBoard->occupied_by(board::Color::WHITE, board::PieceType::PAWN,
                                              board::Position(board::File::F, board::Rank::TWO))))
                 res += 30;
-            else if (piece.position_ == board::Position(board::File::A, board::Rank::THREE)
-                     && (myBoard.occupied_by(board::Color::WHITE, board::PieceType::PAWN,
+            else if (piece->position_ == board::Position(board::File::A, board::Rank::THREE)
+                     && (myBoard->occupied_by(board::Color::WHITE, board::PieceType::PAWN,
                                              board::Position(board::File::B, board::Rank::FOUR))))
                 res += 30;
-            else if (piece.position_ == board::Position(board::File::H, board::Rank::THREE)
-                     && (myBoard.occupied_by(board::Color::BLACK, board::PieceType::PAWN,
+            else if (piece->position_ == board::Position(board::File::H, board::Rank::THREE)
+                     && (myBoard->occupied_by(board::Color::BLACK, board::PieceType::PAWN,
                                              board::Position(board::File::G, board::Rank::FOUR))))
                 res += 30;
-            else if (piece.position_ == board::Position(board::File::F, board::Rank::EIGHT)
-                     && (myBoard.occupied_by(board::Color::BLACK, board::PieceType::KING,
+            else if (piece->position_ == board::Position(board::File::F, board::Rank::EIGHT)
+                     && (myBoard->occupied_by(board::Color::BLACK, board::PieceType::KING,
                                              board::Position(board::File::G, board::Rank::EIGHT))))
                 res -= 30;
-            else if (piece.position_ == board::Position(board::File::C, board::Rank::EIGHT)
-                     && (myBoard.occupied_by(board::Color::BLACK, board::PieceType::KING,
+            else if (piece->position_ == board::Position(board::File::C, board::Rank::EIGHT)
+                     && (myBoard->occupied_by(board::Color::BLACK, board::PieceType::KING,
                                              board::Position(board::File::B, board::Rank::EIGHT))))
                 res -= 30;
         }
@@ -209,17 +209,17 @@ namespace ai {
         double duration;
         clock_t start = clock();
 
-        color_ = myBoard.whose_turn_is_it();
+        color_ = myBoard->whose_turn_is_it();
 
         float bestValue = -INFINITY;
         board::Move bestMove;
 
-        auto moves = myBoard.generate_legal_moves();
+        auto moves = myBoard->generate_legal_moves();
 
         for (auto move : moves) {
-            myBoard.do_move(move);
+            myBoard->do_move(move);
             auto value = minimax(depth_, false, -INFINITY, +INFINITY);
-            myBoard.undo_move(move, true);
+            myBoard->undo_move(move, true);
             if (value > bestValue)
             {
                 bestValue = value;
@@ -236,22 +236,22 @@ namespace ai {
     int AI::backwardPawnCheck(const board::Position& myPos) {
         int res = 0;
         if (color_ == board::Color::WHITE) {
-            auto backLeft = myBoard.read(board::Position(myPos.file_get() - 1, myPos.rank_get() - 1));
-            if (backLeft.has_value() && backLeft.value().type_ == board::PieceType::PAWN)
+            auto backLeft = myBoard->read(board::Position(myPos.file_get() - 1, myPos.rank_get() - 1));
+            if (backLeft && backLeft->type_ == board::PieceType::PAWN)
                 res += 30;
-            auto backRight = myBoard.read(board::Position(myPos.file_get() + 1, myPos.rank_get() - 1));
-            if (backRight.has_value() && backRight.value().type_ == board::PieceType::PAWN) {
+            auto backRight = myBoard->read(board::Position(myPos.file_get() + 1, myPos.rank_get() - 1));
+            if (backRight && backRight->type_ == board::PieceType::PAWN) {
                 if (res > 0)
                     res -= 10;
                 res += 30;
             }
         } else {
-            auto backLeft = myBoard.read(board::Position(myPos.file_get() - 1, myPos.rank_get() + 1));
-            if (backLeft.has_value() && backLeft.value().type_ == board::PieceType::PAWN)
+            auto backLeft = myBoard->read(board::Position(myPos.file_get() - 1, myPos.rank_get() + 1));
+            if (backLeft && backLeft->type_ == board::PieceType::PAWN)
                 res += 10;
 
-            auto backRight = myBoard.read(board::Position(myPos.file_get() + 1, myPos.rank_get() + 1));
-            if (backRight.has_value() && backRight.value().type_ == board::PieceType::PAWN) {
+            auto backRight = myBoard->read(board::Position(myPos.file_get() + 1, myPos.rank_get() + 1));
+            if (backRight && backRight->type_ == board::PieceType::PAWN) {
                 if (res > 0)
                     res -= 10;
                 res += 30;
@@ -265,14 +265,14 @@ namespace ai {
         int res = 0;
         int i = 0;
         if (color_ == board::Color::WHITE) {
-            while (!myBoard[board::Position(myPos.file_get() + i, myPos.rank_get())].has_value()) {
+            while (!myBoard->read(board::Position(myPos.file_get() + i, myPos.rank_get()))) {
                 i++;
             }
             if (myPos.file_get() - i == board::File::H)
                 res += 50;
         }
         else {
-            while (!myBoard[board::Position(myPos.file_get() - i, myPos.rank_get())].has_value()) {
+            while (!myBoard->read(board::Position(myPos.file_get() - i, myPos.rank_get()))) {
                 i++;
             }
             if (myPos.file_get() - i == board::File::A)

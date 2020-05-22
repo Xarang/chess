@@ -3,7 +3,7 @@
 namespace board {
  //some quick constructors for most moves
 
-    Move MoveBuilder::basic_move(Piece p, Position target) {
+    Move MoveBuilder::basic_move(const Piece& p, Position target) {
         auto m = Move();
         m.start_position_ = p.position_;
         m.end_position_ = target;
@@ -11,7 +11,7 @@ namespace board {
         return m;
     }
 
-    Move MoveBuilder::basic_capture(Piece p, Position target) {
+    Move MoveBuilder::basic_capture(const Piece& p, Position target) {
         auto m = Move();
         m.start_position_ = p.position_;
         m.end_position_ = target;
@@ -20,13 +20,13 @@ namespace board {
         return m;
     }
 
-    Move MoveBuilder::with_promotion(Move m, PieceType type) {
+    Move MoveBuilder::with_promotion(const Move& m, PieceType type) {
         auto promoted = Move(m);
         promoted.promotion_ = opt_piecetype_t(type);
         return promoted;
     }
 
-    Move MoveBuilder::double_pawn_push(Piece p) {
+    Move MoveBuilder::double_pawn_push(const Piece& p) {
         auto m = Move();
         m.start_position_ = p.position_;
         Rank newRank = p.color_ == Color::WHITE ? p.position_.rank_get() + 2 : p.position_.rank_get() - 2;
@@ -35,19 +35,19 @@ namespace board {
         return m;
     }
 
-    Move MoveBuilder::king_castling(Piece p) {
+    Move MoveBuilder::king_castling(const Piece& p) {
         auto m = basic_move(p, Position(File::G, p.position_.rank_get()));
         m.is_king_castling_ = true;
         return m;
     }
 
-    Move MoveBuilder::queen_castling(Piece p) {
+    Move MoveBuilder::queen_castling(const Piece& p) {
         auto m = basic_move(p, Position(File::C, p.position_.rank_get()));
         m.is_queen_castling_ = true;
         return m;
     }
 
-    std::vector<Move> MoveBuilder::generate_castling_decomposition(Piece p, bool king_castling) {
+    std::vector<Move> MoveBuilder::generate_castling_decomposition(const Piece& p, bool king_castling) {
         int direction = king_castling ? +1 : -1;
         File end_file = king_castling ? File::G : File::C;
         std::vector<Move> moves;

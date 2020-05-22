@@ -7,9 +7,9 @@ namespace board {
 
     bool Chessboard::occupied_by(board::Color myColor, board::PieceType myType, board::Position myPos) {
         auto piece = read(myPos);
-        if (piece.has_value()
-        && piece->color_ == myColor
-        && piece->type_ == myType) {
+        if (piece
+            && piece->color_ == myColor
+            && piece->type_ == myType) {
             return true;
         }
         return false;
@@ -18,7 +18,7 @@ namespace board {
     }
 
     bool Chessboard::is_move_legal(Move &move, bool check_self_check) {
-
+        //std::cout << "is move legal : " << move.to_string() << " ?\n";
         //do not consider moves that have OOB positions
         if (move.start_position_.file_get() == File::OUTOFBOUNDS ||
             move.start_position_.rank_get() == Rank::OUTOFBOUNDS
@@ -35,16 +35,16 @@ namespace board {
         }
 
         //do not consider moves that move a piece that does not exist
-        if (!(*this)[move.start_position_].has_value())
+        if (read(move.start_position_) == nullptr)
             return false;
 
-        auto piece = (*this)[move.end_position_];
-        if (piece.has_value()) {
+        auto piece = read(move.end_position_);
+        if (piece) {
             if (!move.is_capture_) {
                 return false;
             }
             //do not consider moves that end on a square occupied by an allied piece
-            if (piece.value().color_ == whose_turn_is_it())
+            if (piece->color_ == whose_turn_is_it())
                 return false;
         } else if (move.is_capture_ && !move.is_en_passant_) {
             //do not consider capture moves that end on an empty square...except for en-passant
@@ -65,7 +65,7 @@ namespace board {
                 }
                 //check that the castling is not passing through other pieces
                 auto king = pieces_[{PieceType::KING, whose_turn_is_it()}].front();
-                auto moves_to_castling = MoveBuilder::generate_castling_decomposition(king, move.is_king_castling_);
+                auto moves_to_castling = MoveBuilder::generate_castling_decomposition(*king, move.is_king_castling_);
                 bool was_checked_on_the_way = false;
                 for (auto it = moves_to_castling.begin(); it != moves_to_castling.end(); it++) {
                     //we know that these tiles are free
@@ -103,32 +103,26 @@ namespace board {
         for (auto piece_set : pieces_) {
             if (piece_set.first.second == whose_turn_is_it()){
                 for (auto piece : piece_set.second) {
-                    std::list<Move> pieceMoves = piece.getAllPotentialMoves();
+                    std::list<Move> pieceMoves = piece->getAllPotentialMoves();
                     for (auto move : pieceMoves) {
                         if (move.is_capture_)
                         {
-                            allMoves.push_front(move);
+                            if (is_move_legal(move, check_self_check)) {
+                                allMoves.push_front(move);
+                            }
                         }
                         else
                         {
-                            allMoves.push_back(move);
+                            if (is_move_legal(move, check_self_check)) {
+                                allMoves.push_back(move);
+                            }
                         }
                     }
                 }
             }
         }
 
-        allMoves.remove_if([this, check_self_check](Move &m) {
-            return !this->is_move_legal(m, check_self_check);
-        });
         return allMoves;
-    }
-
-//copies the board and perform a move on it
-    Chessboard Chessboard::project(Move move, bool change_turn) const {
-        auto copy = Chessboard(*this);
-        copy.do_move(move, change_turn);
-        return copy;
     }
 
     bool Chessboard::is_check() {
@@ -142,8 +136,8 @@ namespace board {
         auto king = pieces_[{PieceType::KING, whose_turn_is_it()}].front();
 
         for (auto move : opponent_moves) {
-            if (move.end_position_.file_get() == king.position_.file_get() &&
-                move.end_position_.rank_get() == king.position_.rank_get()) {
+            if (move.end_position_.file_get() == king->position_.file_get() &&
+                move.end_position_.rank_get() == king->position_.rank_get()) {
                 return true;
             }
         }
@@ -182,19 +176,6 @@ namespace board {
         return false;
     }
 
-    std::optional<Piece> &Chessboard::operator[](Position pos) {
-        return board_((int) pos.file_get(), (int) pos.rank_get());
-    }
-
-//same as [], but read only
-    const std::optional<Piece> Chessboard::read(Position pos) const {
-        if (pos.file_get() == File::OUTOFBOUNDS ||
-            pos.rank_get() == Rank::OUTOFBOUNDS)
-            return std::nullopt;
-        return board_((int) pos.file_get(), (int) pos.rank_get());
-    }
-
-
     std::string Chessboard::to_string() const {
         //outputs a FEN string representing the board (https://fr.wikipedia.org/wiki/Notation_Forsyth-Edwards)
         std::string res = "";
@@ -206,9 +187,9 @@ namespace board {
                 Position myPos(currFile, currRank);
                 char symbol = ' ';
 
-                if (read(myPos).has_value()) {
-                    auto myPiece = read(myPos).value();
-                    symbol = myPiece.to_char_fen();
+                auto myPiece = read(myPos);
+                if (myPiece) {
+                    symbol = myPiece->to_char_fen();
                     if (empty_counter != 0)
                         res += std::to_string(empty_counter);
                     res += symbol;
@@ -233,7 +214,16 @@ namespace board {
 /*
 ** build a chessboard from a fen string representing a board state
 */
-    Chessboard::Chessboard(std::string fen_string) : board_(8, 8) {
+    Chessboard::Chessboard(std::string fen_string) {
+
+        //std::cerr << "initialising matrix\n";
+        for (auto i = 0; i < 8; i++) {
+            for (auto j = 0; j < 8; j++) {
+                board_(i,j) = (Piece**)(malloc(sizeof(void*)));
+                *board_(i,j) = nullptr;
+            }
+        }
+        //std::cerr << "matrix of pointers initialised\n";
 
         //string is fen representation
 
@@ -258,28 +248,22 @@ namespace board {
                 if (isdigit(*it)) {
                     fileIndex += (int) *it - '0';
                 } else {
-                    auto piece = (Piece(
+                    auto piece = new Piece(
                             Position((File) fileIndex, (Rank) rankIndex),
                             islower(*it) ? Color::BLACK : Color::WHITE,
-                            char_to_piece(toupper(*it))));
+                            char_to_piece(toupper(*it)));
                     if (std::find(initial_positions[*it].begin(),
                                   initial_positions[*it].end(),
-                                  piece.position_) ==
+                                  piece->position_) ==
                         initial_positions[*it].end()) {
-                        piece.has_already_moved_ = true;
+                        piece->has_already_moved_ = true;
                     }
-                    pieces_[{piece.type_, piece.color_}].emplace_back(piece);
+                    put_piece(piece);
                     fileIndex++;
                 }
             }
             rankIndex--;
         }
-        for (auto piece_set : pieces_) {
-            for (auto piece : piece_set.second) {
-                (*this)[piece.position_] = piece;
-            }
-        }
-
 
         //parse informations regarding the current state of the game
         //whose turn is it
@@ -310,14 +294,9 @@ namespace board {
                     std::cout << "the piece in MAT[" << i << "][" << j
                               << "]  is different\n";
                     std::cout << "MAT[ " << i << "][" << j << "] :"
-                              << (board_(i, j).has_value() ? board_(i,
-                                                                    j)->to_string()
-                                                           : "nullopt") << "\n";
+                              << (*board_(i, j) ? (*board_(i,j))->to_string() : "nullopt") << "\n";
                     std::cout << "other.MAT[ " << i << "][" << j << "] :"
-                              << (b.board_(i, j).has_value() ? b.board_(i,
-                                                                        j)->to_string()
-                                                             : "nullopt")
-                              << "\n";
+                              << (*b.board_(i, j) ? (*b.board_(i,j))->to_string() : "nullopt") << "\n";
                     return false;
                 }
             }
@@ -328,7 +307,7 @@ namespace board {
                 if (std::find(equivalent_piece_set.begin(),
                               equivalent_piece_set.end(), piece) ==
                     equivalent_piece_set.end()) {
-                    std::cout << "could not find piece: " << piece.to_string()
+                    std::cout << "could not find piece: " << piece->to_string()
                               << " in other piece map\n";
                     return false;
                 }
@@ -391,6 +370,14 @@ namespace board {
         }
 
         return true;
+    }
+
+    void Chessboard::put_piece(Piece *piece) {
+        //std::cerr << "placing piece: " << piece->to_string() << "\n";
+        pieces_[{piece->type_, piece->color_}].push_back(piece);
+        //assert((*this)[piece->position_] != nullptr);
+        *((*this)[piece->position_]) = piece;
+        //std::cerr << "piece placed\n";
     }
 
 

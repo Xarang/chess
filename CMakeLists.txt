@@ -39,7 +39,7 @@ set(SRC
     src/chessengine/board/chessboard-do.cc
     src/chessengine/board/chessboard-undo.cc
     src/chessengine/board/color.cc
-        src/chessengine/board/piece-move-builder.cc
+    src/chessengine/board/piece-move-builder.cc
     src/chessengine/board/move-legality-checker.cc
     src/chessengine/board/move.cc
     src/chessengine/board/piece.cc
@@ -48,10 +48,9 @@ set(SRC
     src/chessengine/pgn/pgn-move.cc
     src/chessengine/pgn/pgn-parser.cc
     src/listeners/listener-manager.cc
-    src/unitary-test.cc
     src/ai/uci.cc
     src/ai/minimax.cc
-        src/chessengine/board/piece-move-generator.cc)
+    src/chessengine/board/piece-move-generator.cc)
 
 include_directories(
     src/

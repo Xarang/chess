@@ -13,8 +13,22 @@ namespace board {
         Position start_position((File) uci_move.at(0) - 'a', (Rank) uci_move.at(1) - '1');
         Position end_position((File) uci_move.at(2) - 'a', (Rank) uci_move.at(3) - '1');
 
-        move.piece_ = (*this)[start_position]->type_;
-        auto color = (*this)[start_position]->color_;
+        if (start_position.file_get() == File::OUTOFBOUNDS || start_position.rank_get() == Rank::OUTOFBOUNDS) {
+            std::cerr << "start out of bounds! " << start_position.to_string() << "\n";
+        }
+
+        if (end_position.file_get() == File::OUTOFBOUNDS || end_position.rank_get() == Rank::OUTOFBOUNDS) {
+            std::cerr << "end out of bounds! " << start_position.to_string() << "\n";
+        }
+
+
+        auto piece_ptr = read(start_position);
+
+        if (piece_ptr == nullptr) {
+            std::cerr << "no piece there! " << start_position.to_string() << "\n";
+        }
+        move.piece_ = piece_ptr->type_;
+        auto color = piece_ptr->color_;
         move.start_position_ = start_position;
         move.end_position_ = end_position;
 
@@ -34,17 +48,17 @@ namespace board {
             return move;
         }
         else if (move.piece_ == PieceType::KING) {
-            if (end_position.file_get() + 2 == start_position.file_get()) {
+            if (end_position.file_get() - 2 == start_position.file_get()) {
                 move.is_king_castling_ = true;
                 return move;
             }
-            if (end_position.file_get() - 2 == start_position.file_get()) {
+            if (end_position.file_get() + 2 == start_position.file_get()) {
                 move.is_queen_castling_ = true;
                 return move;
             }
         }
 
-        if ((*this)[end_position].has_value()) {
+        if (read(end_position)) {
             move.is_capture_ = true;
         }
 
@@ -52,7 +66,7 @@ namespace board {
     }
 
 
-    Chessboard Chessboard::parse_uci(std::string uci_position) {
+    std::shared_ptr<Chessboard> Chessboard::parse_uci(std::string uci_position) {
         auto uci_string_stream = std::istringstream(uci_position);
         std::string s;
         uci_string_stream >> s;
@@ -62,7 +76,7 @@ namespace board {
         } else {
             throw std::runtime_error("position string does not start with position");
         }
-        auto board = Chessboard();
+        auto board = std::make_shared<Chessboard>();
 
         if (s == "fen") {
             try {
@@ -74,7 +88,7 @@ namespace board {
                     } else
                         break;
                 }
-                board = Chessboard(fen);
+                board = std::make_shared<Chessboard>(fen);
             }
             catch (std::exception &e) {
                 std::cerr << "error while recreating board position from uci fen string";
@@ -89,8 +103,10 @@ namespace board {
         try {
             std::string move;
             while (uci_string_stream >> move) {
-                Move parsed_uci_move = board.parse_uci_move(move);
-                board.do_move(parsed_uci_move);
+                Move parsed_uci_move = board->parse_uci_move(move);
+                std::cerr << "parsed move: " << parsed_uci_move.to_string() << "\n";
+                board->do_move(parsed_uci_move);
+                std::cerr << "did move: " << parsed_uci_move.to_string() << "\n";
             }
             return board;
         }
@@ -98,7 +114,7 @@ namespace board {
             std::cerr << "error while recreating board position from uci move list :" << e.what() << "\n";
         }
 
-        return Chessboard();
+        return nullptr;
     }
 
 

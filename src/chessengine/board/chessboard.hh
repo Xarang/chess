@@ -37,20 +37,20 @@ namespace board {
 
         //matrix representation of the board [FILE][RANK]
         //squares hold a nullptr if empty, a pointer to a piece in the piece list otherwise
-        boost::numeric::ublas::matrix<std::optional<Piece>> board_ = boost::numeric::ublas::matrix<std::optional<Piece>>(
-                8, 8);
+        boost::numeric::ublas::matrix<Piece**> board_ = boost::numeric::ublas::matrix<Piece**>(
+                8, 8, nullptr/*(Piece**)malloc(sizeof(void*))*/);
         //all our pieces
-        std::unordered_map<std::pair<PieceType, Color>, std::vector<Piece>, hash_pair> pieces_ = {
-                { { PieceType::PAWN, Color::BLACK }, std::vector<Piece>() },
-                { { PieceType::KNIGHT, Color::BLACK }, std::vector<Piece>() },
-                { { PieceType::BISHOP, Color::BLACK }, std::vector<Piece>() },
-                { { PieceType::QUEEN, Color::BLACK }, std::vector<Piece>() },
-                { { PieceType::KING, Color::BLACK }, std::vector<Piece>() },
-                { { PieceType::PAWN, Color::WHITE }, std::vector<Piece>() },
-                { { PieceType::KNIGHT, Color::WHITE }, std::vector<Piece>() },
-                { { PieceType::BISHOP, Color::WHITE }, std::vector<Piece>() },
-                { { PieceType::QUEEN, Color::WHITE }, std::vector<Piece>() },
-                { { PieceType::KING, Color::WHITE }, std::vector<Piece>() },
+        std::unordered_map<std::pair<PieceType, Color>, std::vector<Piece*>, hash_pair> pieces_ = {
+                { { PieceType::PAWN, Color::BLACK }, std::vector<Piece*>() },
+                { { PieceType::KNIGHT, Color::BLACK }, std::vector<Piece*>() },
+                { { PieceType::BISHOP, Color::BLACK }, std::vector<Piece*>() },
+                { { PieceType::QUEEN, Color::BLACK }, std::vector<Piece*>() },
+                { { PieceType::KING, Color::BLACK }, std::vector<Piece*>() },
+                { { PieceType::PAWN, Color::WHITE }, std::vector<Piece*>() },
+                { { PieceType::KNIGHT, Color::WHITE }, std::vector<Piece*>() },
+                { { PieceType::BISHOP, Color::WHITE }, std::vector<Piece*>() },
+                { { PieceType::QUEEN, Color::WHITE }, std::vector<Piece*>() },
+                { { PieceType::KING, Color::WHITE }, std::vector<Piece*>() },
         };
 
         //whose turn is it ?
@@ -68,39 +68,47 @@ namespace board {
         //turns elapsed since a piece was last taken or a pawn moved
         std::vector<int> past_moves_halfmove_clocks_ = {0};
         std::vector<std::optional<Position>> past_moves_en_passant_target_squares_ = {std::nullopt};
-        std::vector<Piece> last_pieces_captured_;
+        std::vector<Piece*> last_pieces_captured_;
+
+        //used by constructors
+        void put_piece(Piece* p);
 
         //these 3 methods are used by do_move
-        void remove_piece(const Piece &p);
-        void move_piece(const Piece &p, const Position& new_position);
-        void promote_piece(const Piece &p, const PieceType& type);
+        void remove_piece(Piece *p);
+        void move_piece(Piece *p, const Position& new_position);
+        void promote_piece(Piece *p, const PieceType& type);
 
         //theses methods are used by undo_move
-        void undo_remove_piece(std::optional<Piece> p);
-        void undo_move_piece(const Piece &p, const Position& old_position);
-        void undo_promote_piece(const Piece &p, const PieceType& type);
+        void undo_remove_piece(Piece *p);
+        void undo_move_piece(Piece *p, const Position& old_position);
+        void undo_promote_piece(Piece *p, const PieceType& type);
+
 
     public:
 
-        // constructors 
-
-        //default constructor (much shorted now huh)
+        // constructors
         Chessboard() {
+
+            //std::cerr << "initialising matrix\n";
+            for (auto i = 0; i < 8; i++) {
+                for (auto j = 0; j < 8; j++) {
+                    board_(i,j) = (Piece**)(malloc(sizeof(void*)));
+                    *board_(i,j) = nullptr;
+                }
+            }
+            //std::cerr << "matrix of pointers initialised\n";
+
             for (auto position_per_fen_char : Chessboard::initial_positions) {
                 auto attributes = Piece::piecetype_and_color_from_fen(position_per_fen_char.first);
                 for (auto position : position_per_fen_char.second) {
-                    pieces_[{attributes.first, attributes.second}].push_back(Piece(position, attributes.second, attributes.first));
+                    put_piece(new Piece(position, attributes.second, attributes.first));
                 }
             }
-            //fill the initial matrix
-            for (auto piece_set : pieces_) {
-                for (auto piece : piece_set.second) {
-                    (*this)[Position(piece.position_.file_get(), piece.position_.rank_get())] = piece;
-                }
-            }
+            //std::cout << to_string() << "\n";
         }
 
-        Chessboard(const Chessboard &other) = default;
+        //no chessboard copy thx
+        Chessboard(const Chessboard &other) = delete; //TODO: make sure this does not break everything
 
 
         bool occupied_by(board::Color myColor, board::PieceType myType, board::Position myPos);
@@ -108,11 +116,26 @@ namespace board {
         //FEN string based constructor
         Chessboard(std::string fen_string);
 
+        //destructor
+        ~Chessboard() {
+            //std::cerr << "entered chessboard destructor\n";
+            for (auto it = board_.begin1(); it < board_.end1(); it++) {
+                if (*(*it)) {
+                    delete(*(*it));
+                }
+                free(*it);
+            }
+            for (auto it = last_pieces_captured_.begin(); it < last_pieces_captured_.end(); it++) {
+                delete(*it);
+            }
+            //std::cerr << "destructed chessbaord\n";
+        }
+
         bool operator==(Chessboard b);
 
         Move parse_uci_move(std::string uci_move);
 
-        static Chessboard parse_uci(std::string uci_position);
+        static std::shared_ptr<Chessboard> parse_uci(std::string uci_position);
 
         //main methods
         void do_move(const Move&, bool change_turn = true);
@@ -129,27 +152,32 @@ namespace board {
 
         void undo_move(const Move&, bool change_turn = true);
 
-        std::optional<Piece> &operator[](Position p);
+        inline Piece** operator[](Position pos) {
+            return board_((int) pos.file_get(), (int) pos.rank_get());
+        }
 
 
         //Getters
-        const std::unordered_map<std::pair<PieceType, Color>, std::vector<Piece>, hash_pair>& get_pieces() {
+        const std::unordered_map<std::pair<PieceType, Color>, std::vector<Piece*>, hash_pair>& get_pieces() {
             return pieces_;
         }
 
         //utils
         std::string to_string() const;
 
-        Color whose_turn_is_it() const { return is_white_turn_ ? Color::WHITE : Color::BLACK; }
+        inline Color whose_turn_is_it() const { return is_white_turn_ ? Color::WHITE : Color::BLACK; }
 
-        const std::optional<Piece> read(Position p) const; //same as operator[], but read-only
+        inline const Piece* read(Position pos) const {//same as operator[], but read-only
+            if (pos.file_get() == File::OUTOFBOUNDS ||
+                pos.rank_get() == Rank::OUTOFBOUNDS)
+                return nullptr;
+            return *board_((int) pos.file_get(), (int) pos.rank_get());
+        }
+
 
         void change_turn() { is_white_turn_ = !is_white_turn_; }
 
         friend class MoveLegalityChecker;
-
-        //make a copy of the board with the move passed as argument executed
-        Chessboard project(Move move, bool change_turn = true) const;
 
         //this is used to initialise initial_positions attribute, which represents the expected initial configuration of a chessboard
         static std::unordered_map<char, std::vector<Position>> initial_positions;

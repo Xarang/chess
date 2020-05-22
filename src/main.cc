@@ -12,15 +12,11 @@
 #include "listener.hh"
 #include "pgn/pgn-parser.hh"
 #include "pgn/pgn-exception.hh"
-#include "unitary-test.hh"
 
 //static attributes declarations for all classes that need it
 std::unordered_map<char, std::vector<board::Position>> board::Chessboard::initial_positions;
 
 int main(int argc, const char *argv[]) {
-        
-    assert(std::is_copy_constructible<board::Chessboard>::value);
-    assert(std::is_copy_constructible_v<board::Chessboard>);
 
     namespace po = boost::program_options;
     auto options = po::options_description("Usage");
@@ -28,9 +24,7 @@ int main(int argc, const char *argv[]) {
         ("help,h", "displays helpful message")
         ("pgn", po::value<std::string>(), "runs provided PGN on our chessengine")
         ("listeners,l", po::value<std::vector<std::string>>()->multitoken(), "plugs in provided listeners")
-        ("evaluate", po::value<std::string>(), "evaluates moves for given fen-represented board.")
         ("perft", po::value<std::string>(), "runs provided Perft on our chessengine and output the amount of moves we were able to generate.")
-        ("unit-test","run unitary-test undo move")
         ("debug", "activates debugging/testing output for some features")
         ;
 
@@ -47,18 +41,14 @@ int main(int argc, const char *argv[]) {
         std::cout << options << "\n";
         return 1;
     }
-    if (variables.count("unit-test"))
-    {
-        auto UT = board::UnitaryTest();
-        return UT.Controller();
-    }
+
     auto listenerManager = listener::ListenerManager();
     if (variables.count("listeners")) {
         listenerManager.load_plugins(variables["listeners"].as<std::vector<std::string>>());
     }
 
     if (variables.count("pgn")) {
-        auto board = board::Chessboard();
+        auto board = std::make_shared<board::Chessboard>();
         listenerManager.register_board(board);
         //pgn here
         std::string pgnfilename = variables["pgn"].as<std::string>();
@@ -80,19 +70,12 @@ int main(int argc, const char *argv[]) {
         }
         content.erase(content.size() - 1, 1);
 
-        auto board = board::Chessboard(content);
-        listenerManager.register_board(board);
+        auto board = std::make_shared<board::Chessboard>(content);
+        listenerManager.register_board(std::move(board));
         listenerManager.run_perft(std::atoi(depth.c_str()), variables.count("debug"));
         
     }
-    else if (variables.count("evaluate")) {
-        auto str = (variables.find("evaluate"))->second.as<std::string>();
-        auto board = board::Chessboard(str);
-        listenerManager.register_board(board);
-        listenerManager.evaluate_ai();
-    }
     else {
-
         listenerManager.run_ai();
     }
 
