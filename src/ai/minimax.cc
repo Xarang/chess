@@ -84,6 +84,10 @@ namespace ai {
                          break;
                      }
                  }
+                 if (maxEval == -INFINITY)
+                 {
+                     maxEval = evaluate();
+                 }
                  res = maxEval;
              }
              else {
@@ -98,6 +102,10 @@ namespace ai {
                      {
                          break;
                      }
+                 }
+                 if (minEval == +INFINITY)
+                 {
+                     minEval = evaluate();
                  }
                  res = minEval;
              }
