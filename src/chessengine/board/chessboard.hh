@@ -142,7 +142,7 @@ namespace board {
 
         bool is_move_legal(Move&, bool check_self_check = true);
 
-        std::list<Move> generate_legal_moves(bool check_self_check = true);
+        void generate_legal_moves(std::list<Move>& allMoves, bool check_self_check = true);
 
         bool is_check();
 

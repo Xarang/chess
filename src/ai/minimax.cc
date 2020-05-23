@@ -63,7 +63,8 @@ namespace ai {
              res = evaluate();
          }
          else {
-             auto moves = myBoard->generate_legal_moves();
+             std::list<board::Move> moves;
+             myBoard->generate_legal_moves(moves);
 
              // Ai wants to minimize
              if (ai_turn) {
@@ -265,8 +266,10 @@ namespace ai {
         float bestValue = -INFINITY;
         std::optional<board::Move> bestMove;
 
-        auto moves = myBoard->generate_legal_moves();
+        std::list<board::Move> moves;
+        myBoard->generate_legal_moves(moves);
         std::cerr << "found " << moves.size() << " legal moves\n";
+
 
         for (auto& move : moves) {
             std::cerr << "evaluating move: " << move.to_string() << "\n";

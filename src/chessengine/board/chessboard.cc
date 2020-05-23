@@ -97,9 +97,9 @@ namespace board {
 
     }
 
-    std::list<Move> Chessboard::generate_legal_moves(bool check_self_check) {
-        std::list<Move> allMoves;
-        std::cerr << "[IN] generate_legal_moves on board: " + to_string() + "\n";
+    void Chessboard::generate_legal_moves(std::list<Move>& allMoves, bool check_self_check) {
+        //std::list<Move> allMoves;
+
         //build the list of all "potential" moves, not accounting for OOB and blocked paths
         for (auto piece_set : pieces_) {
             if (piece_set.first.second == whose_turn_is_it()){
@@ -116,15 +116,14 @@ namespace board {
 
         }
         std::cerr << "[OUT] generate_legal_moves on board: " + to_string() + "\n";
-        return allMoves;
     }
 
     bool Chessboard::is_check() {
 
         //generate legal moves for opponent and check if one on them captures your king.
         change_turn();
-        std::list<Move> opponent_moves = generate_legal_moves(
-                false); //this false means that this call to generate_legal_moves will not check for check itself (since the other player has initiative anyway)
+        std::list<Move> opponent_moves;
+        generate_legal_moves(opponent_moves, false); //this false means that this call to generate_legal_moves will not check for check itself (since the other player has initiative anyway)
         change_turn();
 
         auto king = pieces_[{PieceType::KING, whose_turn_is_it()}].front();
@@ -144,7 +143,8 @@ namespace board {
             return false;
         }
 
-        std::list<Move> moves = generate_legal_moves();
+        std::list<Move> moves;
+        generate_legal_moves(moves);
         for (auto& move : moves) {
             if (is_move_legal(move)) {
                 return false;
@@ -160,7 +160,8 @@ namespace board {
         //or
         //no pawn moved or piece captured in last 50 turns
 
-        std::list<Move> legal_moves = generate_legal_moves();
+        std::list<Move> legal_moves;
+        generate_legal_moves(legal_moves);
         if (legal_moves.empty() && !is_check()) {
             return true;
         }

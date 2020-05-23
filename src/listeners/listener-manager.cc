@@ -89,10 +89,12 @@ namespace listener {
                                 return register_mat(board_->whose_turn_is_it());
                             }
                             else {
+                                std::list<board::Move> list;
                                 if (board_->is_check()) {
                                     register_check(board_->whose_turn_is_it());
                                 }
-                                if (board_->generate_legal_moves().empty()) {
+                                board_->generate_legal_moves(list);
+                                if (list.empty()) {
                                     return register_pat(board_->whose_turn_is_it());
                                 }
                                 else if (board_->is_draw()) {
@@ -125,7 +127,8 @@ namespace listener {
             return 1;
         }
         unsigned long long sum = 0;
-        auto moves = b.generate_legal_moves();
+        std::list<board::Move> moves;
+        b.generate_legal_moves(moves);
         for (auto& move : moves) {
             if (depth == 1) {
                 if (debug) {
