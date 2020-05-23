@@ -10,19 +10,19 @@
 
 namespace ai {
     int AI::evaluate() {
-        //std::cerr << "[IN] evaluate\n";
+        std::cerr << "[IN] evaluate\n";
         int res = 0;
         auto pieces = myBoard->get_pieces();
-        //std::cerr << "evaluate: got pieces\n";
+        std::cerr << "evaluate: got pieces\n";
 
         res += pair_modify(pieces);
-        //std::cerr << "evaluate: performed pair_modify\n";
+        std::cerr << "evaluate: performed pair_modify\n";
         res += bishopEval();
-        //std::cerr << "evaluate: performed bishopEval\n";
+        std::cerr << "evaluate: performed bishopEval\n";
         res += knight_pawns(pieces);
-        //std::cerr << "evaluate: performed knight_pawns\n";
+        std::cerr << "evaluate: performed knight_pawns\n";
 
-        //std::cerr << "[WIP] evaluate: performed misc evaluations\n";
+        std::cerr << "[WIP] evaluate: performed misc evaluations\n";
 
         for (auto piece_pair : pieces)
         {
@@ -57,13 +57,13 @@ namespace ai {
                 }
             }
         }
-        //std::cerr << "[OUT] evaluate\n";
+        std::cerr << "[OUT] evaluate\n";
         return res;
     }
 
     float AI::minimax(const int& depth, const bool& ai_turn, float alpha, float beta) {
          float res = 0;
-         //std::cerr << "[IN] minimax\n";
+         std::cerr << "[IN] minimax\n";
          if (depth == 0 || myBoard->is_checkmate()) {
              res = evaluate();
          }
@@ -103,7 +103,7 @@ namespace ai {
                  res = minEval;
              }
          }
-         //std::cerr << "[OUT] minimax\n";
+         std::cerr << "[OUT] minimax\n";
          return res;
     }
 
