@@ -10,6 +10,7 @@
 
 namespace ai {
     int AI::evaluate() {
+        std::cerr << "[IN] evaluate\n";
         int res = 0;
         auto pieces = myBoard->get_pieces();
 
@@ -51,47 +52,53 @@ namespace ai {
                 }
             }
         }
+        std::cerr << "[OUT] evaluate\n";
         return res;
     }
 
     float AI::minimax(const int& depth, const bool& ai_turn, float alpha, float beta) {
-         if (depth == 0 || myBoard->is_checkmate())
-             return evaluate();
-
-         auto moves = myBoard->generate_legal_moves();
-
-         // Ai wants to minimize
-         if (ai_turn) {
-             float maxEval = -INFINITY;
-             for (auto& move : moves) {
-                 myBoard->do_move(move, true);
-                 auto eval = minimax(depth - 1, !ai_turn, alpha, beta);
-                 myBoard->undo_move(move);
-                 maxEval = std::max(maxEval, eval);
-                 alpha = std::max(alpha, eval);
-                 if (beta <= alpha)
-                 {
-                     break;
-                 }
-             }
-             return maxEval;
+         float res = 0;
+         std::cerr << "[IN] minimax\n";
+         if (depth == 0 || myBoard->is_checkmate()) {
+             res = evaluate();
          }
-
          else {
-             float minEval = +INFINITY;
-             for (auto& move : moves) {
-                 myBoard->do_move(move, true);
-                 auto eval = minimax(depth - 1, !ai_turn, alpha, beta);
-                 myBoard->undo_move(move);
-                 minEval = std::min(minEval, eval);
-                 beta = std::min(beta, eval);
-                 if (beta <= alpha)
-                 {
-                     break;
+             auto moves = myBoard->generate_legal_moves();
+
+             // Ai wants to minimize
+             if (ai_turn) {
+                 float maxEval = -INFINITY;
+                 for (auto& move : moves) {
+                     myBoard->do_move(move, true);
+                     auto eval = minimax(depth - 1, !ai_turn, alpha, beta);
+                     myBoard->undo_move(move);
+                     maxEval = std::max(maxEval, eval);
+                     alpha = std::max(alpha, eval);
+                     if (beta <= alpha)
+                     {
+                         break;
+                     }
                  }
+                 res = maxEval;
              }
-             return minEval;
+             else {
+                 float minEval = +INFINITY;
+                 for (auto& move : moves) {
+                     myBoard->do_move(move, true);
+                     auto eval = minimax(depth - 1, !ai_turn, alpha, beta);
+                     myBoard->undo_move(move);
+                     minEval = std::min(minEval, eval);
+                     beta = std::min(beta, eval);
+                     if (beta <= alpha)
+                     {
+                         break;
+                     }
+                 }
+                 res = minEval;
+             }
          }
+         std::cerr << "[OUT] minimax\n";
+         return res;
     }
 
     int AI::pair_modify(const std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece*>, board::hash_pair>& pieces) {
