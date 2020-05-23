@@ -3,19 +3,22 @@
 
 namespace board {
 
-    bool MoveLegalityChecker::is_move_legal_QUEEN(const Chessboard& chessboard, const Move& move) {
+    bool MoveLegalityChecker::is_move_legal_QUEEN(const Chessboard& chessboard,
+            const Move& move) {
 
         bool b = is_move_legal_BISHOP(chessboard, move);
         if (b)
             return true;
-        if (move.start_position_.rank_get() != move.end_position_.rank_get() && move.start_position_.file_get() != move.end_position_.file_get())
+        if (move.start_position_.rank_get() != move.end_position_.rank_get()
+            && move.start_position_.file_get() != move.end_position_.file_get())
             return false;
         b = is_move_legal_ROOK(chessboard, move);
         return b;
     }
 
     //TODO: use chessboard to assess legality (currently not using it)
-    bool MoveLegalityChecker::is_move_legal_KING(const Chessboard& chessboard, const Move& move) {
+    bool MoveLegalityChecker::is_move_legal_KING(const Chessboard& chessboard,
+            const Move& move) {
         auto king = chessboard.read(move.start_position_);
 
         Position white_a_rook(File::A, Rank::ONE);
@@ -25,36 +28,55 @@ namespace board {
 
         if (move.is_king_castling_ || move.is_queen_castling_) {
             auto rook_ptr = chessboard.whose_turn_is_it() == Color::WHITE ?
-                            chessboard.read(move.is_king_castling_ ? white_h_rook : white_a_rook)
-                          : chessboard.read(move.is_king_castling_ ? black_h_rook : black_a_rook);
+                            chessboard.read(move.is_king_castling_ ?
+                                white_h_rook : white_a_rook)
+                          : chessboard.read(move.is_king_castling_ ?
+                                black_h_rook : black_a_rook);
             if (!rook_ptr) {
                 return false;
             }
             if (king->has_already_moved_ || rook_ptr->has_already_moved_) {
                 return false;
             }
-            if (chessboard.whose_turn_is_it() == Color::WHITE && move.is_king_castling_ && chessboard.did_white_king_castling_) {
+            if (chessboard.whose_turn_is_it() == Color::WHITE
+                && move.is_king_castling_ && chessboard.did_white_king_castling_) {
                 return false;
             }
-            if (chessboard.whose_turn_is_it() == Color::WHITE && move.is_queen_castling_ && chessboard.did_white_queen_castling_) {
+            if (chessboard.whose_turn_is_it() == Color::WHITE
+                && move.is_queen_castling_
+                && chessboard.did_white_queen_castling_) {
                 return false;
             }
-            if (chessboard.whose_turn_is_it() == Color::BLACK && move.is_king_castling_ && chessboard.did_black_king_castling_) {
+            if (chessboard.whose_turn_is_it() == Color::BLACK
+                && move.is_king_castling_
+                && chessboard.did_black_king_castling_) {
                 return false;
             }
-            if (chessboard.whose_turn_is_it() == Color::BLACK && move.is_queen_castling_ && chessboard.did_black_queen_castling_) {
+            if (chessboard.whose_turn_is_it() == Color::BLACK
+                && move.is_queen_castling_
+                && chessboard.did_black_queen_castling_) {
                 return false;
             }
             if (move.is_king_castling_) {
-                if (chessboard.read(Position(move.start_position_.file_get() + 1, move.start_position_.rank_get()))
-                    || chessboard.read(Position(move.start_position_.file_get() + 2, move.start_position_.rank_get()))) {
+                if (chessboard.read(Position(
+                        move.start_position_.file_get() + 1,
+                        move.start_position_.rank_get()))
+                    || chessboard.read(Position(
+                            move.start_position_.file_get() + 2,
+                            move.start_position_.rank_get()))) {
                         return false;
                     }
             }
             else { // (move.is_queen_castling_) {
-                if (chessboard.read(Position(move.start_position_.file_get() - 1, move.start_position_.rank_get()))
-                    || chessboard.read(Position(move.start_position_.file_get() - 2, move.start_position_.rank_get()))
-                    || chessboard.read(Position(move.start_position_.file_get() - 3, move.start_position_.rank_get()))) {
+                if (chessboard.read(Position(
+                        move.start_position_.file_get() - 1,
+                        move.start_position_.rank_get()))
+                    || chessboard.read(Position(
+                            move.start_position_.file_get() - 2,
+                            move.start_position_.rank_get()))
+                    || chessboard.read(Position(
+                            move.start_position_.file_get() - 3,
+                            move.start_position_.rank_get()))) {
                         return false;
                     }
             }
@@ -68,12 +90,14 @@ namespace board {
         auto end_rank = move.end_position_.rank_get();
 
   
-        return abs((int)start_file - (int)end_file) <= 1 && abs((int)start_rank - (int)end_rank) <= 1;
+        return abs((int)start_file - (int)end_file) <= 1
+            && abs((int)start_rank - (int)end_rank) <= 1;
     }
 
 
     //TODO: use chessboard to assess legality (currently not using it)
-    bool MoveLegalityChecker::is_move_legal_KNIGHT(const Chessboard&, const Move& move){
+    bool MoveLegalityChecker::is_move_legal_KNIGHT(const Chessboard&,
+            const Move& move) {
 
         auto startFile = move.start_position_.file_get();
         auto startRank = move.start_position_.rank_get();
@@ -98,67 +122,84 @@ namespace board {
         return startFile + 1 == endFile && startRank + 2 == endRank;
     }
 
-    bool MoveLegalityChecker::is_move_legal_BISHOP(const Chessboard& b, const Move& move) {
+    bool MoveLegalityChecker::is_move_legal_BISHOP(const Chessboard& b,
+            const Move& move) {
         int Fi = 1;
         int Ri = 1;
         bool bo = true;
-        if (move.start_position_.file_get() < move.end_position_.file_get() && move.start_position_.rank_get() < move.end_position_.rank_get())
-        {
-            while (true)
-            {
-                if (move.start_position_.file_get() + Fi == File::OUTOFBOUNDS || move.start_position_.rank_get() + Ri == Rank::OUTOFBOUNDS)
-                {
-                    bo = false;
-                    break;
-                }
-                if (move.start_position_.file_get() + Fi == move.end_position_.file_get() &&
-                    move.start_position_.rank_get() + Ri == move.end_position_.rank_get()) {
-                    return true;
-                }
-                if (b.read(Position(move.start_position_.file_get() + Fi, move.start_position_.rank_get() + Ri)))
-                    return false;
-                Fi += 1;
-                Ri += 1;
-
-            }
-        }
-        else if (move.start_position_.file_get() < move.end_position_.file_get() && move.start_position_.rank_get() > move.end_position_.rank_get())
+        if (move.start_position_.file_get() < move.end_position_.file_get()
+            && move.start_position_.rank_get() < move.end_position_.rank_get())
         {
             while (true)
             {
                 if (move.start_position_.file_get() + Fi == File::OUTOFBOUNDS
-                    || move.start_position_.rank_get() - Ri == Rank::OUTOFBOUNDS){
+                   || move.start_position_.rank_get() + Ri == Rank::OUTOFBOUNDS)
+                {
+                    bo = false;
+                    break;
+                }
+                if (move.start_position_.file_get()
+                    + Fi == move.end_position_.file_get()
+                    && move.start_position_.rank_get()
+                    + Ri == move.end_position_.rank_get()) {
+                    return true;
+                }
+                if (b.read(Position(move.start_position_.file_get() + Fi,
+                        move.start_position_.rank_get() + Ri)))
+                    return false;
+                Fi += 1;
+                Ri += 1;
+
+            }
+        }
+        else if (move.start_position_.file_get() < move.end_position_.file_get()
+            && move.start_position_.rank_get() > move.end_position_.rank_get())
+        {
+            while (true)
+            {
+                if (move.start_position_.file_get()
+                    + Fi == File::OUTOFBOUNDS
+                    || move.start_position_.rank_get()
+                    - Ri == Rank::OUTOFBOUNDS) {
                     bo = false;
                     break;
                 }
 
-                if (move.start_position_.file_get() + Fi == move.end_position_.file_get() &&
-                    move.start_position_.rank_get() - Ri == move.end_position_.rank_get()) {
+                if (move.start_position_.file_get()
+                    + Fi == move.end_position_.file_get() &&
+                    move.start_position_.rank_get()
+                    - Ri == move.end_position_.rank_get()) {
                     return true;
                 }
 
-                if (b.read(Position(move.start_position_.file_get() + Fi, move.start_position_.rank_get() - Ri)))
+                if (b.read(Position(move.start_position_.file_get() + Fi,
+                            move.start_position_.rank_get() - Ri)))
                     return false;
                 Fi += 1;
                 Ri += 1;
             }
         }
 
-        else if (move.start_position_.file_get() > move.end_position_.file_get() && move.start_position_.rank_get() < move.end_position_.rank_get())
+        else if (move.start_position_.file_get() > move.end_position_.file_get()
+            && move.start_position_.rank_get() < move.end_position_.rank_get())
         {
             while (true)
             {
-                if (move.start_position_.file_get() - Fi == File::OUTOFBOUNDS || move.start_position_.rank_get() + Ri == Rank::OUTOFBOUNDS) {
+                if (move.start_position_.file_get() - Fi == File::OUTOFBOUNDS
+                || move.start_position_.rank_get() + Ri == Rank::OUTOFBOUNDS) {
                     bo = false;
                     break;
                 }
 
-                if (move.start_position_.file_get() - Fi == move.end_position_.file_get() &&
-                    move.start_position_.rank_get() + Ri == move.end_position_.rank_get()) {
+                if (move.start_position_.file_get()
+                    - Fi == move.end_position_.file_get()
+                    && move.start_position_.rank_get()
+                    + Ri == move.end_position_.rank_get()) {
                     return true;
                 }
 
-                if (b.read(Position(move.start_position_.file_get() - Fi, move.start_position_.rank_get() + Ri)))
+                if (b.read(Position(move.start_position_.file_get() - Fi,
+                        move.start_position_.rank_get() + Ri)))
                     return false;
                 Fi += 1;
                 Ri += 1;
@@ -168,17 +209,21 @@ namespace board {
         {
             while (true)
             {
-                if (move.start_position_.file_get() - Fi == File::OUTOFBOUNDS || move.start_position_.rank_get() - Ri == Rank::OUTOFBOUNDS) {
+                if (move.start_position_.file_get() - Fi == File::OUTOFBOUNDS
+                || move.start_position_.rank_get() - Ri == Rank::OUTOFBOUNDS) {
                     bo = false;
                     break;
                 }
 
-                if (move.start_position_.file_get() - Fi == move.end_position_.file_get() &&
-                    move.start_position_.rank_get() - Ri == move.end_position_.rank_get()) {
+                if (move.start_position_.file_get()
+                    - Fi == move.end_position_.file_get() &&
+                    move.start_position_.rank_get()
+                    - Ri == move.end_position_.rank_get()) {
                     return true;
                 }
 
-                if (b.read(Position(move.start_position_.file_get() - Fi, move.start_position_.rank_get() - Ri))) {
+                if (b.read(Position(move.start_position_.file_get() - Fi,
+                        move.start_position_.rank_get() - Ri))) {
                     return false;
                 }
                 Fi += 1;
@@ -188,25 +233,33 @@ namespace board {
         return bo;
     }
 
-    bool MoveLegalityChecker::is_move_legal_PAWN(const Chessboard& b, const Move& move) {
+    bool MoveLegalityChecker::is_move_legal_PAWN(const Chessboard& b,
+            const Move& move) {
 
         //std::cout << "checking legality of pawn move: " + move.to_string() << "\n";
         int rank_direction = b.is_white_turn_ ? 1 : -1;
         Rank initial_rank = b.is_white_turn_ ? Rank::TWO : Rank::SEVEN;
 
         if (move.is_double_pawn_push_) {
-            if (move.start_position_.rank_get() != initial_rank || move.is_capture_) {
+            if (move.start_position_.rank_get() != initial_rank
+                || move.is_capture_) {
                 return false;
             }
-            if (b.read(Position(move.start_position_.file_get(), move.start_position_.rank_get() + rank_direction))) {
+            if (b.read(Position(move.start_position_.file_get(),
+                    move.start_position_.rank_get() + rank_direction))) {
                 return false;
             }
-            return (move.start_position_.rank_get() + rank_direction * 2 == move.end_position_.rank_get() &&
-                    move.start_position_.file_get() == move.end_position_.file_get());
+            return (move.start_position_.rank_get()
+                + rank_direction * 2 == move.end_position_.rank_get()
+                && move.start_position_.file_get()
+                == move.end_position_.file_get());
         }
 
-        if (move.piece_ == PieceType::PAWN && ((b.whose_turn_is_it() == Color::WHITE && move.end_position_.rank_get() == Rank::EIGHT)
-           || (b.whose_turn_is_it() == Color::BLACK && move.end_position_.rank_get() == Rank::ONE))) {
+        if (move.piece_ == PieceType::PAWN && (
+                (b.whose_turn_is_it() == Color::WHITE
+                    && move.end_position_.rank_get() == Rank::EIGHT)
+           || (b.whose_turn_is_it() == Color::BLACK
+            && move.end_position_.rank_get() == Rank::ONE))) {
             if (!move.promotion_.has_value()) {
                 //promotion is actually obligatory
                 return false;
@@ -214,10 +267,14 @@ namespace board {
         }
 
         if (move.is_capture_) {
-            if (move.start_position_.rank_get() + rank_direction != move.end_position_.rank_get()) {
+            if (move.start_position_.rank_get() + rank_direction
+                != move.end_position_.rank_get()) {
                 return false;
             }
-            if (move.start_position_.file_get() + 1 != move.end_position_.file_get() && move.start_position_.file_get() - 1 != move.end_position_.file_get()) {
+            if (move.start_position_.file_get() + 1
+                != move.end_position_.file_get()
+                && move.start_position_.file_get() - 1
+                != move.end_position_.file_get()) {
                 return false;
             }
             if (b.read(move.end_position_) == nullptr && !move.is_en_passant_) {
@@ -225,70 +282,92 @@ namespace board {
             }
         }
         else {
-            return (move.start_position_.file_get() == move.end_position_.file_get() && move.start_position_.rank_get() + rank_direction == move.end_position_.rank_get());
+            return (move.start_position_.file_get()
+                == move.end_position_.file_get()
+                && move.start_position_.rank_get()
+                + rank_direction == move.end_position_.rank_get());
         }
         return true;
     }
 
-    bool MoveLegalityChecker::is_move_legal_ROOK(const Chessboard& b, const Move& move) {
+    bool MoveLegalityChecker::is_move_legal_ROOK(const Chessboard& b,
+            const Move& move) {
         int Fi = 1;
         int Ri = 1;
 
-        if (move.start_position_.file_get() < move.end_position_.file_get() && move.start_position_.rank_get() == move.end_position_.rank_get())
+        if (move.start_position_.file_get() < move.end_position_.file_get()
+        && move.start_position_.rank_get() == move.end_position_.rank_get())
         {
-            while (move.start_position_.file_get() + Fi != move.end_position_.file_get()) {
+            while (move.start_position_.file_get() + Fi
+                != move.end_position_.file_get()) {
                 if (move.start_position_.file_get() + Fi == File::OUTOFBOUNDS) {
                     return false;
                 }
-                if (b.read(Position(move.start_position_.file_get() + Fi, move.start_position_.rank_get())))
+                if (b.read(Position(move.start_position_.file_get() + Fi,
+                        move.start_position_.rank_get())))
                     break;
                 Fi += 1;
             }
-            return move.start_position_.file_get() + Fi == move.end_position_.file_get();
+            return move.start_position_.file_get()
+                + Fi == move.end_position_.file_get();
         }
 
-        else if (move.start_position_.file_get() > move.end_position_.file_get() && move.start_position_.rank_get() == move.end_position_.rank_get())
+        else if (move.start_position_.file_get() > move.end_position_.file_get()
+            && move.start_position_.rank_get() == move.end_position_.rank_get())
         {
-            while (move.start_position_.file_get() - Fi != move.end_position_.file_get()) {
+            while (move.start_position_.file_get() - Fi
+                != move.end_position_.file_get()) {
                 if (move.start_position_.file_get() - Fi == File::OUTOFBOUNDS) {
                     return false;
                 }
-                if (b.read(Position(move.start_position_.file_get() - Fi, move.start_position_.rank_get())))
+                if (b.read(Position(move.start_position_.file_get() - Fi,
+                        move.start_position_.rank_get())))
                     break;
                 Fi += 1;
             }
-            return move.start_position_.file_get() - Fi == move.end_position_.file_get();
+            return move.start_position_.file_get()
+                - Fi == move.end_position_.file_get();
         }
 
-        else if (move.start_position_.file_get() == move.end_position_.file_get() && move.start_position_.rank_get() < move.end_position_.rank_get())
+        else if (move.start_position_.file_get()
+            == move.end_position_.file_get()
+            && move.start_position_.rank_get() < move.end_position_.rank_get())
         {
-            while (move.start_position_.rank_get() + Ri != move.end_position_.rank_get()) {
+            while (move.start_position_.rank_get() + Ri
+                != move.end_position_.rank_get()) {
                 if (move.start_position_.rank_get() + Ri == Rank::OUTOFBOUNDS) {
                     return false;
                 }
-                if (b.read(Position(move.start_position_.file_get(), move.start_position_.rank_get() + Ri)))
+                if (b.read(Position(move.start_position_.file_get(),
+                        move.start_position_.rank_get() + Ri)))
                     break;
                 Ri += 1;
             }
-            return move.start_position_.rank_get() + Ri == move.end_position_.rank_get();
+            return move.start_position_.rank_get() + Ri
+                == move.end_position_.rank_get();
         }
 
         else
         {
-            while (move.start_position_.rank_get() - Ri != move.end_position_.rank_get()) {
-                if (move.start_position_.rank_get() - Ri == Rank::OUTOFBOUNDS) {
+            while (move.start_position_.rank_get() - Ri
+                != move.end_position_.rank_get()) {
+                if (move.start_position_.rank_get() - Ri
+                    == Rank::OUTOFBOUNDS) {
                     return false;
                 }
-                if (b.read(Position(move.start_position_.file_get(), move.start_position_.rank_get() - Ri))) {
+                if (b.read(Position(move.start_position_.file_get(),
+                        move.start_position_.rank_get() - Ri))) {
                     break;
                 }
                 Ri += 1;
             }
-            return move.start_position_.rank_get() - Ri == move.end_position_.rank_get();
+            return move.start_position_.rank_get() - Ri
+                == move.end_position_.rank_get();
         }
     }
 
-    bool MoveLegalityChecker::is_move_legal(const Chessboard& b, const Move &move) {
+    bool MoveLegalityChecker::is_move_legal(const Chessboard& b,
+            const Move &move) {
         switch (move.piece_) {
             case PieceType::PAWN:
                 return is_move_legal_PAWN(b, move);

@@ -74,7 +74,8 @@ namespace board
 
     inline std::string Position::to_string() const
     {
-        return file_to_string(file_get()) + rank_to_string(rank_get());
+        return file_to_string(file_get())
+            + rank_to_string(rank_get());
     }
 
 } // namespace board

@@ -9,8 +9,10 @@ namespace board
         if (
                 piece_ == PieceType::PAWN
                 && ((
-                        (start_position_.rank_get() == Rank::TWO && end_position_.rank_get() == Rank::FOUR)
-                        || (start_position_.rank_get() == Rank::SEVEN && end_position_.rank_get() == Rank::FIVE)
+                        (start_position_.rank_get() == Rank::TWO
+                            && end_position_.rank_get() == Rank::FOUR)
+                        || (start_position_.rank_get() == Rank::SEVEN
+                            && end_position_.rank_get() == Rank::FIVE)
                     ))
             ) {
                 is_double_pawn_push_ = true;
@@ -39,7 +41,8 @@ namespace board
         }
     }
 
-    //take the informations we want from pgnmove and re-reformate them in a handier way.
+    //take the informations we want from pgnmove
+    // and re-reformate them in a handier way.
     Move::Move(PgnMove move)
         :   piece_(move.piece_get()),
             start_position_(move.start_get()),
@@ -48,7 +51,8 @@ namespace board
             is_capture_(move.capture_get()),
             is_check_(move.report_get() != ReportType::NONE),
             is_checkmate_(move.report_get() == ReportType::CHECKMATE), 
-            is_double_pawn_push_(false), is_king_castling_(false), is_queen_castling_(false), is_en_passant_(false) {
+            is_double_pawn_push_(false), is_king_castling_(false),
+            is_queen_castling_(false), is_en_passant_(false) {
 
         // detecting special moves..
         set_double_pawn_push();
@@ -63,7 +67,8 @@ namespace board
         std::string str = "[MOVE] ";
         str += piece_to_char(piece_);
         str += "  ";
-        str += start_position_.to_string() + " -" + (is_capture_ ? "X" : "-") + "> " + end_position_.to_string();
+        str += start_position_.to_string() + " -" +
+                (is_capture_ ? "X" : "-") + "> " + end_position_.to_string();
         str += "  ";
         std::list<std::string> tags;
         if (is_king_castling_) {
@@ -79,7 +84,8 @@ namespace board
             tags.push_front("en passant");
         }
         if (promotion_.has_value()) {
-            tags.push_front("promoting to -> " + std::string(1, piece_to_char(promotion_.value())));
+            tags.push_front("promoting to -> "
+                + std::string(1, piece_to_char(promotion_.value())));
         }
 
         for (auto tag : tags) {
@@ -91,10 +97,12 @@ namespace board
     std::string Move::uci() const {
         std::string promotion = "";
         if (promotion_.has_value()) {
-            promotion = std::string(1, tolower(piece_to_char(promotion_.value())));
+            promotion = std::string(1,
+                    tolower(piece_to_char(promotion_.value())));
             //std::cerr << "promotion: " << promotion << "\n";
         }
-        return start_position_.to_string() + end_position_.to_string() + promotion;
+        return start_position_.to_string()
+            + end_position_.to_string() + promotion;
     }
 
     bool Move::is_halfmove_clock_resetter() const {

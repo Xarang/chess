@@ -69,32 +69,39 @@ namespace board {
         }
         //move forward
         m.emplace_front(Move());
-        MoveBuilder::set_basic_move(m.front(), p, Position(p.position_.file_get(), p.position_.rank_get() + direction));
+        MoveBuilder::set_basic_move(m.front(), p,
+                Position(p.position_.file_get(),
+                        p.position_.rank_get() + direction));
         //capture in diagonals
         m.emplace_front(Move());
-        MoveBuilder::set_basic_capture(m.front(), p, Position(p.position_.file_get() + 1,
-                                                                p.position_.rank_get() + direction));
+        MoveBuilder::set_basic_capture(m.front(), p,
+                Position(p.position_.file_get() + 1,
+                        p.position_.rank_get() + direction));
         m.emplace_front(Move());
-        MoveBuilder::set_basic_capture(m.front(), p, Position(p.position_.file_get() - 1,
-                                                                p.position_.rank_get() + direction));
+        MoveBuilder::set_basic_capture(m.front(), p,
+                Position(p.position_.file_get() - 1,
+                        p.position_.rank_get() + direction));
 
         for (Move& move : m) {
             if (move.piece_ == PieceType::PAWN &&
-                    ((move.end_position_.rank_get() == Rank::EIGHT && p.color_ == Color::WHITE)
-                    || (move.end_position_.rank_get() == Rank::ONE && p.color_ == Color::BLACK))) {
+                    ((move.end_position_.rank_get() == Rank::EIGHT
+                        && p.color_ == Color::WHITE)
+                    || (move.end_position_.rank_get() == Rank::ONE
+                        && p.color_ == Color::BLACK))) {
                 m.emplace_front(Move());
-                MoveBuilder::set_with_promotion(m.front(), move, PieceType::BISHOP);
+                MoveBuilder::set_with_promotion(
+                        m.front(), move, PieceType::BISHOP);
                 m.emplace_front(Move());
-                MoveBuilder::set_with_promotion(m.front(), move, PieceType::QUEEN);
+                MoveBuilder::set_with_promotion(
+                        m.front(), move, PieceType::QUEEN);
                 m.emplace_front(Move());
-                MoveBuilder::set_with_promotion(m.front(), move, PieceType::ROOK);
+                MoveBuilder::set_with_promotion(
+                        m.front(), move, PieceType::ROOK);
                 m.emplace_front(Move());
-                MoveBuilder::set_with_promotion(m.front(), move, PieceType::KNIGHT);
+                MoveBuilder::set_with_promotion(
+                        m.front(), move, PieceType::KNIGHT);
             }
         }
-
-        //std::cout << "generated potential moves for piece: " << p.to_string() << "\n";
-       
     }
 
     void PieceMoveGenerator::Bishop(const Piece &p, std::list<Move>& m) {
@@ -114,13 +121,16 @@ namespace board {
                 curr_rank = curr_rank + add_rank;
                 /*int check_file = static_cast<int>(curr_file);
                 int check_rank = static_cast<int>(curr_file);*/
-                if (curr_file == File::OUTOFBOUNDS || curr_rank == Rank::OUTOFBOUNDS) {
+                if (curr_file == File::OUTOFBOUNDS
+                    || curr_rank == Rank::OUTOFBOUNDS) {
                     break;
                 }
                 m.emplace_back(Move());
-                MoveBuilder::set_basic_move(m.back(), p, Position(curr_file, curr_rank));
+                MoveBuilder::set_basic_move(m.back(), p,
+                        Position(curr_file, curr_rank));
                 m.emplace_back(Move());
-                MoveBuilder::set_basic_capture(m.back(), p, Position(curr_file, curr_rank));
+                MoveBuilder::set_basic_capture(m.back(), p,
+                        Position(curr_file, curr_rank));
             }
         }
     }
@@ -134,9 +144,13 @@ namespace board {
 
         for (auto pair : knight_directions) {
             m.emplace_back(Move());
-            MoveBuilder::set_basic_move(m.back(), p, Position(org_file + pair.first, org_rank + pair.second));
+            MoveBuilder::set_basic_move(m.back(), p,
+                    Position(org_file + pair.first,
+                            org_rank + pair.second));
             m.emplace_back(Move());
-            MoveBuilder::set_basic_capture(m.back(), p, Position(org_file + pair.first, org_rank + pair.second));
+            MoveBuilder::set_basic_capture(m.back(), p,
+                    Position(org_file + pair.first,
+                            org_rank + pair.second));
         }
     }
 
@@ -160,13 +174,16 @@ namespace board {
                 curr_rank = curr_rank + add_rank;
                 /*int check_file = static_cast<int>(curr_file);
                 int check_rank = static_cast<int>(curr_file);*/
-                if (curr_file == File::OUTOFBOUNDS || curr_rank == Rank::OUTOFBOUNDS) {
+                if (curr_file == File::OUTOFBOUNDS
+                    || curr_rank == Rank::OUTOFBOUNDS) {
                     break;
                 }
                 m.emplace_back(Move());
-                MoveBuilder::set_basic_move(m.back(), p, Position(curr_file, curr_rank));
+                MoveBuilder::set_basic_move(m.back(), p,
+                        Position(curr_file, curr_rank));
                 m.emplace_back(Move());
-                MoveBuilder::set_basic_capture(m.back(), p, Position(curr_file, curr_rank));
+                MoveBuilder::set_basic_capture(m.back(), p,
+                        Position(curr_file, curr_rank));
             }
         }
     }
@@ -192,13 +209,16 @@ namespace board {
                 curr_rank = curr_rank + add_rank;
                 /*int check_file = static_cast<int>(curr_file);
                 int check_rank = static_cast<int>(curr_file);*/
-                if (curr_file == File::OUTOFBOUNDS || curr_rank == Rank::OUTOFBOUNDS) {
+                if (curr_file == File::OUTOFBOUNDS
+                    || curr_rank == Rank::OUTOFBOUNDS) {
                     break;
                 }
                 m.emplace_back(Move());
-                MoveBuilder::set_basic_move(m.back(), p, Position(curr_file, curr_rank));
+                MoveBuilder::set_basic_move(m.back(), p,
+                        Position(curr_file, curr_rank));
                 m.emplace_back(Move());
-                MoveBuilder::set_basic_capture(m.back(), p, Position(curr_file, curr_rank));
+                MoveBuilder::set_basic_capture(m.back(), p,
+                        Position(curr_file, curr_rank));
             }
         }
     }
@@ -216,9 +236,13 @@ namespace board {
         Rank org_rank = p.position_.rank_get();
         for (auto pair : king_directions) {
             m.emplace_back(Move());
-            MoveBuilder::set_basic_move(m.back(), p, Position(org_file + pair.first, org_rank + pair.second));
+            MoveBuilder::set_basic_move(m.back(), p,
+                    Position(org_file + pair.first,
+                            org_rank + pair.second));
             m.emplace_back(Move());
-            MoveBuilder::set_basic_capture(m.back(), p, Position(org_file + pair.first, org_rank + pair.second));
+            MoveBuilder::set_basic_capture(m.back(), p,
+                    Position(org_file + pair.first,
+                            org_rank + pair.second));
         }
     }
 

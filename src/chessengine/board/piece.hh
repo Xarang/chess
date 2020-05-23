@@ -17,17 +17,21 @@ namespace board
         bool has_already_moved_;
 
         Piece(Position newPos, Color newColor, PieceType newPieceType) 
-        : position_(newPos), color_(newColor), type_(newPieceType), has_already_moved_(false)
+        : position_(newPos), color_(newColor), type_(newPieceType),
+        has_already_moved_(false)
         {}
 
         void getAllPotentialMoves(std::list<struct Move>& m);
 
         bool operator==(const Piece& other) const {
-            return position_ == other.position_ && color_ == other.color_ && type_ == other.type_ && has_already_moved_ == other.has_already_moved_;
+            return position_ == other.position_ && color_ == other.color_
+            && type_ == other.type_
+            && has_already_moved_ == other.has_already_moved_;
         }
 
         char to_char_fen() const;
-        static std::pair<PieceType, Color> piecetype_and_color_from_fen(char fen);
+        static std::pair<PieceType, Color>
+            piecetype_and_color_from_fen(char fen);
 
 
         std::string to_string() const;
