@@ -58,7 +58,8 @@ namespace ai {
          if (depth == 0 || myBoard->is_checkmate())
              return evaluate();
 
-         auto moves = myBoard->generate_legal_moves();
+         std::list<board::Move> moves;
+         myBoard->generate_legal_moves(moves);
 
          // Ai wants to minimize
          if (ai_turn) {
@@ -257,7 +258,8 @@ namespace ai {
         float bestValue = -INFINITY;
         std::optional<board::Move> bestMove;
 
-        auto moves = myBoard->generate_legal_moves();
+        std::list<board::Move> moves;
+        myBoard->generate_legal_moves(moves);
 
         for (auto& move : moves) {
             myBoard->do_move(move);

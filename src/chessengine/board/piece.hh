@@ -20,7 +20,7 @@ namespace board
         : position_(newPos), color_(newColor), type_(newPieceType), has_already_moved_(false)
         {}
 
-        std::list<struct Move>& getAllPotentialMoves(std::list<struct Move>& m);
+        void getAllPotentialMoves(std::list<struct Move>& m);
 
         bool operator==(const Piece& other) const {
             return position_ == other.position_ && color_ == other.color_ && type_ == other.type_ && has_already_moved_ == other.has_already_moved_;
@@ -35,12 +35,12 @@ namespace board
 
     class PieceMoveGenerator {
         public:
-        static std::list<Move>& Pawn(const Piece &p, std::list<Move>& m);
-        static std::list<Move>& Knight(const Piece &p, std::list<Move>& m);
-        static std::list<Move>& Bishop(const Piece &p, std::list<Move>& m);
-        static std::list<Move>& Rook(const Piece &p, std::list<Move>& m);
-        static std::list<Move>& Queen(const Piece &p, std::list<Move>& m);
-        static std::list<Move>& King(const Piece &p, std::list<Move>& m);
+        static void Pawn(const Piece &p, std::list<Move>& m);
+        static void Knight(const Piece &p, std::list<Move>& m);
+        static void Bishop(const Piece &p, std::list<Move>& m);
+        static void Rook(const Piece &p, std::list<Move>& m);
+        static void Queen(const Piece &p, std::list<Move>& m);
+        static void King(const Piece &p, std::list<Move>& m);
     };
 
 

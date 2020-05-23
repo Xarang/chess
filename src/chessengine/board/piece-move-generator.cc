@@ -59,7 +59,7 @@ namespace board {
 
 
 
-    std::list<Move>& PieceMoveGenerator::Pawn(const Piece &p, std::list<Move>& m) {
+    void PieceMoveGenerator::Pawn(const Piece &p, std::list<Move>& m) {
         //std::list<Move> moves;
         int direction = p.color_ == Color::WHITE ? 1 : -1;
         //double pawn advance
@@ -94,10 +94,10 @@ namespace board {
         }
 
         //std::cout << "generated potential moves for piece: " << p.to_string() << "\n";
-        return m;
+       
     }
 
-    std::list<Move>& PieceMoveGenerator::Bishop(const Piece &p, std::list<Move>& m) {
+    void PieceMoveGenerator::Bishop(const Piece &p, std::list<Move>& m) {
         //std::list<Move> bishop_moves;
         File org_file = p.position_.file_get();
         Rank org_rank = p.position_.rank_get();
@@ -123,11 +123,9 @@ namespace board {
                 MoveBuilder::set_basic_capture(m.back(), p, Position(curr_file, curr_rank));
             }
         }
-
-        return m;
     }
 
-    std::list<Move>& PieceMoveGenerator::Knight(const Piece &p, std::list<Move>& m) {
+    void PieceMoveGenerator::Knight(const Piece &p, std::list<Move>& m) {
         //std::list<Move> knight_moves;
 
         File org_file = p.position_.file_get();
@@ -140,11 +138,9 @@ namespace board {
             m.emplace_back(Move());
             MoveBuilder::set_basic_capture(m.back(), p, Position(org_file + pair.first, org_rank + pair.second));
         }
-
-        return m;
     }
 
-    std::list<Move>& PieceMoveGenerator::Rook(const Piece &p, std::list<Move>& m) {
+    void PieceMoveGenerator::Rook(const Piece &p, std::list<Move>& m) {
         //std::list<Move> rook_moves;
 
         File org_file = p.position_.file_get();
@@ -173,11 +169,9 @@ namespace board {
                 MoveBuilder::set_basic_capture(m.back(), p, Position(curr_file, curr_rank));
             }
         }
-
-        return m;
     }
 
-    std::list<Move>& PieceMoveGenerator::Queen(const Piece &p, std::list<Move>& m) {
+    void PieceMoveGenerator::Queen(const Piece &p, std::list<Move>& m) {
         //std::list<Move> queen_moves;
 
         File org_file = p.position_.file_get();
@@ -207,11 +201,9 @@ namespace board {
                 MoveBuilder::set_basic_capture(m.back(), p, Position(curr_file, curr_rank));
             }
         }
-
-        return m;
     }
 
-    std::list<Move>& PieceMoveGenerator::King(const Piece &p, std::list<Move>& m) {
+    void PieceMoveGenerator::King(const Piece &p, std::list<Move>& m) {
         //std::list<Move> king_moves;
         if (!p.has_already_moved_) {
             m.emplace_back(Move());
@@ -228,8 +220,6 @@ namespace board {
             m.emplace_back(Move());
             MoveBuilder::set_basic_capture(m.back(), p, Position(org_file + pair.first, org_rank + pair.second));
         }
-
-        return m;
     }
 
 }
