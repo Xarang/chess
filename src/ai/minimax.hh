@@ -10,7 +10,7 @@ namespace ai {
         friend board::Chessboard;
         std::shared_ptr<board::Chessboard> myBoard;
         clock_t remaining_time_ = 300;
-        int depth_ = 3;
+        int depth_ = 4;
         board::Color color_ = board::Color::WHITE;
 
         //Piece Material Values
@@ -181,6 +181,8 @@ namespace ai {
         int bishopEval();
 
         int queenEval();
+
+        int rookEval();
 
             /*
              * For mobility values, we might need a specific class in order to take into account multiple paramters:

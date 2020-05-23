@@ -21,6 +21,10 @@ namespace ai {
         res += knight_pawns(pieces);
         //std::cerr << "evaluate: performed knight_pawns\n";
 
+        res += queenEval();
+
+        //res += rookEval();
+
         //std::cerr << "[WIP] evaluate: performed misc evaluations\n";
 
         for (auto piece_pair : pieces)
@@ -33,9 +37,11 @@ namespace ai {
                     res += material_values[piece->type_];
                     //Piece's positional value
                     if (color_ == board::Color::WHITE)
-                        res += (*table_valuesWhite[piece->type_])[(int)piece->position_.file_get()][(int)piece->position_.rank_get()];
+                        res += (*table_valuesWhite[piece->type_])[(int)piece->position_.file_get()]
+                                [(int)piece->position_.rank_get()];
                     else
-                        res += (*table_valuesBlack[piece->type_])[(int)piece->position_.file_get()][(int)piece->position_.rank_get()];
+                        res += (*table_valuesBlack[piece->type_])[(int)piece->position_.file_get()]
+                                [(int)piece->position_.rank_get()];
 
                     if (piece->type_ == board::PieceType::PAWN) {
                         res += backwardPawnCheck(piece->position_);
@@ -46,9 +52,11 @@ namespace ai {
                 {
                     res -= material_values[piece->type_];
                     if (color_ == board::Color::WHITE)
-                        res -= (*table_valuesWhite[piece->type_])[(int)piece->position_.file_get()][(int)piece->position_.rank_get()];
+                        res -= (*table_valuesWhite[piece->type_])[(int)piece->position_.file_get()]
+                                [(int)piece->position_.rank_get()];
                     else
-                        res -= (*table_valuesBlack[piece->type_])[(int)piece->position_.file_get()][(int)piece->position_.rank_get()];
+                        res -= (*table_valuesBlack[piece->type_])[(int)piece->position_.file_get()]
+                                [(int)piece->position_.rank_get()];
                     if (piece->type_ == board::PieceType::PAWN) {
                         res -= backwardPawnCheck(piece->position_);
                         res -= candidatePawnCheck(piece->position_);
@@ -124,35 +132,49 @@ namespace ai {
          }
     }
 
-    int AI::pair_modify(const std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece*>, board::hash_pair>& pieces) {
+    int AI::pair_modify(const std::unordered_map<std::pair<board::PieceType, board::Color>,
+            std::vector<board::Piece*>, board::hash_pair>& pieces) {
         int res = 0;
         //Bonus
-        if (pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::BISHOP, board::Color::WHITE))->second.size() > 1)
+        if (pieces.find(std::make_pair<board::PieceType, board::Color>(
+                board::PieceType::BISHOP, board::Color::WHITE))->second.size() > 1)
             res += 50;
-        if (pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::BISHOP, board::Color::BLACK))->second.size() > 1)
+        if (pieces.find(std::make_pair<board::PieceType, board::Color>(
+                board::PieceType::BISHOP, board::Color::BLACK))->second.size() > 1)
             res -= 50;
         //Malus
-        if (pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::KNIGHT, board::Color::WHITE))->second.size() > 1)
+        if (pieces.find(std::make_pair<board::PieceType, board::Color>(
+                board::PieceType::KNIGHT, board::Color::WHITE))->second.size() > 1)
             res -= 30;
-        if (pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::KNIGHT, board::Color::BLACK))->second.size() > 1)
+        if (pieces.find(std::make_pair<board::PieceType, board::Color>(
+                board::PieceType::KNIGHT, board::Color::BLACK))->second.size() > 1)
             res += 30;
-        if (pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::ROOK, board::Color::WHITE))->second.size() > 1)
+        if (pieces.find(std::make_pair<board::PieceType, board::Color>(
+                board::PieceType::ROOK, board::Color::WHITE))->second.size() > 1)
             res -= 40;
-        if (pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::ROOK, board::Color::BLACK))->second.size() > 1)
+        if (pieces.find(std::make_pair<board::PieceType, board::Color>(
+                board::PieceType::ROOK, board::Color::BLACK))->second.size() > 1)
             res += 40;
-        if (pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::PAWN, board::Color::WHITE))->second.size() == 0)
-            res -= 70;
-        if (pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::PAWN, board::Color::BLACK))->second.size() == 0)
-            res += 70;
+        if (pieces.find(std::make_pair<board::PieceType, board::Color>(
+                board::PieceType::PAWN, board::Color::WHITE))->second.size() == 0)
+            res -= 60;
+        if (pieces.find(std::make_pair<board::PieceType, board::Color>(
+                board::PieceType::PAWN, board::Color::BLACK))->second.size() == 0)
+            res += 60;
         return res;
     }
 
-    int AI::knight_pawns(const std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece*>, board::hash_pair>& pieces) {
+    int AI::knight_pawns(const std::unordered_map<std::pair<board::PieceType, board::Color>,
+            std::vector<board::Piece*>, board::hash_pair>& pieces) {
         int res = 0;
-        int whitePawns = pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::PAWN, board::Color::WHITE))->second.size();
-        int whiteKnights = pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::KNIGHT, board::Color::WHITE))->second.size();
-        int blackPawns = pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::PAWN, board::Color::WHITE))->second.size();
-        int blackKnights = pieces.find(std::make_pair<board::PieceType, board::Color>(board::PieceType::KNIGHT, board::Color::WHITE))->second.size();
+        int whitePawns = pieces.find(std::make_pair<board::PieceType, board::Color>(
+                board::PieceType::PAWN, board::Color::WHITE))->second.size();
+        int whiteKnights = pieces.find(std::make_pair<board::PieceType, board::Color>(
+                board::PieceType::KNIGHT, board::Color::WHITE))->second.size();
+        int blackPawns = pieces.find(std::make_pair<board::PieceType, board::Color>(
+                board::PieceType::PAWN, board::Color::WHITE))->second.size();
+        int blackKnights = pieces.find(std::make_pair<board::PieceType, board::Color>(
+                board::PieceType::KNIGHT, board::Color::WHITE))->second.size();
 
         res -= (8 - whitePawns) * 15 * whiteKnights;
         res += (8 - blackPawns) * 15 * blackKnights;
@@ -163,8 +185,8 @@ namespace ai {
         int res = 0;
 
         if (color_ == board::Color::WHITE) {
-
-            auto queen = myBoard->get_pieces().find(std::make_pair<board::PieceType, board::Color>(board::PieceType::QUEEN, board::Color::WHITE))->second;
+            auto queen = myBoard->get_pieces().find(std::make_pair<board::PieceType, board::Color>(
+                    board::PieceType::QUEEN, board::Color::WHITE))->second;
 
             if (!queen.empty() && queen.front()->position_.rank_get() == board::Rank::ONE) {
                 if (myBoard->occupied_by(color_, board::PieceType::QUEEN,
@@ -182,7 +204,8 @@ namespace ai {
             }
         } else
         {
-            auto queen = myBoard->get_pieces().find(std::make_pair<board::PieceType, board::Color>(board::PieceType::QUEEN, board::Color::BLACK))->second;
+            auto queen = myBoard->get_pieces().find(std::make_pair<board::PieceType, board::Color>(
+                    board::PieceType::QUEEN, board::Color::BLACK))->second;
 
             if (!queen.empty() && queen.front()->position_.rank_get() == board::Rank::EIGHT) {
                 if (myBoard->occupied_by(color_, board::PieceType::QUEEN,
@@ -204,8 +227,10 @@ namespace ai {
 
     int AI::bishopEval() {
         int res = 0;
-        auto whiteBishops = myBoard->get_pieces().find(std::make_pair<board::PieceType, board::Color>(board::PieceType::BISHOP, board::Color::WHITE))->second;
-        auto blackBishops = myBoard->get_pieces().find(std::make_pair<board::PieceType, board::Color>(board::PieceType::BISHOP, board::Color::BLACK))->second;
+        auto whiteBishops = myBoard->get_pieces().find(std::make_pair<board::PieceType, board::Color>(
+                board::PieceType::BISHOP, board::Color::WHITE))->second;
+        auto blackBishops = myBoard->get_pieces().find(std::make_pair<board::PieceType, board::Color>(
+                board::PieceType::BISHOP, board::Color::BLACK))->second;
 
         for (auto piece : whiteBishops) {
             if (piece->position_ == board::Position(board::File::A, board::Rank::SEVEN)
