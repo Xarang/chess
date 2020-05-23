@@ -51,6 +51,11 @@ namespace board
         bool is_halfmove_clock_resetter() const;
 
 
+        Move(const Move& other) = delete; //no copy allowed !
+        Move(Move&& other) = default; //move is ok
+
+        Move& operator=(Move&& other) = default;
+
         private:
         void set_double_pawn_push();
         void set_king_castling();

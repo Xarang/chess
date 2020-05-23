@@ -126,7 +126,7 @@ namespace listener {
         }
         unsigned long long sum = 0;
         auto moves = b.generate_legal_moves();
-        for (auto move : moves) {
+        for (auto& move : moves) {
             if (depth == 1) {
                 if (debug) {
                     std::cout << b.to_string() << " " << move.uci() << "\n";
@@ -168,18 +168,22 @@ namespace listener {
             //ai get best move for board;
             //auto moves = board_->generate_legal_moves();
 
-            auto move = chess_ai.searchMove().uci();
+            auto move = chess_ai.searchMove();
+            if (!move.has_value()) {
+                throw new std::runtime_error(
+                        "uci sent position even though game is supposedly over.");
+            }
 
             //outputs best move to log file
             //std::cerr << "best move: " << move << std::endl;
 
             //send move
-            ai::play_move(move);
+            ai::play_move(move->uci());
         }
     }
 
     //listener calls
-    void ListenerManager::register_move(board::Color color, board::Move move, std::optional<board::Piece> captured_piece) {
+    void ListenerManager::register_move(board::Color color, board::Move& move, std::optional<board::Piece> captured_piece) {
         for (auto listener : listeners_) {
             listener->on_piece_moved(move.piece_, move.start_position_, move.end_position_);
         }

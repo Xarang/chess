@@ -65,7 +65,8 @@ namespace board {
                 }
                 //check that the castling is not passing through other pieces
                 auto king = pieces_[{PieceType::KING, whose_turn_is_it()}].front();
-                auto moves_to_castling = MoveBuilder::generate_castling_decomposition(*king, move.is_king_castling_);
+                std::vector<Move> moves_to_castling;
+                MoveBuilder::set_castling_decomposition(moves_to_castling, *king, move.is_king_castling_);
                 bool was_checked_on_the_way = false;
                 for (auto it = moves_to_castling.begin(); it != moves_to_castling.end(); it++) {
                     //we know that these tiles are free
@@ -104,9 +105,9 @@ namespace board {
             if (piece_set.first.second == whose_turn_is_it()){
                 for (auto piece : piece_set.second) {
                     std::list<Move> pieceMoves = piece->getAllPotentialMoves();
-                    for (auto move : pieceMoves) {
+                    for (auto& move : pieceMoves) {
                             if (is_move_legal(move, check_self_check)) {
-                                allMoves.push_front(move);
+                                allMoves.emplace_front(std::move(move));
                             }
                     }
                 }
@@ -126,7 +127,7 @@ namespace board {
 
         auto king = pieces_[{PieceType::KING, whose_turn_is_it()}].front();
 
-        for (auto move : opponent_moves) {
+        for (auto& move : opponent_moves) {
             if (move.end_position_.file_get() == king->position_.file_get() &&
                 move.end_position_.rank_get() == king->position_.rank_get()) {
                 return true;
@@ -142,7 +143,7 @@ namespace board {
         }
 
         std::list<Move> moves = generate_legal_moves();
-        for (auto move : moves) {
+        for (auto& move : moves) {
             if (is_move_legal(move)) {
                 return false;
             }

@@ -63,7 +63,7 @@ namespace ai {
          // Ai wants to minimize
          if (ai_turn) {
              float maxEval = -INFINITY;
-             for (auto move : moves) {
+             for (auto& move : moves) {
                  myBoard->do_move(move, true);
                  auto eval = minimax(depth - 1, !ai_turn, alpha, beta);
                  myBoard->undo_move(move);
@@ -79,7 +79,7 @@ namespace ai {
 
          else {
              float minEval = +INFINITY;
-             for (auto move : moves) {
+             for (auto& move : moves) {
                  myBoard->do_move(move, true);
                  auto eval = minimax(depth - 1, !ai_turn, alpha, beta);
                  myBoard->undo_move(move);
@@ -205,25 +205,27 @@ namespace ai {
         return res;
     }
 
-    board::Move AI::searchMove() {
+    std::optional<board::Move> AI::searchMove() {
         double duration;
         clock_t start = clock();
 
         color_ = myBoard->whose_turn_is_it();
 
         float bestValue = -INFINITY;
-        board::Move bestMove;
+        std::optional<board::Move> bestMove;
 
         auto moves = myBoard->generate_legal_moves();
 
-        for (auto move : moves) {
+        for (auto& move : moves) {
             myBoard->do_move(move);
             auto value = minimax(depth_, false, -INFINITY, +INFINITY);
             myBoard->undo_move(move, true);
             if (value > bestValue)
             {
                 bestValue = value;
-                bestMove = move;
+                //board::Move&& m = std::move(move);
+                //TODO: make sure this swaperoo works
+                bestMove = std::make_optional<board::Move>(std::move(move));
             }
         }
         duration = (clock() - start) / (double) CLOCKS_PER_SEC;

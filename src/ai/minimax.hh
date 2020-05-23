@@ -190,6 +190,6 @@ namespace ai {
              */
         int evaluate();
         float minimax(const int& depth, const bool& is_black, float alpha, float beta);
-        board::Move searchMove();
+        std::optional<board::Move> searchMove();
     };
 }
