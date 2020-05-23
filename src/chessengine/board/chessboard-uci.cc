@@ -45,6 +45,11 @@ namespace board {
                     move.is_en_passant_ = true;
                 }
             }
+
+            if (uci_move.size() >= 5) {
+                //promotion
+                move.promotion_ = std::make_optional<PieceType>(char_to_piece(toupper(uci_move.at(4))));
+            }
             return move;
         }
         else if (move.piece_ == PieceType::KING) {
