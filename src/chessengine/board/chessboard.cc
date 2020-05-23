@@ -104,7 +104,8 @@ namespace board {
         for (auto piece_set : pieces_) {
             if (piece_set.first.second == whose_turn_is_it()){
                 for (auto piece : piece_set.second) {
-                    std::list<Move> pieceMoves = piece->getAllPotentialMoves();
+                    std::list<Move> pieceMoves;
+                    piece->getAllPotentialMoves(pieceMoves);
                     for (auto& move : pieceMoves) {
                             if (is_move_legal(move, check_self_check)) {
                                 allMoves.emplace_front(std::move(move));

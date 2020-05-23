@@ -165,11 +165,7 @@ namespace ai {
                 500, 500, 500, 500, 500, 500, 500, 500, 500, 500,
                 500, 500, 500, 500, 500, 500, 500, 500, 500, 500
         };
-
-        // Best Openings
-        std::list<std::string> openingWhite = {"c2c4", "g1f3", "b2b3"};
-        std::list<std::string> openingBlack = { "d7d5"};
-
+        
         //BackwardPawnCheck
         int backwardPawnCheck(const board::Position& myPos);
 

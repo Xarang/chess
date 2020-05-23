@@ -5,22 +5,22 @@
 
 namespace board {
 
-    std::list<Move> Piece::getAllPotentialMoves() {
+    std::list<Move>& Piece::getAllPotentialMoves(std::list<Move>& m) {
         switch (type_) {
             case PieceType::PAWN:
-                return PieceMoveGenerator::Pawn(*this);
+                return PieceMoveGenerator::Pawn(*this, m);
             case PieceType::BISHOP:
-                return PieceMoveGenerator::Bishop(*this);
+                return PieceMoveGenerator::Bishop(*this, m);
             case PieceType::KNIGHT:
-                return PieceMoveGenerator::Knight(*this);
+                return PieceMoveGenerator::Knight(*this, m);
             case PieceType::ROOK:
-                return PieceMoveGenerator::Rook(*this);
+                return PieceMoveGenerator::Rook(*this, m);
             case PieceType::QUEEN:
-                return PieceMoveGenerator::Queen(*this);
+                return PieceMoveGenerator::Queen(*this, m);
             case PieceType::KING:
-                return PieceMoveGenerator::King(*this);
+                return PieceMoveGenerator::King(*this, m);
             default:
-                return std::list<Move>();
+                return m;
         }
     }
 
