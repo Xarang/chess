@@ -408,8 +408,10 @@ namespace ai {
         }
         duration = (clock() - start) / (double) CLOCKS_PER_SEC;
         remaining_time_ -= duration;
-        if (remaining_time_ <= 45)
+        if (remaining_time_ <= 30)
             depth_ = 2;
+        if (remaining_time_ <= 10)
+            depth_ = 1;
         //std::cerr << "returning best move: \n";
         //std::cerr << bestMove->to_string() << "\n";
         return bestMove;
