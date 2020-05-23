@@ -179,6 +179,9 @@ namespace ai {
         int knight_pawns(const std::unordered_map<std::pair<board::PieceType, board::Color>, std::vector<board::Piece*>, board::hash_pair>& pieces);
 
         int bishopEval();
+
+        int queenEval();
+
             /*
              * For mobility values, we might need a specific class in order to take into account multiple paramters:
              * Value of going forward > Value of going backwards
