@@ -45,12 +45,14 @@ namespace board {
                 { { PieceType::KNIGHT, Color::BLACK }, std::vector<Piece*>() },
                 { { PieceType::BISHOP, Color::BLACK }, std::vector<Piece*>() },
                 { { PieceType::QUEEN, Color::BLACK }, std::vector<Piece*>() },
+                { { PieceType::ROOK, Color::BLACK }, std::vector<Piece*>() },
                 { { PieceType::KING, Color::BLACK }, std::vector<Piece*>() },
                 { { PieceType::PAWN, Color::WHITE }, std::vector<Piece*>() },
                 { { PieceType::KNIGHT, Color::WHITE }, std::vector<Piece*>() },
                 { { PieceType::BISHOP, Color::WHITE }, std::vector<Piece*>() },
                 { { PieceType::QUEEN, Color::WHITE }, std::vector<Piece*>() },
                 { { PieceType::KING, Color::WHITE }, std::vector<Piece*>() },
+                { { PieceType::ROOK, Color::WHITE }, std::vector<Piece*>() },
         };
 
         //whose turn is it ?

@@ -10,19 +10,18 @@
 
 namespace ai {
     int AI::evaluate() {
-        std::cerr << "[IN] evaluate\n";
+        //std::cerr << "[IN] evaluate\n";
         int res = 0;
         auto pieces = myBoard->get_pieces();
-        std::cerr << "evaluate: got pieces\n";
-
+        //std::cerr << "evaluate: got pieces\n";
         res += pair_modify(pieces);
-        std::cerr << "evaluate: performed pair_modify\n";
+        //std::cerr << "evaluate: performed pair_modify\n";
         res += bishopEval();
-        std::cerr << "evaluate: performed bishopEval\n";
+        //std::cerr << "evaluate: performed bishopEval\n";
         res += knight_pawns(pieces);
-        std::cerr << "evaluate: performed knight_pawns\n";
+        //std::cerr << "evaluate: performed knight_pawns\n";
 
-        std::cerr << "[WIP] evaluate: performed misc evaluations\n";
+        //std::cerr << "[WIP] evaluate: performed misc evaluations\n";
 
         for (auto piece_pair : pieces)
         {
@@ -57,13 +56,13 @@ namespace ai {
                 }
             }
         }
-        std::cerr << "[OUT] evaluate\n";
+        //std::cerr << "[OUT] evaluate\n";
         return res;
     }
 
     float AI::minimax(const int& depth, const bool& ai_turn, float alpha, float beta) {
          float res = 0;
-         std::cerr << "[IN] minimax\n";
+         //std::cerr << "[IN] minimax\n";
          if (depth == 0 || myBoard->is_checkmate()) {
              res = evaluate();
          }
@@ -103,7 +102,7 @@ namespace ai {
                  res = minEval;
              }
          }
-         std::cerr << "[OUT] minimax\n";
+         //std::cerr << "[OUT] minimax\n";
          return res;
     }
 
@@ -262,7 +261,7 @@ namespace ai {
     }
 
     std::optional<board::Move> AI::searchMove() {
-        std::cerr << "entered search move\n";
+        //std::cerr << "entered search move\n";
         double duration;
         clock_t start = clock();
 
@@ -273,11 +272,11 @@ namespace ai {
 
         std::list<board::Move> moves;
         myBoard->generate_legal_moves(moves);
-        std::cerr << "found " << moves.size() << " legal moves\n";
+        //std::cerr << "found " << moves.size() << " legal moves\n";
 
 
         for (auto& move : moves) {
-            std::cerr << "evaluating move: " << move.to_string() << "\n";
+            //std::cerr << "evaluating move: " << move.to_string() << "\n";
             myBoard->do_move(move);
             auto value = minimax(depth_, false, -INFINITY, +INFINITY);
             myBoard->undo_move(move, true);
@@ -293,8 +292,8 @@ namespace ai {
         remaining_time_ -= duration;
         if (remaining_time_ <= 120)
             depth_ = 2;
-        std::cerr << "returning best move: \n";
-        std::cerr << bestMove->to_string() << "\n";
+        //std::cerr << "returning best move: \n";
+        //std::cerr << bestMove->to_string() << "\n";
         return bestMove;
     }
 
