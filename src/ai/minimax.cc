@@ -129,6 +129,49 @@ namespace ai {
         return res;
     }
 
+    int AI::queenEval() {
+        int res = 0;
+
+        if (color_ == board::Color::WHITE) {
+
+            auto queen = myBoard->get_pieces().find(std::make_pair<board::PieceType, board::Color>(board::PieceType::QUEEN, board::Color::WHITE))->second;
+
+            if (!queen.empty() && queen.front()->position_.rank_get() == board::Rank::ONE) {
+                if (myBoard->occupied_by(color_, board::PieceType::QUEEN,
+                        board::Position(board::File::B, board::Rank::ONE)))
+                    res -= 25;
+                if (myBoard->occupied_by(color_, board::PieceType::QUEEN,
+                                         board::Position(board::File::C, board::Rank::ONE)))
+                    res -= 25;
+                if (myBoard->occupied_by(color_, board::PieceType::QUEEN,
+                                         board::Position(board::File::F, board::Rank::ONE)))
+                    res -= 25;
+                if (myBoard->occupied_by(color_, board::PieceType::QUEEN,
+                                         board::Position(board::File::G, board::Rank::ONE)))
+                    res -= 25;
+            }
+        } else
+        {
+            auto queen = myBoard->get_pieces().find(std::make_pair<board::PieceType, board::Color>(board::PieceType::QUEEN, board::Color::BLACK))->second;
+
+            if (!queen.empty() && queen.front()->position_.rank_get() == board::Rank::EIGHT) {
+                if (myBoard->occupied_by(color_, board::PieceType::QUEEN,
+                                         board::Position(board::File::B, board::Rank::EIGHT)))
+                    res += 25;
+                if (myBoard->occupied_by(color_, board::PieceType::QUEEN,
+                                         board::Position(board::File::C, board::Rank::EIGHT)))
+                    res += 25;
+                if (myBoard->occupied_by(color_, board::PieceType::QUEEN,
+                                         board::Position(board::File::F, board::Rank::EIGHT)))
+                    res += 25;
+                if (myBoard->occupied_by(color_, board::PieceType::QUEEN,
+                                         board::Position(board::File::G, board::Rank::EIGHT)))
+                    res += 25;
+            }
+        }
+        return res;
+    }
+
     int AI::bishopEval() {
         int res = 0;
         auto whiteBishops = myBoard->get_pieces().find(std::make_pair<board::PieceType, board::Color>(board::PieceType::BISHOP, board::Color::WHITE))->second;
