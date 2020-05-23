@@ -249,6 +249,7 @@ namespace ai {
     }
 
     std::optional<board::Move> AI::searchMove() {
+        std::cerr << "entered search move\n";
         double duration;
         clock_t start = clock();
 
@@ -258,8 +259,10 @@ namespace ai {
         std::optional<board::Move> bestMove;
 
         auto moves = myBoard->generate_legal_moves();
+        std::cerr << "found " << moves.size() << " legal moves\n";
 
         for (auto& move : moves) {
+            std::cerr << "evaluating move: " << move.to_string() << "\n";
             myBoard->do_move(move);
             auto value = minimax(depth_, false, -INFINITY, +INFINITY);
             myBoard->undo_move(move, true);
@@ -275,6 +278,8 @@ namespace ai {
         remaining_time_ -= duration;
         if (remaining_time_ <= 120)
             depth_ = 2;
+        std::cerr << "returning best move: \n";
+        std::cerr << bestMove->to_string() << "\n";
         return bestMove;
     }
 

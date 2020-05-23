@@ -72,6 +72,7 @@ namespace board {
 
 
     std::shared_ptr<Chessboard> Chessboard::parse_uci(std::string uci_position) {
+        std::cerr << "received position: " << uci_position << "\n";
         auto uci_string_stream = std::istringstream(uci_position);
         std::string s;
         uci_string_stream >> s;
@@ -109,9 +110,9 @@ namespace board {
             std::string move;
             while (uci_string_stream >> move) {
                 Move parsed_uci_move = board->parse_uci_move(move);
-                //std::cerr << "parsed move: " << parsed_uci_move.to_string() << "\n";
+                std::cerr << "parsed move: " << parsed_uci_move.to_string() << "\n";
                 board->do_move(parsed_uci_move);
-                //std::cerr << "did move: " << parsed_uci_move.to_string() << "\n";
+                std::cerr << "did move: " << parsed_uci_move.to_string() << "\n";
             }
             return board;
         }

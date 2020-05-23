@@ -99,7 +99,7 @@ namespace board {
 
     std::list<Move> Chessboard::generate_legal_moves(bool check_self_check) {
         std::list<Move> allMoves;
-
+        std::cerr << "[IN] generate_legal_moves on board: " + to_string() + "\n";
         //build the list of all "potential" moves, not accounting for OOB and blocked paths
         for (auto piece_set : pieces_) {
             if (piece_set.first.second == whose_turn_is_it()){
@@ -115,6 +115,7 @@ namespace board {
             }
 
         }
+        std::cerr << "[OUT] generate_legal_moves on board: " + to_string() + "\n";
         return allMoves;
     }
 

@@ -160,7 +160,7 @@ namespace listener {
 
             chess_ai.myBoard = board::Chessboard::parse_uci(board_str);
             if (chess_ai.myBoard == nullptr) {
-                //std::cerr << "could not parse board sent by UCI\n";
+                std::cerr << "could not parse board sent by UCI\n";
                 throw new std::runtime_error("bad board");
             }
             //std::cerr << "parsed board\n";
@@ -170,8 +170,9 @@ namespace listener {
 
             auto move = chess_ai.searchMove();
             if (!move.has_value()) {
+                std::cerr << "no valid move found\n";
                 throw new std::runtime_error(
-                        "uci sent position even though game is supposedly over.");
+                    "uci sent position even though game is supposedly over.");
             }
 
             //outputs best move to log file
