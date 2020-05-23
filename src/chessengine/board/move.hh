@@ -38,8 +38,10 @@ namespace board
         bool is_en_passant_;
 
         Move() : piece_(PieceType::PAWN), start_position_(), end_position_(),
-                promotion_(), is_capture_(false), is_check_(false), is_checkmate_(),
-                is_double_pawn_push_(false), is_king_castling_(false), is_queen_castling_(false), is_en_passant_(false) {
+                promotion_(), is_capture_(false), is_check_(false),
+                is_checkmate_(),
+                is_double_pawn_push_(false), is_king_castling_(false),
+                is_queen_castling_(false), is_en_passant_(false) {
                     //default, empty constructor
                 }
 
