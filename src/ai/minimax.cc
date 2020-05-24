@@ -382,7 +382,6 @@ namespace ai {
         //std::cerr << "entered search move\n";
         double duration;
         clock_t start = clock();
-
         color_ = myBoard->whose_turn_is_it();
 
         float bestValue = -INFINITY;
@@ -398,7 +397,7 @@ namespace ai {
             myBoard->do_move(move);
             auto value = minimax(depth_, false, -INFINITY, +INFINITY);
             myBoard->undo_move(move, true);
-            if (value > bestValue)
+            if (value > bestValue || bestValue == -INFINITY)
             {
                 bestValue = value;
                 //board::Move&& m = std::move(move);
